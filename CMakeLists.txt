@@ -22,6 +22,7 @@ add_executable(la64
 
     src/instruction/core.c
     src/instruction/data.c
+    src/instruction/io.c
 )
 
 target_include_directories(la64

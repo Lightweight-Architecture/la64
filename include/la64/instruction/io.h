@@ -22,21 +22,14 @@
  * SOFTWARE.
  */
 
-#include <la64/instruction/instruction.h>
-#include <la64/instruction/core.h>
+#ifndef LA64_INSTRUCTION_IO_H
+#define LA64_INSTRUCTION_IO_H
 
-void la64_op_hlt(la64_core_t *core)
-{
-    la64_instr_termcond(core->op.param_cnt != 0);
+#include <la64/core.h>
 
-    if(core->term == LA64_TERM_NONE)
-    {
-        core->term = LA64_TERM_HALT;
-    }
-}
+#define LA16_IO_PORT_SERIAL 0b0
 
-void la64_op_nop(la64_core_t *core)
-{
-    la64_instr_termcond(core->op.param_cnt != 0);
-    /* doing nothing */
-}
+void la64_op_in(la64_core_t *core);
+void la64_op_out(la64_core_t *core);
+
+#endif /* LA64_INSTRUCTION_IO_H */

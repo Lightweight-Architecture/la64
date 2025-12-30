@@ -41,7 +41,10 @@
 #define LA64_OPCODE_PUSH            0b00000101
 #define LA64_OPCODE_POP             0b00000110
 
-#define LA64_OPCODE_MAX             LA64_OPCODE_POP
+#define LA64_OPCODE_IN              0b00000111
+#define LA64_OPCODE_OUT             0b00001000
+
+#define LA64_OPCODE_MAX             LA64_OPCODE_OUT
 
 #pragma mark - parameter modes
 

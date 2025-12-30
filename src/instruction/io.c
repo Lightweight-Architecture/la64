@@ -22,52 +22,46 @@
  * SOFTWARE.
  */
 
-#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
+
 #include <la64/instruction/instruction.h>
-#include <la64/instruction/data.h>
-#include <la64/machine.h>
+#include <la64/instruction/io.h>
 
-void la64_op_mov(la64_core_t *core)
+void la64_op_in(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 2);
 
-    /* performing move */
-    *(core->op.param[0]) = *(core->op.param[1]);
+    switch(*(core->op.param[1]))
+    {
+        case LA16_IO_PORT_SERIAL:
+        {
+            struct termios oldt, newt;
+            tcgetattr(STDIN_FILENO, &oldt);
+            newt = oldt;
+            newt.c_lflag &= ~(ICANON | ECHO);
+            tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+            read(STDIN_FILENO, core->op.param[0], 1);
+            tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+            break;
+        }
+        default:
+            break;
+    }
 }
 
-void la64_op_swp(la64_core_t *core)
+void la64_op_out(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 2);
 
-    /* performing swap */
-    uint64_t param_backup = *(core->op.param[0]);
-    *(core->op.param[0]) = *(core->op.param[1]);
-    *(core->op.param[1]) = param_backup;
-}
-
-void la64_op_swpz(la64_core_t *core)
-{
-    la64_instr_termcond(core->op.param_cnt != 2);
-
-    /* performing zero out swap */
-    *(core->op.param[0]) = *(core->op.param[1]);
-    *(core->op.param[1]) = 0;
-}
-
-void la64_op_push(la64_core_t *core)
-{
-    la64_instr_termcond(core->op.param_cnt != 1);
-
-    /* performing push */
-    *((uint64_t*)&(core->machine->memory->memory[*(core->sp)])) = *(core->op.param[0]);
-    core->sp -= 8;
-}
-
-void la64_op_pop(la64_core_t *core)
-{
-    la64_instr_termcond(core->op.param_cnt != 1);
-
-    /* performing pop */
-    core->sp += 8;
-    *(core->op.param[0]) = *((uint64_t*)&(core->machine->memory->memory[*(core->sp)]));
+    switch(*(core->op.param[0]))
+    {
+        case LA16_IO_PORT_SERIAL:
+        {
+            write(STDOUT_FILENO, core->op.param[1], 1);
+            break;
+        }
+        default:
+            break;
+    }
 }

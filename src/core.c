@@ -34,6 +34,7 @@
 
 #include <la64/instruction/core.h>
 #include <la64/instruction/data.h>
+#include <la64/instruction/io.h>
 
 #include <lautils/bitwalker.h>
 
@@ -47,7 +48,11 @@ la64_opfunc_t opfunc_table[LA64_OPCODE_MAX + 1] = {
     la64_op_swp,
     la64_op_swpz,
     la64_op_push,
-    la64_op_pop
+    la64_op_pop,
+
+    /* io operations */
+    la64_op_in,
+    la64_op_out
 };
 
 la64_core_t *la64_core_alloc()
@@ -139,7 +144,7 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
 
     /* finding out how many steps the the program counter has to jump */
     core->op.ilen = bitwalker_bytes_used(&bw);
-    
+
     return;
 }
 

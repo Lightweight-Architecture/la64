@@ -22,21 +22,9 @@
  * SOFTWARE.
  */
 
-#include <la64/instruction/instruction.h>
-#include <la64/instruction/core.h>
+#ifndef LA64_INSTRUCTION_H
+#define LA64_INSTRUCTION_H
 
-void la64_op_hlt(la64_core_t *core)
-{
-    la64_instr_termcond(core->op.param_cnt != 0);
+#define la64_instr_termcond(case) if(case) { core->term == LA64_TERM_BAD_ACCESS; };
 
-    if(core->term == LA64_TERM_NONE)
-    {
-        core->term = LA64_TERM_HALT;
-    }
-}
-
-void la64_op_nop(la64_core_t *core)
-{
-    la64_instr_termcond(core->op.param_cnt != 0);
-    /* doing nothing */
-}
+#endif /* LA64_INSTRUCTION_H */
