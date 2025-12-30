@@ -52,7 +52,24 @@
 #define LA64_OPCODE_IN              0b00001111
 #define LA64_OPCODE_OUT             0b00010000
 
-#define LA64_OPCODE_MAX             LA64_OPCODE_OUT
+#define LA64_OPCODE_ADD             0b00010001
+#define LA64_OPCODE_SUB             0b00010010
+#define LA64_OPCODE_MUL             0b00010011
+#define LA64_OPCODE_DIV             0b00010100
+#define LA64_OPCODE_IDIV            0b00010101
+#define LA64_OPCODE_MOD             0b00010110
+#define LA64_OPCODE_INC             0b00010111
+#define LA64_OPCODE_DEC             0b00011000
+#define LA64_OPCODE_NOT             0b00011001
+#define LA64_OPCODE_AND             0b00011010
+#define LA64_OPCODE_OR              0b00011011
+#define LA64_OPCODE_XOR             0b00011100
+#define LA64_OPCODE_SHR             0b00011101
+#define LA64_OPCODE_SHL             0b00011110
+#define LA64_OPCODE_ROR             0b00011111
+#define LA64_OPCODE_ROL             0b00100000
+
+#define LA64_OPCODE_MAX             LA64_OPCODE_ROL
 
 #pragma mark - parameter modes
 

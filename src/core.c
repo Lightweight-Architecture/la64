@@ -35,6 +35,7 @@
 #include <la64/instruction/core.h>
 #include <la64/instruction/data.h>
 #include <la64/instruction/io.h>
+#include <la64/instruction/alu.h>
 
 #include <lautils/bitwalker.h>
 
@@ -60,7 +61,25 @@ la64_opfunc_t opfunc_table[LA64_OPCODE_MAX + 1] = {
 
     /* io operations */
     la64_op_in,
-    la64_op_out
+    la64_op_out,
+
+    /* arithmetic operations */
+    la64_op_add,
+    la64_op_sub,
+    la64_op_mul,
+    la64_op_div,
+    la64_op_idiv,
+    la64_op_mod,
+    la64_op_inc,
+    la64_op_dec,
+    la64_op_not,
+    la64_op_and,
+    la64_op_or,
+    la64_op_xor,
+    la64_op_shr,
+    la64_op_shl,
+    la64_op_ror,
+    la64_op_rol
 };
 
 la64_core_t *la64_core_alloc()
