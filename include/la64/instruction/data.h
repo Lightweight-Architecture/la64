@@ -32,5 +32,13 @@ void la64_op_swp(la64_core_t *core);
 void la64_op_swpz(la64_core_t *core);
 void la64_op_push(la64_core_t *core);
 void la64_op_pop(la64_core_t *core);
+void la64_op_ldb(la64_core_t *core);
+void la64_op_ldw(la64_core_t *core);
+void la64_op_ldd(la64_core_t *core);
+void la64_op_ldq(la64_core_t *core);
+void la64_op_stb(la64_core_t *core);
+void la64_op_stw(la64_core_t *core);
+void la64_op_std(la64_core_t *core);
+void la64_op_stq(la64_core_t *core);
 
 #endif /* LA64_INSTRUCTION_DATA_H */

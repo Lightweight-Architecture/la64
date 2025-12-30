@@ -49,6 +49,14 @@ la64_opfunc_t opfunc_table[LA64_OPCODE_MAX + 1] = {
     la64_op_swpz,
     la64_op_push,
     la64_op_pop,
+    la64_op_ldb,
+    la64_op_ldw,
+    la64_op_ldd,
+    la64_op_ldq,
+    la64_op_stb,
+    la64_op_stw,
+    la64_op_std,
+    la64_op_stq,
 
     /* io operations */
     la64_op_in,

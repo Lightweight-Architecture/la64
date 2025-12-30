@@ -40,9 +40,17 @@
 #define LA64_OPCODE_SWPZ            0b00000100
 #define LA64_OPCODE_PUSH            0b00000101
 #define LA64_OPCODE_POP             0b00000110
+#define LA64_OPCODE_LDB             0b00000111
+#define LA64_OPCODE_LDW             0b00001000
+#define LA64_OPCODE_LDD             0b00001001
+#define LA64_OPCODE_LDQ             0b00001010
+#define LA64_OPCODE_STB             0b00001011
+#define LA64_OPCODE_STW             0b00001100
+#define LA64_OPCODE_STD             0b00001101
+#define LA64_OPCODE_STQ             0b00001110
 
-#define LA64_OPCODE_IN              0b00000111
-#define LA64_OPCODE_OUT             0b00001000
+#define LA64_OPCODE_IN              0b00001111
+#define LA64_OPCODE_OUT             0b00010000
 
 #define LA64_OPCODE_MAX             LA64_OPCODE_OUT
 

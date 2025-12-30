@@ -71,3 +71,59 @@ void la64_op_pop(la64_core_t *core)
     core->sp += 8;
     *(core->op.param[0]) = *((uint64_t*)&(core->machine->memory->memory[*(core->sp)]));
 }
+
+void la64_op_ldb(la64_core_t *core)
+{
+    la64_instr_termcond(core->op.param_cnt != 2);
+    
+    *(core->op.param[0]) = *((uint8_t*)&(core->machine->memory->memory[*(core->op.param[1])]));
+}
+
+void la64_op_ldw(la64_core_t *core)
+{
+    la64_instr_termcond(core->op.param_cnt != 2);
+
+    *(core->op.param[0]) = *((uint16_t*)&(core->machine->memory->memory[*(core->op.param[1])]));
+}
+
+void la64_op_ldd(la64_core_t *core)
+{
+    la64_instr_termcond(core->op.param_cnt != 2);
+
+    *(core->op.param[0]) = *((uint32_t*)&(core->machine->memory->memory[*(core->op.param[1])]));
+}
+
+void la64_op_ldq(la64_core_t *core)
+{
+    la64_instr_termcond(core->op.param_cnt != 2);
+
+    *(core->op.param[0]) = *((uint64_t*)&(core->machine->memory->memory[*(core->op.param[1])]));
+}
+
+void la64_op_stb(la64_core_t *core)
+{
+    la64_instr_termcond(core->op.param_cnt != 2);
+
+    *((uint8_t*)&(core->machine->memory->memory[*(core->op.param[0])])) = (uint8_t)*(core->op.param[1]);
+}
+
+void la64_op_stw(la64_core_t *core)
+{
+    la64_instr_termcond(core->op.param_cnt != 2);
+
+    *((uint16_t*)&(core->machine->memory->memory[*(core->op.param[0])])) = (uint16_t)*(core->op.param[1]);
+}
+
+void la64_op_std(la64_core_t *core)
+{
+    la64_instr_termcond(core->op.param_cnt != 2);
+
+    *((uint32_t*)&(core->machine->memory->memory[*(core->op.param[0])])) = (uint32_t)*(core->op.param[1]);
+}
+
+void la64_op_stq(la64_core_t *core)
+{
+    la64_instr_termcond(core->op.param_cnt != 2);
+
+    *((uint64_t*)&(core->machine->memory->memory[*(core->op.param[0])])) = (uint64_t)*(core->op.param[1]);
+}
