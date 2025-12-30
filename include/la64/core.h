@@ -34,17 +34,19 @@
 #define LA64_OPCODE_HLT             0b00000000
 #define LA64_OPCODE_NOP             0b00000001
 
-/* io operations */
-#define LA64_OPCODE_MAX             LA64_OPCODE_NOP
+/* data operations */
+#define LA64_OPCODE_MOV             0b00000010
+
+#define LA64_OPCODE_MAX             LA64_OPCODE_MOV
 
 #pragma mark - parameter modes
 
-#define LA16_PARAMETER_CODING_INSTR_END 0b000
-#define LA16_PARAMETER_CODING_REG       0b001
-#define LA16_PARAMETER_CODING_IMM8      0b010
-#define LA16_PARAMETER_CODING_IMM16     0b011
-#define LA16_PARAMETER_CODING_IMM32     0b100
-#define LA16_PARAMETER_CODING_IMM64     0b101
+#define LA64_PARAMETER_CODING_INSTR_END 0b000
+#define LA64_PARAMETER_CODING_REG       0b001
+#define LA64_PARAMETER_CODING_IMM8      0b010
+#define LA64_PARAMETER_CODING_IMM16     0b011
+#define LA64_PARAMETER_CODING_IMM32     0b100
+#define LA64_PARAMETER_CODING_IMM64     0b101
 /* leaving 0x110/0x111 open for later additions */
 
 #pragma mark - register
@@ -93,16 +95,19 @@
 
 #pragma mark - termination flags
 
-#define LA64_TERM_FLAG_NONE         0b00
-#define LA64_TERM_FLAG_HALT         0b01
-#define LA64_TERM_FLAG_BAD_ACCESS   0b10
-#define LA64_TERM_FLAG_PERMISSION   0b11
+#define LA64_TERM_NONE              0b000
+#define LA64_TERM_HALT              0b001
+#define LA64_TERM_BAD_ACCESS        0b010
+#define LA64_TERM_PERMISSION        0b011
+#define LA64_TERM_BAD_INSTRUCTION   0b100
 
 typedef struct la64_machine la64_machine_t;
 
 typedef struct {
+    uint8_t ilen;
     uint8_t op;
     uint64_t imm[32];
+    uint8_t param_cnt;
     uint64_t *param[32];
 } la64_operation_t;
 

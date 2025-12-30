@@ -23,17 +23,9 @@
  */
 
 #include <stdio.h>
-#include <la64/instruction/core.h>
+#include <la64/instruction/data.h>
 
-void la64_op_hlt(la64_core_t *core)
+void la64_op_mov(la64_core_t *core)
 {
-    if(core->term == LA64_TERM_NONE)
-    {
-        core->term = LA64_TERM_HALT;
-    }
-}
-
-void la64_op_nop(la64_core_t *core)
-{
-    /* doing nothing */
+    /* mov to be implemented */
 }

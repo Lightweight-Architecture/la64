@@ -22,18 +22,11 @@
  * SOFTWARE.
  */
 
-#include <stdio.h>
-#include <la64/instruction/core.h>
+#ifndef LA64_INSTRUCTION_DATA_H
+#define LA64_INSTRUCTION_DATA_H
 
-void la64_op_hlt(la64_core_t *core)
-{
-    if(core->term == LA64_TERM_NONE)
-    {
-        core->term = LA64_TERM_HALT;
-    }
-}
+#include <la64/core.h>
 
-void la64_op_nop(la64_core_t *core)
-{
-    /* doing nothing */
-}
+void la64_op_mov(la64_core_t *core);
+
+#endif /* LA64_INSTRUCTION_DATA_H */

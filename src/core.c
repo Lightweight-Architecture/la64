@@ -31,7 +31,9 @@
 #include <la64/register.h>
 #include <la64/memory.h>
 #include <la64/machine.h>
+
 #include <la64/instruction/core.h>
+#include <la64/instruction/data.h>
 
 #include <lautils/bitwalker.h>
 
@@ -39,6 +41,9 @@ la64_opfunc_t opfunc_table[LA64_OPCODE_MAX + 1] = {
     /* core operations */
     la64_op_hlt,
     la64_op_nop,
+
+    /* data operations */
+    la64_op_mov
 };
 
 la64_core_t *la64_core_alloc()
@@ -76,7 +81,52 @@ void la64_core_dealloc(la64_core_t *core)
 static void la64_core_decode_instruction_at_pc(la64_core_t *core)
 {
     /* reset operation structure */
-    //memset(&(core->op), 0, sizeof(la16_operation_t));
+    memset(&(core->op), 0, sizeof(la64_operation_t));
+
+    /* preparing bitwalker */
+    bitwalker_t bw;
+    bitwalker_init_read(&bw, &(core->machine->memory->memory[*(core->pc)]), 32, BW_LITTLE_ENDIAN);
+
+    /* getting opcode */
+    core->op.op = (uint8_t)bitwalker_read(&bw, 8);
+    printf("\ndecoder] opcode: 0x%x\n", core->op.op);
+    printf("[decoder] parsing parameters\n");
+
+    /* parsing loop */
+    bool reached_end = false;
+    while(!reached_end)
+    {
+        /* next mode */
+        uint8_t mode = (uint8_t)bitwalker_read(&bw, 3);
+
+        /* switch through modes */
+        switch(mode)
+        {
+            case LA64_PARAMETER_CODING_INSTR_END:
+                printf("[decoder] end\n");
+                reached_end = true;
+                break;
+            case LA64_PARAMETER_CODING_REG:
+                printf("[decoder] reg param!\n");
+                core->op.param[core->op.param_cnt++] = core->rl[(uint8_t)bitwalker_read(&bw, 5)];
+                break;
+            case LA64_PARAMETER_CODING_IMM8:
+                printf("[decoder] imm8 param!\n");
+                core->op.imm[core->op.param_cnt] = (uint8_t)bitwalker_read(&bw, 8);
+                core->op.param[core->op.param_cnt] = &(core->op.imm[core->op.param_cnt]);
+                core->op.param_cnt++;
+                break;
+            default:
+                core->term = LA64_TERM_BAD_INSTRUCTION;
+                reached_end = true;
+                return;
+        }
+    }
+
+    /* finding out how many steps the the program counter has to jump */
+    core->op.ilen = bitwalker_bytes_used(&bw);
+
+    printf("[decoder] instruction size: %hhu\n", core->op.ilen);
 
     /* preparing real address for memory */
     //unsigned short pc_real_addr = *(core->pc);
@@ -181,28 +231,33 @@ static void *la64_core_execute_thread(void *arg)
 
     // Set runs flag
     core->runs = 0b00000001;
-    core->term = LA64_TERM_FLAG_NONE;
+    core->term = LA64_TERM_NONE;
 
     while(1)
     {
         switch(core->term)
         {
-            case LA64_TERM_FLAG_NONE:
+            case LA64_TERM_NONE:
                 break;
-            case LA64_TERM_FLAG_HALT:
-                printf("[exec] halted at 0x%llx\n", *(core->pc));
+            case LA64_TERM_HALT:
+                printf("[exec] halt @ 0x%llx\n", *(core->pc));
                 core->runs = 0b00000000;
                 return NULL;
-            case LA64_TERM_FLAG_BAD_ACCESS:
-                printf("[exec] bad access at 0x%llx\n", *(core->pc));
+            case LA64_TERM_BAD_ACCESS:
+                printf("[exec] bad access @ 0x%llx\n", *(core->pc));
                 core->runs = 0b00000000;
                 return NULL;
-            case LA64_TERM_FLAG_PERMISSION:
-                printf("[exec] permission denied at 0x%llx\n", *(core->pc));
+            case LA64_TERM_PERMISSION:
+                printf("[exec] permission denied @ 0x%llx\n", *(core->pc));
+                core->runs = 0b00000000;
+                return NULL;
+            case LA64_TERM_BAD_INSTRUCTION:
+bad_instruction_shortcut:
+                printf("[exec] bad instruction @ 0x%llx\n", *(core->pc));
                 core->runs = 0b00000000;
                 return NULL;
             default:
-                printf("[exec] unknown exception at 0x%llx\n", *(core->pc));
+                printf("[exec] unknown exception @ 0x%llx\n", *(core->pc));
                 break;
         }
 
@@ -214,11 +269,10 @@ static void *la64_core_execute_thread(void *arg)
         }
         else
         {
-            printf("[exec] illegal opcode: 0x%x\n", core->op.op);
-            opfunc_table[LA64_OPCODE_HLT](core);
+            goto bad_instruction_shortcut;
         }
 
-        *(core->pc) += 4;
+        *(core->pc) += core->op.ilen;
     }
 
     core->runs = 0b00000000;
