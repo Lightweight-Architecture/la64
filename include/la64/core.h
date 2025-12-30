@@ -38,8 +38,10 @@
 #define LA64_OPCODE_MOV             0b00000010
 #define LA64_OPCODE_SWP             0b00000011
 #define LA64_OPCODE_SWPZ            0b00000100
+#define LA64_OPCODE_PUSH            0b00000101
+#define LA64_OPCODE_POP             0b00000110
 
-#define LA64_OPCODE_MAX             LA64_OPCODE_SWPZ
+#define LA64_OPCODE_MAX             LA64_OPCODE_POP
 
 #pragma mark - parameter modes
 

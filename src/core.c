@@ -45,7 +45,9 @@ la64_opfunc_t opfunc_table[LA64_OPCODE_MAX + 1] = {
     /* data operations */
     la64_op_mov,
     la64_op_swp,
-    la64_op_swpz
+    la64_op_swpz,
+    la64_op_push,
+    la64_op_pop
 };
 
 la64_core_t *la64_core_alloc()

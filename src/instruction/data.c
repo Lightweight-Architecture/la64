@@ -24,6 +24,7 @@
 
 #include <stdio.h>
 #include <la64/instruction/data.h>
+#include <la64/machine.h>
 
 void la64_op_mov(la64_core_t *core)
 {
@@ -62,4 +63,30 @@ void la64_op_swpz(la64_core_t *core)
     /* performing zero out swap */
     *(core->op.param[0]) = *(core->op.param[1]);
     *(core->op.param[1]) = 0;
+}
+
+void la64_op_push(la64_core_t *core)
+{
+    /* checking if parameter are sufficient */
+    if(core->op.param_cnt < 1 || core->op.param_cnt > 1)
+    {
+        core->term = LA64_TERM_BAD_INSTRUCTION;
+    }
+
+    /* performing push */
+    *((uint64_t*)&(core->machine->memory->memory[*(core->sp)])) = *(core->op.param[0]);
+    core->sp -= 8;
+}
+
+void la64_op_pop(la64_core_t *core)
+{
+    /* checking if parameter are sufficient */
+    if(core->op.param_cnt < 1 || core->op.param_cnt > 1)
+    {
+        core->term = LA64_TERM_BAD_INSTRUCTION;
+    }
+
+    /* performing pop */
+    core->sp += 8;
+    *(core->op.param[0]) = *((uint64_t*)&(core->machine->memory->memory[*(core->sp)]));
 }
