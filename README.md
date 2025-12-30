@@ -1,2 +1,2 @@
-# la64
-lightweight 64bit architecture
+# la16
+16bit lightweight architecture
