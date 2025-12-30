@@ -36,6 +36,7 @@
 #include <la64/instruction/data.h>
 #include <la64/instruction/io.h>
 #include <la64/instruction/alu.h>
+#include <la64/instruction/ctrl.h>
 
 #include <lautils/bitwalker.h>
 
@@ -79,7 +80,21 @@ la64_opfunc_t opfunc_table[LA64_OPCODE_MAX + 1] = {
     la64_op_shr,
     la64_op_shl,
     la64_op_ror,
-    la64_op_rol
+    la64_op_rol,
+    
+    /* control flow operations */
+    la64_op_jmp,
+    la64_op_cmp,
+    la64_op_je,
+    la64_op_jne,
+    la64_op_jlt,
+    la64_op_jgt,
+    la64_op_jle,
+    la64_op_jge,
+    la64_op_jz,
+    la64_op_jnz,
+    la64_op_bl,
+    la64_op_ret
 };
 
 la64_core_t *la64_core_alloc()

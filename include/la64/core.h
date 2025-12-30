@@ -69,7 +69,20 @@
 #define LA64_OPCODE_ROR             0b00011111
 #define LA64_OPCODE_ROL             0b00100000
 
-#define LA64_OPCODE_MAX             LA64_OPCODE_ROL
+#define LA64_OPCODE_JMP             0b00100001
+#define LA64_OPCODE_CMP             0b00100010
+#define LA64_OPCODE_JE              0b00100011
+#define LA64_OPCODE_JNE             0b00100100
+#define LA64_OPCODE_JLT             0b00100101
+#define LA64_OPCODE_JGT             0b00100110
+#define LA64_OPCODE_JLE             0b00100111
+#define LA64_OPCODE_JGE             0b00101000
+#define LA64_OPCODE_JZ              0b00101001
+#define LA64_OPCODE_JNZ             0b00101010
+#define LA64_OPCODE_BL              0b00101011
+#define LA64_OPCODE_RET             0b00101100
+
+#define LA64_OPCODE_MAX             LA64_OPCODE_RET
 
 #pragma mark - parameter modes
 

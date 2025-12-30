@@ -1,0 +1,43 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2024 cr4zyengineer
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+#ifndef LA64_INSTRUCTION_CTRL_H
+#define LA64_INSTRUCTION_CTRL_H
+
+#include <la64/core.h>
+
+void la64_op_jmp(la64_core_t *core);
+void la64_op_cmp(la64_core_t *core);
+void la64_op_je(la64_core_t *core);
+void la64_op_jne(la64_core_t *core);
+void la64_op_jlt(la64_core_t *core);
+void la64_op_jgt(la64_core_t *core);
+void la64_op_jle(la64_core_t *core);
+void la64_op_jge(la64_core_t *core);
+void la64_op_jz(la64_core_t *core);
+void la64_op_jnz(la64_core_t *core);
+void la64_op_bl(la64_core_t *core);
+void la64_op_ret(la64_core_t *core);
+
+#endif /* LA64_INSTRUCTION_CTRL_H */
