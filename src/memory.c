@@ -69,7 +69,7 @@ void la64_memory_dealloc(la64_memory_t *memory)
     }
 
     /* release that shit */
-    free(memory->memory);
+    munmap(memory->memory, memory->memory_size);
     free(memory);
 }
 
