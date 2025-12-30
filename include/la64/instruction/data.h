@@ -28,5 +28,7 @@
 #include <la64/core.h>
 
 void la64_op_mov(la64_core_t *core);
+void la64_op_swp(la64_core_t *core);
+void la64_op_swpz(la64_core_t *core);
 
 #endif /* LA64_INSTRUCTION_DATA_H */

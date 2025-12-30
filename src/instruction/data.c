@@ -36,3 +36,30 @@ void la64_op_mov(la64_core_t *core)
     /* performing move */
     *(core->op.param[0]) = *(core->op.param[1]);
 }
+
+void la64_op_swp(la64_core_t *core)
+{
+    /* checking if parameter are sufficient */
+    if(core->op.param_cnt < 2 || core->op.param_cnt > 2)
+    {
+        core->term = LA64_TERM_BAD_INSTRUCTION;
+    }
+
+    /* performing swap */
+    uint64_t param_backup = *(core->op.param[0]);
+    *(core->op.param[0]) = *(core->op.param[1]);
+    *(core->op.param[1]) = param_backup;
+}
+
+void la64_op_swpz(la64_core_t *core)
+{
+    /* checking if parameter are sufficient */
+    if(core->op.param_cnt < 2 || core->op.param_cnt > 2)
+    {
+        core->term = LA64_TERM_BAD_INSTRUCTION;
+    }
+
+    /* performing zero out swap */
+    *(core->op.param[0]) = *(core->op.param[1]);
+    *(core->op.param[1]) = 0;
+}

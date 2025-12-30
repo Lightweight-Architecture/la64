@@ -43,7 +43,9 @@ la64_opfunc_t opfunc_table[LA64_OPCODE_MAX + 1] = {
     la64_op_nop,
 
     /* data operations */
-    la64_op_mov
+    la64_op_mov,
+    la64_op_swp,
+    la64_op_swpz
 };
 
 la64_core_t *la64_core_alloc()
@@ -129,7 +131,7 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
                 core->op.param_cnt++;
                 break;
             case LA64_PARAMETER_CODING_IMM64:
-                printf("[decoder] imm16 param!\n");
+                printf("[decoder] imm64 param!\n");
                 core->op.imm[core->op.param_cnt] = (uint64_t)bitwalker_read(&bw, 64);
                 core->op.param[core->op.param_cnt] = &(core->op.imm[core->op.param_cnt]);
                 core->op.param_cnt++;

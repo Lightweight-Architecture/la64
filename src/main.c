@@ -62,8 +62,8 @@ void la64_insert_mov(bitwalker_t *bw)
     bitwalker_write(bw, LA64_REGISTER_R0, 5);
 
     /* write intermediate 8 parameter */
-    bitwalker_write(bw, LA64_PARAMETER_CODING_IMM8, 3);
-    bitwalker_write(bw, 27, 8);
+    bitwalker_write(bw, LA64_PARAMETER_CODING_IMM16, 3);
+    bitwalker_write(bw, 0xFFFF, 16);
     
     /* write end */
     bitwalker_write(bw, LA64_PARAMETER_CODING_INSTR_END, 3);

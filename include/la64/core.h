@@ -36,8 +36,10 @@
 
 /* data operations */
 #define LA64_OPCODE_MOV             0b00000010
+#define LA64_OPCODE_SWP             0b00000011
+#define LA64_OPCODE_SWPZ            0b00000100
 
-#define LA64_OPCODE_MAX             LA64_OPCODE_MOV
+#define LA64_OPCODE_MAX             LA64_OPCODE_SWPZ
 
 #pragma mark - parameter modes
 
