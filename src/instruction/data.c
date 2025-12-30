@@ -27,5 +27,12 @@
 
 void la64_op_mov(la64_core_t *core)
 {
-    /* mov to be implemented */
+    /* checking if parameter are sufficient */
+    if(core->op.param_cnt < 2 || core->op.param_cnt > 2)
+    {
+        core->term = LA64_TERM_BAD_INSTRUCTION;
+    }
+
+    /* performing move */
+    *(core->op.param[0]) = *(core->op.param[1]);
 }

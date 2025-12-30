@@ -116,6 +116,24 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
                 core->op.param[core->op.param_cnt] = &(core->op.imm[core->op.param_cnt]);
                 core->op.param_cnt++;
                 break;
+            case LA64_PARAMETER_CODING_IMM16:
+                printf("[decoder] imm16 param!\n");
+                core->op.imm[core->op.param_cnt] = (uint16_t)bitwalker_read(&bw, 16);
+                core->op.param[core->op.param_cnt] = &(core->op.imm[core->op.param_cnt]);
+                core->op.param_cnt++;
+                break;
+            case LA64_PARAMETER_CODING_IMM32:
+                printf("[decoder] imm32 param!\n");
+                core->op.imm[core->op.param_cnt] = (uint32_t)bitwalker_read(&bw, 32);
+                core->op.param[core->op.param_cnt] = &(core->op.imm[core->op.param_cnt]);
+                core->op.param_cnt++;
+                break;
+            case LA64_PARAMETER_CODING_IMM64:
+                printf("[decoder] imm16 param!\n");
+                core->op.imm[core->op.param_cnt] = (uint64_t)bitwalker_read(&bw, 64);
+                core->op.param[core->op.param_cnt] = &(core->op.imm[core->op.param_cnt]);
+                core->op.param_cnt++;
+                break;
             default:
                 core->term = LA64_TERM_BAD_INSTRUCTION;
                 reached_end = true;
