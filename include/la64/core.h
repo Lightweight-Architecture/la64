@@ -49,9 +49,11 @@
 #define LA64_OPCODE_STD             0b00001101
 #define LA64_OPCODE_STQ             0b00001110
 
+/* io operations */
 #define LA64_OPCODE_IN              0b00001111
 #define LA64_OPCODE_OUT             0b00010000
 
+/* alu operations */
 #define LA64_OPCODE_ADD             0b00010001
 #define LA64_OPCODE_SUB             0b00010010
 #define LA64_OPCODE_MUL             0b00010011
@@ -69,6 +71,7 @@
 #define LA64_OPCODE_ROR             0b00011111
 #define LA64_OPCODE_ROL             0b00100000
 
+/* control flow operations */
 #define LA64_OPCODE_JMP             0b00100001
 #define LA64_OPCODE_CMP             0b00100010
 #define LA64_OPCODE_JE              0b00100011
