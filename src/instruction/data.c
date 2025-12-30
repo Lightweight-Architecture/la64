@@ -29,7 +29,7 @@
 void la64_op_mov(la64_core_t *core)
 {
     /* checking if parameter are sufficient */
-    if(core->op.param_cnt < 2 || core->op.param_cnt > 2)
+    if(core->op.param_cnt != 2)
     {
         core->term = LA64_TERM_BAD_INSTRUCTION;
     }
@@ -41,7 +41,7 @@ void la64_op_mov(la64_core_t *core)
 void la64_op_swp(la64_core_t *core)
 {
     /* checking if parameter are sufficient */
-    if(core->op.param_cnt < 2 || core->op.param_cnt > 2)
+    if(core->op.param_cnt != 2)
     {
         core->term = LA64_TERM_BAD_INSTRUCTION;
     }
@@ -55,7 +55,7 @@ void la64_op_swp(la64_core_t *core)
 void la64_op_swpz(la64_core_t *core)
 {
     /* checking if parameter are sufficient */
-    if(core->op.param_cnt < 2 || core->op.param_cnt > 2)
+    if(core->op.param_cnt != 2)
     {
         core->term = LA64_TERM_BAD_INSTRUCTION;
     }
@@ -68,7 +68,7 @@ void la64_op_swpz(la64_core_t *core)
 void la64_op_push(la64_core_t *core)
 {
     /* checking if parameter are sufficient */
-    if(core->op.param_cnt < 1 || core->op.param_cnt > 1)
+    if(core->op.param_cnt != 1)
     {
         core->term = LA64_TERM_BAD_INSTRUCTION;
     }
@@ -81,7 +81,7 @@ void la64_op_push(la64_core_t *core)
 void la64_op_pop(la64_core_t *core)
 {
     /* checking if parameter are sufficient */
-    if(core->op.param_cnt < 1 || core->op.param_cnt > 1)
+    if(core->op.param_cnt != 1)
     {
         core->term = LA64_TERM_BAD_INSTRUCTION;
     }

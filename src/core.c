@@ -93,8 +93,6 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
 
     /* getting opcode */
     core->op.op = (uint8_t)bitwalker_read(&bw, 8);
-    printf("\ndecoder] opcode: 0x%x\n", core->op.op);
-    printf("[decoder] parsing parameters\n");
 
     /* parsing loop */
     bool reached_end = false;
@@ -107,33 +105,27 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
         switch(mode)
         {
             case LA64_PARAMETER_CODING_INSTR_END:
-                printf("[decoder] end\n");
                 reached_end = true;
                 break;
             case LA64_PARAMETER_CODING_REG:
-                printf("[decoder] reg param!\n");
                 core->op.param[core->op.param_cnt++] = core->rl[(uint8_t)bitwalker_read(&bw, 5)];
                 break;
             case LA64_PARAMETER_CODING_IMM8:
-                printf("[decoder] imm8 param!\n");
                 core->op.imm[core->op.param_cnt] = (uint8_t)bitwalker_read(&bw, 8);
                 core->op.param[core->op.param_cnt] = &(core->op.imm[core->op.param_cnt]);
                 core->op.param_cnt++;
                 break;
             case LA64_PARAMETER_CODING_IMM16:
-                printf("[decoder] imm16 param!\n");
                 core->op.imm[core->op.param_cnt] = (uint16_t)bitwalker_read(&bw, 16);
                 core->op.param[core->op.param_cnt] = &(core->op.imm[core->op.param_cnt]);
                 core->op.param_cnt++;
                 break;
             case LA64_PARAMETER_CODING_IMM32:
-                printf("[decoder] imm32 param!\n");
                 core->op.imm[core->op.param_cnt] = (uint32_t)bitwalker_read(&bw, 32);
                 core->op.param[core->op.param_cnt] = &(core->op.imm[core->op.param_cnt]);
                 core->op.param_cnt++;
                 break;
             case LA64_PARAMETER_CODING_IMM64:
-                printf("[decoder] imm64 param!\n");
                 core->op.imm[core->op.param_cnt] = (uint64_t)bitwalker_read(&bw, 64);
                 core->op.param[core->op.param_cnt] = &(core->op.imm[core->op.param_cnt]);
                 core->op.param_cnt++;
@@ -147,96 +139,7 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
 
     /* finding out how many steps the the program counter has to jump */
     core->op.ilen = bitwalker_bytes_used(&bw);
-
-    printf("[decoder] instruction size: %hhu\n", core->op.ilen);
-
-    /* preparing real address for memory */
-    //unsigned short pc_real_addr = *(core->pc);
-
-    /* using la16 memory page protection access */
-    /*if(!la16_mpp_access(core, &pc_real_addr, LA16_PAGEU_FLAG_EXEC, 2))
-    {*/
-        /* setting operation to halt */
-        /*core->op.op = LA16_OPCODE_HLT;*/
-
-        /* setting termination flag to bad access */
-        /*core->term = LA16_TERM_FLAG_BAD_ACCESS;
-        return;
-    }*/
-
-    /* initilize */
-    /*bitwalker_t bw;
-    bitwalker_init_read(&bw, &(core->machine->memory->memory[pc_real_addr]), sizeof(unsigned int), BW_LITTLE_ENDIAN);
-    */
-    /* setting opcode according to instruction */
-    /*core->op.op = (uint8_t)bitwalker_read(&bw, 8);
-    */
-    /* extracting mode */
-    /*unsigned char mode = (uint8_t)bitwalker_read(&bw, 3);
-    */
-    /* setting parameter to intermediate */
-    /*core->op.param[0] = &(core->op.imm[0]);
-    core->op.param[1] = &(core->op.imm[1]);
-    */
-    /* handling parameter mode */
-    /*switch(mode)
-    {
-        case LA16_PARAMETER_CODING_COMBINATION_REG:
-        {
-            core->op.reg[0] = (uint8_t)bitwalker_read(&bw, 5);
-            core->op.param[0] = core->rl[core->op.reg[0]];
-            goto out_res_a_check;
-        }
-        case LA16_PARAMETER_CODING_COMBINATION_REG_REG:
-        {
-            core->op.reg[0] = (uint8_t)bitwalker_read(&bw, 5);
-            core->op.reg[1] = (uint8_t)bitwalker_read(&bw, 5);
-            core->op.param[0] = core->rl[core->op.reg[0]];
-            core->op.param[1] = core->rl[core->op.reg[1]];
-            goto out_res_a_check;
-        }
-        case LA16_PARAMETER_CODING_COMBINATION_IMM16:
-        {
-            core->op.imm[0] = (uint16_t)bitwalker_read(&bw, 16);
-            break;
-        }
-        case LA16_PARAMETER_CODING_COMBINATION_IMM16_REG:
-        {
-            core->op.imm[0] = (uint16_t)bitwalker_read(&bw, 16);
-            core->op.reg[0] = (uint8_t)bitwalker_read(&bw, 5);
-            core->op.param[1] = core->rl[core->op.reg[0]];
-            goto out_res_a_check;
-        }
-        case LA16_PARAMETER_CODING_COMBINATION_REG_IMM16:
-        {
-            core->op.reg[0] = (uint8_t)bitwalker_read(&bw, 5);
-            core->op.param[0] = core->rl[core->op.reg[0]];
-            core->op.imm[1] = (uint16_t)bitwalker_read(&bw, 16);
-            goto out_res_a_check;
-        }
-        case LA16_PARAMETER_CODING_COMBINATION_IMM8_IMM8:
-        {
-            core->op.imm[0] = (uint8_t)bitwalker_read(&bw, 8);
-            core->op.imm[1] = (uint8_t)bitwalker_read(&bw, 8);
-            break;
-        }
-        default:
-            break;
-    }
-
-    return;
-
-out_res_a_check:
-    // Find out what res contains
-    if(core->op.reg[0] > LA16_REGISTER_EL0_MAX ||
-       core->op.reg[1] > LA16_REGISTER_EL0_MAX)
-    {
-        if(*(core->el) == LA16_CORE_MODE_EL0)
-        {
-            core->op.op = LA16_OPCODE_HLT;
-            core->term = LA16_TERM_FLAG_PERMISSION;
-        }
-    }*/
+    
     return;
 }
 

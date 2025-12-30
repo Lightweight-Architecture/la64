@@ -27,6 +27,11 @@
 
 void la64_op_hlt(la64_core_t *core)
 {
+    if(core->op.param_cnt != 0)
+    {
+        core->term = LA64_TERM_BAD_INSTRUCTION;
+    }
+
     if(core->term == LA64_TERM_NONE)
     {
         core->term = LA64_TERM_HALT;
@@ -35,5 +40,10 @@ void la64_op_hlt(la64_core_t *core)
 
 void la64_op_nop(la64_core_t *core)
 {
+    if(core->op.param_cnt != 0)
+    {
+        core->term = LA64_TERM_BAD_INSTRUCTION;
+    }
+    
     /* doing nothing */
 }
