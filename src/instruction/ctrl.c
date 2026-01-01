@@ -168,8 +168,7 @@ void la64_op_bl(la64_core_t *core)
     }
 
     /* pushing all relevant registers onto stack */
-    la64_push(core, core->op.ilen);
-    la64_push(core, *(core->rl[LA64_REGISTER_PC]));
+    la64_push(core, *(core->rl[LA64_REGISTER_PC]) + core->op.ilen);
     la64_push(core, *(core->rl[LA64_REGISTER_FP]));
     la64_push(core, *(core->rl[LA64_REGISTER_CF]));
     la64_push(core, *(core->rl[LA64_REGISTER_R0]));
@@ -254,5 +253,5 @@ void la64_op_ret(la64_core_t *core)
     *(core->rl[LA64_REGISTER_CF]) = la64_pop(core);
     *(core->rl[LA64_REGISTER_FP]) = la64_pop(core);
     *(core->rl[LA64_REGISTER_PC]) = la64_pop(core);
-    core->op.ilen = la64_pop(core);
+    core->op.ilen = 0;
 }
