@@ -57,17 +57,17 @@ void la64_op_swpz(la64_core_t *core)
 void la64_op_push(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 1);
-
-    core->sp -= 8;
+    
     *((uint64_t*)&(core->machine->memory->memory[*(core->sp)])) = *(core->op.param[0]);
+    core->sp -= 8;
 }
 
 void la64_op_pop(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 1);
 
-    *(core->op.param[0]) = *((uint64_t*)&(core->machine->memory->memory[*(core->sp)]));
     core->sp += 8;
+    *(core->op.param[0]) = *((uint64_t*)&(core->machine->memory->memory[*(core->sp)]));
 }
 
 void la64_op_ldb(la64_core_t *core)
@@ -124,4 +124,3 @@ void la64_op_stq(la64_core_t *core)
     la64_instr_termcond(core->op.param_cnt != 2);
 
     *((uint64_t*)&(core->machine->memory->memory[*(core->op.param[0])])) = (uint64_t)*(core->op.param[1]);
-}

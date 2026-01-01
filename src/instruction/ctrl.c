@@ -128,14 +128,14 @@ void la64_op_jnz(la64_core_t *core)
 
 void la64_push(la64_core_t *core, uint64_t value)
 {
-    *(core->sp) -= 8;
     *((uint64_t*)&(core->machine->memory->memory[*(core->sp)])) = value;
+    *(core->sp) -= 8;
 }
 
 uint64_t la64_pop(la64_core_t *core)
 {
-    return *((uint64_t*)&(core->machine->memory->memory[*(core->sp)]));
     *(core->sp) += 8;
+    return *((uint64_t*)&(core->machine->memory->memory[*(core->sp)]));
 }
 
 /* call convention not needed, la64 supports arguments directly in bl (biggest win ever) */
