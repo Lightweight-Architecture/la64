@@ -25,6 +25,11 @@
 #ifndef LA64_INSTRUCTION_H
 #define LA64_INSTRUCTION_H
 
-#define la64_instr_termcond(case) if(case) { core->term == LA64_TERM_BAD_ACCESS; };
+#define la64_instr_termcond(case)                           \
+    if(case)                                                \
+    {                                                       \
+        core->term = LA64_TERM_BAD_ACCESS;                  \
+        return;                                             \
+    }    
 
 #endif /* LA64_INSTRUCTION_H */

@@ -29,49 +29,6 @@
 
 #include <la64/machine.h>
 
-#include <lautils/bitwalker.h>
-
-/* costs 8 bytes */
-void la64_insert_entry(bitwalker_t *bw)
-{
-    /* write opcode */
-    bitwalker_write(bw, 0x8, 64);
-}
-
-/* costs 2 bytes */
-void la64_insert_nop(bitwalker_t *bw)
-{
-    /* write opcode */
-    bitwalker_write(bw, LA64_OPCODE_NOP, 8);
-    
-    /* write end */
-    bitwalker_write(bw, LA64_PARAMETER_CODING_INSTR_END, 3);
-
-    /* skip rest of bits */
-    bitwalker_skip(bw, 5);
-}
-
-/* costs 3 bytes */
-void la64_insert_mov(bitwalker_t *bw)
-{
-    /* write opcode */
-    bitwalker_write(bw, LA64_OPCODE_MOV, 8);
-
-    /* write register parameter */
-    bitwalker_write(bw, LA64_PARAMETER_CODING_REG, 3);
-    bitwalker_write(bw, LA64_REGISTER_R0, 5);
-
-    /* write intermediate 8 parameter */
-    bitwalker_write(bw, LA64_PARAMETER_CODING_IMM16, 3);
-    bitwalker_write(bw, 0xFFFF, 16);
-    
-    /* write end */
-    bitwalker_write(bw, LA64_PARAMETER_CODING_INSTR_END, 3);
-
-    /* skip rest of bits */
-    bitwalker_skip(bw, 2);
-}
-
 int main(int argc, char *argv[])
 {
     /* creating new la16 virtual machine */
@@ -79,15 +36,8 @@ int main(int argc, char *argv[])
 
     printf("[bios] memory size: %llu bytes\n", machine->memory->memory_size);
 
-    /* init bitwalker */
-    bitwalker_t bw;
-    bitwalker_init(&bw, machine->memory->memory, 1000, BW_LITTLE_ENDIAN);
-
-    /* write a couple of instructions for testing */
-    la64_insert_entry(&bw);
-    la64_insert_nop(&bw);
-    la64_insert_mov(&bw);
-    la64_insert_nop(&bw);
+    /* load boot image */
+    la64_memory_load_image(machine->memory, argv[1]);
 
     /*
      * getting entry point of boot image of virtual machine
@@ -98,7 +48,7 @@ int main(int argc, char *argv[])
     printf("[bios] found entry point @ 0x%llx\n", *(machine->core[0]->pc));
 
     /* setting stack pointer of  */
-    *(machine->core[0]->sp) = machine->memory->memory_size - 2;
+    *(machine->core[0]->sp) = machine->memory->memory_size - 8;
 
     printf("[bios] set stack pointer @ 0x%llx\n", *(machine->core[0]->sp));
     printf("[exec] executing core\n");
