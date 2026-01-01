@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
     printf("[boot] found entry point @ 0x%llx\n", *(machine->core[0]->pc));
 
     /* setting stack pointer of  */
-    *(machine->core[0]->sp) = machine->memory->memory_size - 8;
+    *(machine->core[0]->sp) = machine->memory->memory_size;
 
     printf("[boot] set stack pointer @ 0x%llx\n", *(machine->core[0]->sp));
     printf("[exec] executing core\n");
