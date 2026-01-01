@@ -26,6 +26,7 @@
 #include <la64/instruction/instruction.h>
 #include <la64/instruction/data.h>
 #include <la64/machine.h>
+#include <la64/memory.h>
 
 void la64_op_mov(la64_core_t *core)
 {
@@ -58,7 +59,15 @@ void la64_op_push(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 1);
     
-    *((uint64_t*)&(core->machine->memory->memory[*(core->sp)])) = *(core->op.param[0]);
+    void *ptr = la64_memory_access(core, *(core->sp), la64MemoryAccessSizeQuadWord);
+
+    if(ptr == NULL)
+    {
+        core->term = LA64_TERM_BAD_ACCESS;
+        return;
+    }
+
+    *((uint64_t*)ptr) = *(core->op.param[0]);
     *(core->sp) -= 8;
 }
 
@@ -67,61 +76,134 @@ void la64_op_pop(la64_core_t *core)
     la64_instr_termcond(core->op.param_cnt != 1);
 
     *(core->sp) += 8;
-    *(core->op.param[0]) = *((uint64_t*)&(core->machine->memory->memory[*(core->sp)]));
+
+    void *ptr = la64_memory_access(core, *(core->sp), la64MemoryAccessSizeQuadWord);
+
+    if(ptr == NULL)
+    {
+        core->term = LA64_TERM_BAD_ACCESS;
+        return;
+    }
+
+    *(core->op.param[0]) = *((uint64_t*)ptr);
 }
 
 void la64_op_ldb(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 2);
-    
-    *(core->op.param[0]) = *((uint8_t*)&(core->machine->memory->memory[*(core->op.param[1])]));
+
+    void *ptr = la64_memory_access(core, *(core->op.param[1]), la64MemoryAccessSizeByte);
+
+    if(ptr == NULL)
+    {
+        core->term = LA64_TERM_BAD_ACCESS;
+        return;
+    }
+
+    *(core->op.param[0]) = *((uint8_t*)ptr);
 }
 
 void la64_op_ldw(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 2);
 
-    *(core->op.param[0]) = *((uint16_t*)&(core->machine->memory->memory[*(core->op.param[1])]));
+    void *ptr = la64_memory_access(core, *(core->op.param[1]), la64MemoryAccessSizeWord);
+
+    if(ptr == NULL)
+    {
+        core->term = LA64_TERM_BAD_ACCESS;
+        return;
+    }
+
+    *(core->op.param[0]) = *((uint16_t*)ptr);
 }
 
 void la64_op_ldd(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 2);
 
-    *(core->op.param[0]) = *((uint32_t*)&(core->machine->memory->memory[*(core->op.param[1])]));
+    void *ptr = la64_memory_access(core, *(core->op.param[1]), la64MemoryAccessSizeDoubleWord);
+
+    if(ptr == NULL)
+    {
+        core->term = LA64_TERM_BAD_ACCESS;
+        return;
+    }
+
+    *(core->op.param[0]) = *((uint32_t*)ptr);
 }
 
 void la64_op_ldq(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 2);
 
-    *(core->op.param[0]) = *((uint64_t*)&(core->machine->memory->memory[*(core->op.param[1])]));
+    void *ptr = la64_memory_access(core, *(core->op.param[1]), la64MemoryAccessSizeQuadWord);
+
+    if(ptr == NULL)
+    {
+        core->term = LA64_TERM_BAD_ACCESS;
+        return;
+    }
+
+    *(core->op.param[0]) = *((uint64_t*)ptr);
 }
 
 void la64_op_stb(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 2);
 
-    *((uint8_t*)&(core->machine->memory->memory[*(core->op.param[0])])) = (uint8_t)*(core->op.param[1]);
+    void *ptr = la64_memory_access(core, *(core->op.param[0]), la64MemoryAccessSizeByte);
+
+    if(ptr == NULL)
+    {
+        core->term = LA64_TERM_BAD_ACCESS;
+        return;
+    }
+
+    *((uint8_t*)ptr) = *(core->op.param[1]);
 }
 
 void la64_op_stw(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 2);
 
-    *((uint16_t*)&(core->machine->memory->memory[*(core->op.param[0])])) = (uint16_t)*(core->op.param[1]);
+    void *ptr = la64_memory_access(core, *(core->op.param[0]), la64MemoryAccessSizeWord);
+
+    if(ptr == NULL)
+    {
+        core->term = LA64_TERM_BAD_ACCESS;
+        return;
+    }
+
+    *((uint16_t*)ptr) = *(core->op.param[1]);
 }
 
 void la64_op_std(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 2);
 
-    *((uint32_t*)&(core->machine->memory->memory[*(core->op.param[0])])) = (uint32_t)*(core->op.param[1]);
+    void *ptr = la64_memory_access(core, *(core->op.param[0]), la64MemoryAccessSizeDoubleWord);
+
+    if(ptr == NULL)
+    {
+        core->term = LA64_TERM_BAD_ACCESS;
+        return;
+    }
+
+    *((uint32_t*)ptr) = *(core->op.param[1]);
 }
 
 void la64_op_stq(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 2);
 
-    *((uint64_t*)&(core->machine->memory->memory[*(core->op.param[0])])) = (uint64_t)*(core->op.param[1]);
+    void *ptr = la64_memory_access(core, *(core->op.param[0]), la64MemoryAccessSizeQuadWord);
+
+    if(ptr == NULL)
+    {
+        core->term = LA64_TERM_BAD_ACCESS;
+        return;
+    }
+
+    *((uint64_t*)ptr) = *(core->op.param[1]);
 }

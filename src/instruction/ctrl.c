@@ -25,6 +25,7 @@
 #include <la64/instruction/instruction.h>
 #include <la64/instruction/ctrl.h>
 #include <la64/machine.h>
+#include <la64/memory.h>
 #include <stdio.h>
 
 void la64_op_jmp(la64_core_t *core)
@@ -128,14 +129,30 @@ void la64_op_jnz(la64_core_t *core)
 
 void la64_push(la64_core_t *core, uint64_t value)
 {
-    *((uint64_t*)&(core->machine->memory->memory[*(core->sp)])) = value;
+    void *ptr = la64_memory_access(core, *(core->sp), la64MemoryAccessSizeQuadWord);
+
+    if(ptr == NULL)
+    {
+        core->term = LA64_TERM_BAD_ACCESS;
+        return;
+    }
+
+    *((uint64_t*)ptr) = value;
     *(core->sp) -= 8;
 }
 
 uint64_t la64_pop(la64_core_t *core)
 {
     *(core->sp) += 8;
-    return *((uint64_t*)&(core->machine->memory->memory[*(core->sp)]));
+    void *ptr = la64_memory_access(core, *(core->sp), la64MemoryAccessSizeQuadWord);
+
+    if(ptr == NULL)
+    {
+        core->term = LA64_TERM_BAD_ACCESS;
+        return 0;
+    }
+
+    return *((uint64_t*)ptr);
 }
 
 /* call convention not needed, la64 supports arguments directly in bl (biggest win ever) */
