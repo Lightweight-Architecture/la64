@@ -124,3 +124,4 @@ void la64_op_stq(la64_core_t *core)
     la64_instr_termcond(core->op.param_cnt != 2);
 
     *((uint64_t*)&(core->machine->memory->memory[*(core->op.param[0])])) = (uint64_t)*(core->op.param[1]);
+}
