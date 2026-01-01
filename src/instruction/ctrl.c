@@ -185,7 +185,7 @@ void la64_op_bl(la64_core_t *core)
     la64_push(core, *(core->rl[LA64_REGISTER_RR]));
 
     /* writing parameters */
-    for(uint8_t i = 1; i < core->op.param_cnt; i++)
+    for(uint8_t i = 1; i < core->op.param_cnt && i < (LA64_REGISTER_R26 - 1); i++)
     {
         *(core->rl[(LA64_REGISTER_R0 - 1) + i]) = param_imm[i];
     }
