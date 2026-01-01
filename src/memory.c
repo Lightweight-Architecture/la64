@@ -82,6 +82,7 @@ bool la64_memory_load_image(la64_memory_t *memory,
     /* checking file descriptor */
     if(fd == -1)
     {
+        printf("[boot] failed to open boot image at path %s\n", image_path);
         return false;
     }
 
@@ -93,14 +94,14 @@ bool la64_memory_load_image(la64_memory_t *memory,
     /* checking if memory is big enough for our memory */
     if(image_size > memory->memory_size)
     {
-        printf("[bios] error: boot image is too large\n");
+        printf("[boot] error: boot image is too large\n");
         return false;
     }
 
     /* loading boot image into memory */
     read(fd, memory->memory, image_size);
 
-    printf("[bios] loaded boot image: %zu bytes\n", image_size);
+    printf("[boot] loaded boot image: %zu bytes\n", image_size);
 
     close(fd);
 

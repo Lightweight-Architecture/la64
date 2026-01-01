@@ -31,13 +31,21 @@
 
 int main(int argc, char *argv[])
 {
+    if(argc < 2 || argv == NULL || argv[1] == NULL)
+    {
+        goto usage;
+    }
+
     /* creating new la16 virtual machine */
     la64_machine_t *machine = la64_machine_alloc(0xFFFFFF);
 
-    printf("[bios] memory size: %llu bytes\n", machine->memory->memory_size);
+    printf("[boot] memory size: %llu bytes\n", machine->memory->memory_size);
 
     /* load boot image */
-    la64_memory_load_image(machine->memory, argv[1]);
+    if(!la64_memory_load_image(machine->memory, argv[1]))
+    {
+        goto usage;
+    }
 
     /*
      * getting entry point of boot image of virtual machine
@@ -45,12 +53,12 @@ int main(int argc, char *argv[])
      */
     *(machine->core[0]->pc) = *((la64_memory_address_t*)&machine->memory->memory[0x0]);
 
-    printf("[bios] found entry point @ 0x%llx\n", *(machine->core[0]->pc));
+    printf("[boot] found entry point @ 0x%llx\n", *(machine->core[0]->pc));
 
     /* setting stack pointer of  */
     *(machine->core[0]->sp) = machine->memory->memory_size - 8;
 
-    printf("[bios] set stack pointer @ 0x%llx\n", *(machine->core[0]->sp));
+    printf("[boot] set stack pointer @ 0x%llx\n", *(machine->core[0]->sp));
     printf("[exec] executing core\n");
 
     /* executing virtual machines 1st core TODO: Implement threading */
@@ -60,4 +68,8 @@ int main(int argc, char *argv[])
     la64_machine_dealloc(machine);
 
     return 0;
+
+usage:
+    printf("%s <boot image>\n", (argv == NULL || argv[0] == NULL) ? "(nil)" : argv[0]);
+    return 1;
 }

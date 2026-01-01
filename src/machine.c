@@ -71,7 +71,7 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
 
     /* much more compact error handling */
 out_release_memory:
-    free(machine->memory);
+    la64_memory_dealloc(machine->memory);
 out_release_machine:
     free(machine);
     return NULL;
