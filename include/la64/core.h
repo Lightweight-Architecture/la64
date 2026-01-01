@@ -148,6 +148,7 @@
 #define LA64_TERM_BAD_ACCESS        0b010
 #define LA64_TERM_PERMISSION        0b011
 #define LA64_TERM_BAD_INSTRUCTION   0b100
+#define LA64_TERM_BAD_ARITHMETIC    0b101
 
 typedef struct la64_machine la64_machine_t;
 

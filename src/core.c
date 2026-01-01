@@ -249,6 +249,10 @@ bad_instruction_shortcut:
                 printf("[exec] bad instruction @ 0x%llx\n", *(core->pc));
                 core->runs = 0b00000000;
                 return NULL;
+            case LA64_TERM_BAD_ARITHMETIC:
+                printf("[exec] bad arithmetic @ 0x%llx\n", *(core->pc));
+                core->runs = 0b00000000;
+                return NULL;
             default:
                 printf("[exec] unknown exception @ 0x%llx\n", *(core->pc));
                 break;

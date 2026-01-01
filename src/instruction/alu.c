@@ -25,8 +25,63 @@
 #include <la64/instruction/instruction.h>
 #include <la64/instruction/alu.h>
 
-#define DEFINE_LA64_ARITHMETIC_OP(act) *(core->op.param[0]) = *(core->op.param[(core->op.param_cnt == 2) ? 0 : 1]) act *(core->op.param[(core->op.param_cnt == 2) ? 1 : 2])
-#define DEFINE_LA64_SIGNED_ARITHMETIC_OP(act) *(core->op.param[0]) = (int64_t)*(core->op.param[(core->op.param_cnt == 2) ? 0 : 1]) act (int64_t)*(core->op.param[(core->op.param_cnt == 2) ? 1 : 2])
+#define DEFINE_LA64_ARITHMETIC_OP(act)                                                              \
+    if(core->op.param_cnt == 2)                                                                     \
+    {                                                                                               \
+        *(core->op.param[0]) = *(core->op.param[0]) act *(core->op.param[1]);                       \
+    }                                                                                               \
+    else                                                                                            \
+    {                                                                                               \
+        *(core->op.param[0]) = *(core->op.param[1]) act *(core->op.param[2]);                       \
+    }
+
+#define DEFINE_LA64_SIGNED_ARITHMETIC_OP(act)                                                       \
+    if(core->op.param_cnt == 2)                                                                     \
+    {                                                                                               \
+        *(core->op.param[0]) = (int64_t)*(core->op.param[0]) act (int64_t)*(core->op.param[1]);     \
+    }                                                                                               \
+    else                                                                                            \
+    {                                                                                               \
+        *(core->op.param[0]) = (int64_t)*(core->op.param[1]) act (int64_t)*(core->op.param[2]);     \
+    }
+
+#define DEFINE_LA64_ARITHMETIC_OP_ZERO_BAD(act)                                                     \
+    uint64_t *operand[2];                                                                           \
+    if(core->op.param_cnt == 2)                                                                     \
+    {                                                                                               \
+        operand[0] = core->op.param[0];     \
+        operand[1] = core->op.param[1];     \
+    }                                                                                               \
+    else                                                                                            \
+    {                                                                                               \
+        operand[0] = core->op.param[1];     \
+        operand[1] = core->op.param[2];     \
+    }                                                                                               \
+    if(*operand[0] == 0 || *operand[1] == 0)                                                        \
+    {                                                                                               \
+        core->term = LA64_TERM_BAD_ARITHMETIC;                                                      \
+        return;                                                                                     \
+    }                                                                                               \
+    *(core->op.param[0]) = *operand[0] act *operand[1];
+
+#define DEFINE_LA64_SIGNED_ARITHMETIC_OP_ZERO_BAD(act)                                              \
+    uint64_t *operand[2];                                                                           \
+    if(core->op.param_cnt == 2)                                                                     \
+    {                                                                                               \
+        operand[0] = core->op.param[0];                                                             \
+        operand[1] = core->op.param[1];                                                             \
+    }                                                                                               \
+    else                                                                                            \
+    {                                                                                               \
+        operand[0] = core->op.param[1];                                                             \
+        operand[1] = core->op.param[2];                                                             \
+    }                                                                                               \
+    if(*operand[0] == 0 || *operand[1] == 0)                                                        \
+    {                                                                                               \
+        core->term = LA64_TERM_BAD_ARITHMETIC;                                                      \
+        return;                                                                                     \
+    }                                                                                               \
+    *(core->op.param[0]) = (int64_t)*operand[0] act (int64_t)*operand[1];
 
 void la64_op_add(la64_core_t *core)
 {
@@ -53,21 +108,21 @@ void la64_op_div(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
 
-    DEFINE_LA64_ARITHMETIC_OP(/);
+    DEFINE_LA64_ARITHMETIC_OP_ZERO_BAD(/);
 }
 
 void la64_op_idiv(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
 
-    DEFINE_LA64_SIGNED_ARITHMETIC_OP(/);
+    DEFINE_LA64_SIGNED_ARITHMETIC_OP_ZERO_BAD(/);
 }
 
 void la64_op_mod(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
 
-    DEFINE_LA64_ARITHMETIC_OP(%);
+    DEFINE_LA64_ARITHMETIC_OP_ZERO_BAD(%);
 }
 
 void la64_op_inc(la64_core_t *core)
