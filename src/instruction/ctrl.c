@@ -110,8 +110,8 @@ void la64_op_jz(la64_core_t *core)
     
     if(*(core->op.param[0]) == 0)
     {
-        core->op.param[0] = core->op.param[1];
-        la64_op_jmp(core);
+        core->op.ilen = 0;
+        *(core->pc) = *(core->op.param[1]);
     }
 }
 
@@ -121,8 +121,8 @@ void la64_op_jnz(la64_core_t *core)
     
     if(*(core->op.param[0]) != 0)
     {
-        core->op.param[0] = core->op.param[1];
-        la64_op_jmp(core);
+        core->op.ilen = 0;
+        *(core->pc) = *(core->op.param[1]);
     }
 }
 
