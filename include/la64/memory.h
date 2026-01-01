@@ -41,4 +41,16 @@ void la64_memory_dealloc(la64_memory_t *memory);
 
 bool la64_memory_load_image(la64_memory_t *memory, const char *image_path);
 
+typedef struct la64_core la64_core_t;
+
+typedef enum la64MemoryAccessSize {
+    la64MemoryAccessSizeByte,
+    la64MemoryAccessSizeWord,
+    la64MemoryAccessSizeDoubleWord,
+    la64MemoryAccessSizeQuadWord,
+    la64MemoryAccessSizeInstruction
+} la64_memory_access_size_t;
+
+void *la64_memory_access(la64_core_t *core, uint64_t addr, la64_memory_access_size_t access_size);
+
 #endif /* LA64_MEMORY_H */

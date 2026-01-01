@@ -23,6 +23,8 @@
  */
 
 #include <la64/memory.h>
+#include <la64/core.h>
+#include <la64/machine.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -106,4 +108,55 @@ bool la64_memory_load_image(la64_memory_t *memory,
     close(fd);
 
     return true;
+}
+
+size_t size_from_access_type(la64_memory_access_size_t access_size)
+{
+    switch(access_size)
+    {
+        case la64MemoryAccessSizeByte:
+            return sizeof(uint8_t);
+        case la64MemoryAccessSizeWord:
+            return sizeof(uint16_t);
+        case la64MemoryAccessSizeDoubleWord:
+            return sizeof(uint32_t);
+        case la64MemoryAccessSizeQuadWord:
+            return sizeof(uint64_t);
+        case la64MemoryAccessSizeInstruction:
+            return (sizeof(uint64_t) * 45);         /* just to make sure */
+        default:
+            return 0;
+    }
+}
+
+void *la64_memory_access(la64_core_t *core,
+                         uint64_t addr,
+                         la64_memory_access_size_t access_size)
+{
+    /* null pointer check */
+    if(core == NULL || core->machine == NULL || core->machine->memory == NULL)
+    {
+        return NULL;
+    }
+
+    /* getting size */
+    size_t size = size_from_access_type(access_size);
+
+    /* null size check */
+    if(size == 0)
+    {
+        return NULL;
+    }
+
+    /* get end */
+    uint64_t addr_end = addr + size;
+
+    /* wrap around check */
+    if(addr >= addr_end ||
+       core->machine->memory->memory_size < addr_end)
+    {
+        return NULL;
+    }
+
+    return &(core->machine->memory->memory[addr]);
 }
