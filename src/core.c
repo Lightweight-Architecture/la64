@@ -141,6 +141,17 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
     /* getting opcode */
     core->op.op = (uint8_t)bitwalker_read(&bw, 8);
 
+    /* making shortcuts for argless opcodes */
+    switch(core->op.op)
+    {
+        case LA64_OPCODE_HLT:
+        case LA64_OPCODE_NOP:
+        case LA64_OPCODE_RET:
+            return;
+        default:
+            break;
+    }
+
     /* parsing loop */
     bool reached_end = false;
     while(!reached_end)
