@@ -134,9 +134,19 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
     /* reset operation structure */
     memset(&(core->op), 0, sizeof(la64_operation_t));
 
+    /* accessing memory */
+    void *iptr = la64_memory_access(core, *(core->pc), la64MemoryAccessSizeInstruction);
+
+    /* null pointer check */
+    if(iptr == NULL)
+    {
+        core->term = LA64_TERM_BAD_ACCESS;
+        return;
+    }
+
     /* preparing bitwalker */
     bitwalker_t bw;
-    bitwalker_init_read(&bw, &(core->machine->memory->memory[*(core->pc)]), 32, BW_LITTLE_ENDIAN);
+    bitwalker_init_read(&bw, iptr, 32, BW_LITTLE_ENDIAN);
 
     /* getting opcode */
     core->op.op = (uint8_t)bitwalker_read(&bw, 8);
@@ -154,7 +164,7 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
 
     /* parsing loop */
     bool reached_end = false;
-    while(!reached_end)
+    for(uint8_t i = 0; i < 32 && !reached_end; i++)
     {
         /* next mode */
         uint8_t mode = (uint8_t)bitwalker_read(&bw, 3);
