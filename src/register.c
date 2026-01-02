@@ -24,10 +24,11 @@
 
 #include <la64/register.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 la64_register_t la64_register_alloc()
 {
-    la64_register_t reg = calloc(1, sizeof(unsigned short));
+    la64_register_t reg = calloc(1, sizeof(uint64_t));
     *reg = 0;
     return reg;
 }
