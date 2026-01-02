@@ -108,12 +108,6 @@ la64_core_t *la64_core_alloc()
         core->rl[i] = la64_register_alloc();
     }
 
-    /* put the special registers in nicely packaged shortcuts */
-    core->pc = core->rl[LA64_REGISTER_PC];
-    core->sp = core->rl[LA64_REGISTER_SP];
-    core->fp = core->rl[LA64_REGISTER_FP];
-    core->cf = core->rl[LA64_REGISTER_CF];
-
     return core;
 }
 
@@ -135,7 +129,7 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
     memset(&(core->op), 0, sizeof(la64_operation_t));
 
     /* accessing memory */
-    void *iptr = la64_memory_access(core, *(core->pc), la64MemoryAccessSizeInstruction);
+    void *iptr = la64_memory_access(core, *(core->rl[LA64_REGISTER_PC]), la64MemoryAccessSizeInstruction);
 
     /* null pointer check */
     if(iptr == NULL)
@@ -233,28 +227,28 @@ static void *la64_core_execute_thread(void *arg)
             case LA64_TERM_NONE:
                 break;
             case LA64_TERM_HALT:
-                printf("[exec] halt @ 0x%llx\n", *(core->pc));
+                printf("[exec] halt @ 0x%llx\n", *(core->rl[LA64_REGISTER_PC]));
                 core->runs = 0b00000000;
                 return NULL;
             case LA64_TERM_BAD_ACCESS:
-                printf("[exec] bad access @ 0x%llx\n", *(core->pc));
+                printf("[exec] bad access @ 0x%llx\n", *(core->rl[LA64_REGISTER_PC]));
                 core->runs = 0b00000000;
                 return NULL;
             case LA64_TERM_PERMISSION:
-                printf("[exec] permission denied @ 0x%llx\n", *(core->pc));
+                printf("[exec] permission denied @ 0x%llx\n", *(core->rl[LA64_REGISTER_PC]));
                 core->runs = 0b00000000;
                 return NULL;
             case LA64_TERM_BAD_INSTRUCTION:
 bad_instruction_shortcut:
-                printf("[exec] bad instruction @ 0x%llx\n", *(core->pc));
+                printf("[exec] bad instruction @ 0x%llx\n", *(core->rl[LA64_REGISTER_PC]));
                 core->runs = 0b00000000;
                 return NULL;
             case LA64_TERM_BAD_ARITHMETIC:
-                printf("[exec] bad arithmetic @ 0x%llx\n", *(core->pc));
+                printf("[exec] bad arithmetic @ 0x%llx\n", *(core->rl[LA64_REGISTER_PC]));
                 core->runs = 0b00000000;
                 return NULL;
             default:
-                printf("[exec] unknown exception @ 0x%llx\n", *(core->pc));
+                printf("[exec] unknown exception @ 0x%llx\n", *(core->rl[LA64_REGISTER_PC]));
                 break;
         }
 
@@ -269,7 +263,7 @@ bad_instruction_shortcut:
             goto bad_instruction_shortcut;
         }
 
-        *(core->pc) += core->op.ilen;
+        *(core->rl[LA64_REGISTER_PC]) += core->op.ilen;
     }
 
     core->runs = 0b00000000;

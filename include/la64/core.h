@@ -161,12 +161,7 @@ typedef struct {
 } la64_operation_t;
 
 struct la64_core {
-    /* shortcuts too special purpose registers */
-    la64_register_t pc;     /* program counter */
-    la64_register_t sp;     /* stack pointer */
-    la64_register_t fp;     /* frame pointer */
-    la64_register_t cf;     /* compare flag*/
-
+    /* registers */
     la64_register_t rl[LA64_REGISTER_MAX + 1];
 
     /* Opertion registers */

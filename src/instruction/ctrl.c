@@ -32,7 +32,7 @@ void la64_op_jmp(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 1);
     core->op.ilen = 0;
-    *(core->pc) = *(core->op.param[0]);
+    *(core->rl[LA64_REGISTER_PC]) = *(core->op.param[0]);
 }
 
 void la64_op_cmp(la64_core_t *core)
@@ -42,14 +42,14 @@ void la64_op_cmp(la64_core_t *core)
     int64_t a = (int64_t)*(core->op.param[0]);
     int64_t b = (int64_t)*(core->op.param[1]);
     
-    *(core->cf) = (a == b) * LA64_CMP_Z | (a <  b) * LA64_CMP_L | (a >  b) * LA64_CMP_G;
+    *(core->rl[LA64_REGISTER_CF]) = (a == b) * LA64_CMP_Z | (a <  b) * LA64_CMP_L | (a >  b) * LA64_CMP_G;
 }
 
 void la64_op_je(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 1);
     
-    if(*(core->cf) & LA64_CMP_Z)
+    if(*(core->rl[LA64_REGISTER_CF]) & LA64_CMP_Z)
     {
         la64_op_jmp(core);
     }
@@ -59,7 +59,7 @@ void la64_op_jne(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 1);
     
-    if(!(*(core->cf) & LA64_CMP_Z))
+    if(!(*(core->rl[LA64_REGISTER_CF]) & LA64_CMP_Z))
     {
         la64_op_jmp(core);
     }
@@ -69,7 +69,7 @@ void la64_op_jlt(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 1);
     
-    if(*(core->cf) & LA64_CMP_L)
+    if(*(core->rl[LA64_REGISTER_CF]) & LA64_CMP_L)
     {
         la64_op_jmp(core);
     }
@@ -79,7 +79,7 @@ void la64_op_jgt(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 1);
     
-    if(*(core->cf) & LA64_CMP_G)
+    if(*(core->rl[LA64_REGISTER_CF]) & LA64_CMP_G)
     {
         la64_op_jmp(core);
     }
@@ -89,7 +89,7 @@ void la64_op_jle(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 1);
     
-    if(*(core->cf) & LA64_CMP_L || *(core->cf) & LA64_CMP_Z)
+    if(*(core->rl[LA64_REGISTER_CF]) & LA64_CMP_L || *(core->rl[LA64_REGISTER_CF]) & LA64_CMP_Z)
     {
         la64_op_jmp(core);
     }
@@ -99,7 +99,7 @@ void la64_op_jge(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 1);
     
-    if(*(core->cf) & LA64_CMP_G || *(core->cf) & LA64_CMP_Z)
+    if(*(core->rl[LA64_REGISTER_CF]) & LA64_CMP_G || *(core->rl[LA64_REGISTER_CF]) & LA64_CMP_Z)
     {
         la64_op_jmp(core);
     }
@@ -112,7 +112,7 @@ void la64_op_jz(la64_core_t *core)
     if(*(core->op.param[0]) == 0)
     {
         core->op.ilen = 0;
-        *(core->pc) = *(core->op.param[1]);
+        *(core->rl[LA64_REGISTER_PC]) = *(core->op.param[1]);
     }
 }
 
@@ -123,13 +123,13 @@ void la64_op_jnz(la64_core_t *core)
     if(*(core->op.param[0]) != 0)
     {
         core->op.ilen = 0;
-        *(core->pc) = *(core->op.param[1]);
+        *(core->rl[LA64_REGISTER_PC]) = *(core->op.param[1]);
     }
 }
 
 void la64_push(la64_core_t *core, uint64_t value)
 {
-    void *ptr = la64_memory_access(core, *(core->sp), la64MemoryAccessSizeQuadWord);
+    void *ptr = la64_memory_access(core, *(core->rl[LA64_REGISTER_SP]), la64MemoryAccessSizeQuadWord);
 
     if(ptr == NULL)
     {
@@ -138,13 +138,13 @@ void la64_push(la64_core_t *core, uint64_t value)
     }
 
     *((uint64_t*)ptr) = value;
-    *(core->sp) -= 8;
+    *(core->rl[LA64_REGISTER_SP]) -= 8;
 }
 
 uint64_t la64_pop(la64_core_t *core)
 {
-    *(core->sp) += 8;
-    void *ptr = la64_memory_access(core, *(core->sp), la64MemoryAccessSizeQuadWord);
+    *(core->rl[LA64_REGISTER_SP]) += 8;
+    void *ptr = la64_memory_access(core, *(core->rl[LA64_REGISTER_SP]), la64MemoryAccessSizeQuadWord);
 
     if(ptr == NULL)
     {
@@ -206,21 +206,21 @@ void la64_op_bl(la64_core_t *core)
     }
 
     /* setting current frame pointer to stack pointer to point to stack frame */
-    *(core->fp) = *(core->sp);
+    *(core->rl[LA64_REGISTER_FP]) = *(core->rl[LA64_REGISTER_SP]);
 
     /* manipulating ilen */
     core->op.ilen = 0;
 
     /* jump! */
-    *(core->pc) = param_imm[0];
+    *(core->rl[LA64_REGISTER_PC]) = param_imm[0];
 }
 
 void la64_op_ret(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 0);
 
-    *(core->sp) = *(core->fp);
-
+    *(core->rl[LA64_REGISTER_SP]) = *(core->rl[LA64_REGISTER_FP]);
+    
     *(core->rl[LA64_REGISTER_R26]) = la64_pop(core);
     *(core->rl[LA64_REGISTER_R25]) = la64_pop(core);
     *(core->rl[LA64_REGISTER_R24]) = la64_pop(core);
