@@ -198,7 +198,6 @@ void la64_op_bl(la64_core_t *core)
     la64_push(core, *(core->rl[LA64_REGISTER_R24]));
     la64_push(core, *(core->rl[LA64_REGISTER_R25]));
     la64_push(core, *(core->rl[LA64_REGISTER_R26]));
-    la64_push(core, *(core->rl[LA64_REGISTER_RR]));
 
     /* writing parameters */
     for(uint8_t i = 1; i < core->op.param_cnt && i < (LA64_REGISTER_R26 - 1); i++)
@@ -222,7 +221,6 @@ void la64_op_ret(la64_core_t *core)
 
     *(core->sp) = *(core->fp);
 
-    *(core->rl[LA64_REGISTER_RR]) = la64_pop(core);
     *(core->rl[LA64_REGISTER_R26]) = la64_pop(core);
     *(core->rl[LA64_REGISTER_R25]) = la64_pop(core);
     *(core->rl[LA64_REGISTER_R24]) = la64_pop(core);
