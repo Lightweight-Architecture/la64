@@ -18,7 +18,6 @@ add_executable(la64
     src/core.c
     src/machine.c
     src/memory.c
-    src/register.c
 
     src/instruction/core.c
     src/instruction/data.c

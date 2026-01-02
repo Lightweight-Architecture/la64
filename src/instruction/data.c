@@ -59,7 +59,7 @@ void la64_op_push(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 1);
     
-    void *ptr = la64_memory_access(core, *(core->rl[LA64_REGISTER_SP]), la64MemoryAccessSizeQuadWord);
+    void *ptr = la64_memory_access(core, core->rl[LA64_REGISTER_SP], la64MemoryAccessSizeQuadWord);
 
     if(ptr == NULL)
     {
@@ -68,16 +68,16 @@ void la64_op_push(la64_core_t *core)
     }
 
     *((uint64_t*)ptr) = *(core->op.param[0]);
-    *(core->rl[LA64_REGISTER_SP]) -= 8;
+    core->rl[LA64_REGISTER_SP] -= 8;
 }
 
 void la64_op_pop(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 1);
 
-    *(core->rl[LA64_REGISTER_SP]) += 8;
+    core->rl[LA64_REGISTER_SP] += 8;
 
-    void *ptr = la64_memory_access(core, *(core->rl[LA64_REGISTER_SP]), la64MemoryAccessSizeQuadWord);
+    void *ptr = la64_memory_access(core, core->rl[LA64_REGISTER_SP], la64MemoryAccessSizeQuadWord);
 
     if(ptr == NULL)
     {

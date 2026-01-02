@@ -25,7 +25,6 @@
 #ifndef LA64_CORE_H
 #define LA64_CORE_H
 
-#include <la64/register.h>
 #include <stdint.h>
 
 #pragma mark - opcode
@@ -160,11 +159,11 @@ typedef struct {
     uint64_t *param[32];
 } la64_operation_t;
 
-struct la64_core {
+typedef struct la64_core {
     /* registers */
-    la64_register_t rl[LA64_REGISTER_MAX + 1];
+    uint64_t rl[LA64_REGISTER_MAX + 1];
 
-    /* Opertion registers */
+    /* operation */
     la64_operation_t op;
 
     /* Exec flags */
@@ -173,9 +172,8 @@ struct la64_core {
 
     /* Machine related things */
     la64_machine_t *machine;
-};
+} la64_core_t;
 
-typedef struct la64_core la64_core_t;
 typedef void (*la64_opfunc_t)(la64_core_t *core);
 
 extern la64_opfunc_t opfunc_table[LA64_OPCODE_MAX + 1];
