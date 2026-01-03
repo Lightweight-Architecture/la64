@@ -129,30 +129,28 @@ void la64_op_jnz(la64_core_t *core)
 
 void la64_push(la64_core_t *core, uint64_t value)
 {
-    void *ptr = la64_memory_access(core, core->rl[LA64_REGISTER_SP], la64MemoryAccessSizeQuadWord);
-
-    if(ptr == NULL)
+    if(!la64_memory_write(core, core->rl[LA64_REGISTER_SP], value, sizeof(uint64_t)))
     {
         core->term = LA64_TERM_BAD_ACCESS;
         return;
     }
 
-    *((uint64_t*)ptr) = value;
     core->rl[LA64_REGISTER_SP] -= 8;
 }
 
 uint64_t la64_pop(la64_core_t *core)
 {
     core->rl[LA64_REGISTER_SP] += 8;
-    void *ptr = la64_memory_access(core, core->rl[LA64_REGISTER_SP], la64MemoryAccessSizeQuadWord);
 
-    if(ptr == NULL)
+    uint64_t value = 0;
+
+    if(!la64_memory_read(core, core->rl[LA64_REGISTER_SP], sizeof(uint64_t), &value))
     {
         core->term = LA64_TERM_BAD_ACCESS;
         return 0;
     }
 
-    return *((uint64_t*)ptr);
+    return value;
 }
 
 /* call convention not needed, la64 supports arguments directly in bl (biggest win ever) */
