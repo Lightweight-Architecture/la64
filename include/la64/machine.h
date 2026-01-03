@@ -30,6 +30,7 @@
 #include <la64/mmio.h>
 #include <la64/timer.h>
 #include <la64/interrupt.h>
+#include <la64/uart.h>
 #include <stdint.h>
 
 typedef struct la64_machine {
@@ -38,6 +39,7 @@ typedef struct la64_machine {
     la64_mmio_bus_t *mmio_bus;
     la64_intc_t *intc;
     la64_timer_t *timer;
+    la64_uart_t *uart;
 } la64_machine_t;
 
 la64_machine_t *la64_machine_alloc(uint64_t memory_size);

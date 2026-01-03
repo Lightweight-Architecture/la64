@@ -24,14 +24,14 @@
 
 #include <stdlib.h>
 #include <la64/machine.h>
-#include <la64/interrupt.h>
-#include <la64/timer.h>
 
 #define LA64_INTC_BASE      0x1FE00000
 #define LA64_INTC_SIZE      0x40
 #define LA64_TIMER_BASE     0x1FE00100
 #define LA64_TIMER_SIZE     0x28
 #define LA64_TIMER_FREQ     100000000
+#define LA64_UART_BASE      0x1FE00500
+#define LA64_UART_SIZE      0x10
 
 la64_machine_t *la64_machine_alloc(uint64_t memory_size)
 {
@@ -115,9 +115,26 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
         goto out_release_timer;
     }
 
+    /* allocate uart */
+    machine->uart = la64_uart_alloc(machine->core[0], LA64_IRQ_UART);
+
+    if(machine->uart == NULL)
+    {
+        goto out_release_timer;
+    }
+
+    la64_uart_start(machine->uart);
+
+    if(!la64_mmio_register(machine->mmio_bus, LA64_UART_BASE, LA64_UART_SIZE, machine->uart, (mmio_read_fn)la64_uart_read, (mmio_write_fn)la64_uart_write, "uart"))
+    {
+        goto out_release_uart;
+    }
+
     return machine;
 
     /* much more compact error handling */
+out_release_uart:
+    la64_uart_dealloc(machine->uart);
 out_release_timer:
     la64_timer_dealloc(machine->timer);
 out_release_intc:
@@ -142,6 +159,13 @@ void la64_machine_dealloc(la64_machine_t *machine)
     if(machine == NULL)
     {
         return;
+    }
+
+    /* release uart */
+    if(machine->uart)
+    {
+        la64_uart_stop(machine->uart);
+        la64_uart_dealloc(machine->uart);
     }
 
     /* release timer */

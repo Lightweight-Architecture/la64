@@ -35,7 +35,6 @@
 
 #include <la64/instruction/core.h>
 #include <la64/instruction/data.h>
-#include <la64/instruction/io.h>
 #include <la64/instruction/alu.h>
 #include <la64/instruction/ctrl.h>
 
@@ -62,8 +61,8 @@ la64_opfunc_t opfunc_table[LA64_OPCODE_MAX + 1] = {
     la64_op_stq,
 
     /* io operations */
-    la64_op_in,
-    la64_op_out,
+    NULL,
+    NULL,
 
     /* arithmetic operations */
     la64_op_add,

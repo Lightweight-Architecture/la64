@@ -21,10 +21,10 @@ add_executable(la64
     src/mmio.c
     src/timer.c
     src/interrupt.c
+    src/uart.c
 
     src/instruction/core.c
     src/instruction/data.c
-    src/instruction/io.c
     src/instruction/alu.c
     src/instruction/ctrl.c
 )
