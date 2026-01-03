@@ -30,6 +30,8 @@
 #include <la64/core.h>
 #include <la64/memory.h>
 #include <la64/machine.h>
+#include <la64/interrupt.h>
+#include <la64/timer.h>
 
 #include <la64/instruction/core.h>
 #include <la64/instruction/data.h>
@@ -116,7 +118,7 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
     memset(&(core->op), 0, sizeof(la64_operation_t));
 
     /* accessing memory */
-    void *iptr = la64_memory_access(core, core->rl[LA64_REGISTER_PC], la64MemoryAccessSizeInstruction);
+    void *iptr = la64_memory_access(core, core->rl[LA64_REGISTER_PC], 100);
 
     /* null pointer check */
     if(iptr == NULL)
@@ -251,6 +253,17 @@ bad_instruction_shortcut:
         }
 
         core->rl[LA64_REGISTER_PC] += core->op.ilen;
+
+        /* Check and handle pending interrupts */
+        if (core->machine && core->machine->intc) {
+            la64_intc_check(core);
+        }
+
+        /* Tick the timer (if present) */
+        if (core->machine && core->machine->timer) {
+            extern uint64_t la64_get_host_cycles(void);
+            la64_timer_tick(core->machine->timer, la64_get_host_cycles());
+        }
     }
 
     core->runs = 0b00000000;
