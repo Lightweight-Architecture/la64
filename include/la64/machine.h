@@ -27,11 +27,17 @@
 
 #include <la64/core.h>
 #include <la64/memory.h>
+#include <la64/mmio.h>
+#include <la64/timer.h>
+#include <la64/interrupt.h>
 #include <stdint.h>
 
 typedef struct la64_machine {
     la64_core_t *core[4];
     la64_memory_t *memory;
+    la64_mmio_bus_t *mmio_bus;
+    la64_intc_t *intc;
+    la64_timer_t *timer;
 } la64_machine_t;
 
 la64_machine_t *la64_machine_alloc(uint64_t memory_size);
