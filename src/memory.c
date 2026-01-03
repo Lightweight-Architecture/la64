@@ -25,6 +25,7 @@
 #include <la64/memory.h>
 #include <la64/core.h>
 #include <la64/machine.h>
+#include <la64/mmio.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -110,37 +111,15 @@ bool la64_memory_load_image(la64_memory_t *memory,
     return true;
 }
 
-size_t size_from_access_type(la64_memory_access_size_t access_size)
-{
-    switch(access_size)
-    {
-        case la64MemoryAccessSizeByte:
-            return sizeof(uint8_t);
-        case la64MemoryAccessSizeWord:
-            return sizeof(uint16_t);
-        case la64MemoryAccessSizeDoubleWord:
-            return sizeof(uint32_t);
-        case la64MemoryAccessSizeQuadWord:
-            return sizeof(uint64_t);
-        case la64MemoryAccessSizeInstruction:
-            return (sizeof(uint64_t) * 45);         /* just to make sure */
-        default:
-            return 0;
-    }
-}
-
 void *la64_memory_access(la64_core_t *core,
                          uint64_t addr,
-                         la64_memory_access_size_t access_size)
+                         size_t size)
 {
     /* null pointer check */
     if(core == NULL || core->machine == NULL || core->machine->memory == NULL)
     {
         return NULL;
     }
-
-    /* getting size */
-    size_t size = size_from_access_type(access_size);
 
     /* null size check */
     if(size == 0)
@@ -159,4 +138,104 @@ void *la64_memory_access(la64_core_t *core,
     }
 
     return &(core->machine->memory->memory[addr]);
+}
+
+bool la64_memory_read(la64_core_t *core,
+                      uint64_t addr,
+                      size_t size,
+                      uint64_t *value)
+{
+    /* null pointer check */
+    if(core == NULL || value == NULL)
+    {
+        return false;
+    }
+
+    /* finding mmio device */
+    la64_mmio_region_t *mmio = la64_mmio_find(core->machine->mmio_bus, addr);
+
+    /* null pointer check */
+    if(mmio != NULL)
+    {
+        /* mmio device found, try to fetch */
+        *value = mmio->read(mmio->device, addr - mmio->base_addr, size);
+        return true;
+    }
+
+    /* getting pointer */
+    void *ptr = la64_memory_access(core, addr, size);
+    if(!ptr)
+    {
+        return false;
+    }
+
+    /* perform read from memory */
+    switch (size)
+    {
+        case 1:
+            *value = *(uint8_t *)ptr;
+            goto out_success;
+        case 2:
+            *value = *(uint16_t *)ptr;
+            goto out_success;
+        case 4:
+            *value = *(uint32_t *)ptr;
+            goto out_success;
+        case 8:
+            *value = *(uint64_t *)ptr;
+            goto out_success;
+    }
+
+    return true;
+
+out_success:
+    return true;
+}
+
+bool la64_memory_write(la64_core_t *core,
+                       uint64_t addr,
+                       uint64_t value,
+                       size_t size)
+{
+    /* null pointer check */
+    if(core == NULL)
+    {
+        return false;
+    }
+
+    /* trying to find mmio device */
+    la64_mmio_region_t *mmio = la64_mmio_find(core->machine->mmio_bus, addr);
+
+    /* null pointer checking potential mmio device */
+    if(mmio != NULL)
+    {
+        /* performing mmio write */
+        mmio->write(mmio->device, addr - mmio->base_addr, value, size);
+        return true;
+    }
+
+    /* accessing memory */
+    void *ptr = la64_memory_access(core, addr, size);
+    if(!ptr) return false;
+    
+    switch (size)
+    {
+        case 1:
+            *(uint8_t *)ptr = value;
+            goto out_success;
+        case 2:
+            *(uint16_t *)ptr = value;
+            goto out_success;
+        case 4:
+            *(uint32_t *)ptr = value;
+            goto out_success;
+        case 8:
+            *(uint64_t *)ptr = value;
+            goto out_success;
+    }
+
+    return false;
+
+out_success:
+    return true;
 }
