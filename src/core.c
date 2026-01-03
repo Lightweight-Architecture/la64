@@ -60,10 +60,6 @@ la64_opfunc_t opfunc_table[LA64_OPCODE_MAX + 1] = {
     la64_op_std,
     la64_op_stq,
 
-    /* io operations */
-    NULL,
-    NULL,
-
     /* arithmetic operations */
     la64_op_add,
     la64_op_sub,
