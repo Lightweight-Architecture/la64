@@ -24,6 +24,14 @@
 
 #include <stdlib.h>
 #include <la64/machine.h>
+#include <la64/interrupt.h>
+#include <la64/timer.h>
+
+#define LA64_INTC_BASE      0x1FE00000
+#define LA64_INTC_SIZE      0x40
+#define LA64_TIMER_BASE     0x1FE00100
+#define LA64_TIMER_SIZE     0x28
+#define LA64_TIMER_FREQ     100000000
 
 la64_machine_t *la64_machine_alloc(uint64_t memory_size)
 {
@@ -46,6 +54,16 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
         goto out_release_machine;
     }
 
+    /* allocate mmio */
+    machine->mmio_bus = la64_mmio_alloc();
+
+    /* null pointer check */
+    if(machine->mmio_bus == NULL)
+    {
+        /* release machine, memory and return nothing */
+        goto out_release_memory;
+    }
+
     /* allocate new cores */
     for(uint8_t i = 0; i < 4; i++)
     {
@@ -61,15 +79,56 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
             }
 
             /* releasing */
-            goto out_release_memory;
+            goto out_release_mmio;
         }
 
         machine->core[i]->machine = machine;
     }
 
+    /* allocate interrupt controller */
+    machine->intc = la64_intc_alloc(machine->core[0]);
+
+    /* null pointer check */
+    if(machine->intc == NULL)
+    {
+        goto out_release_cores;
+    }
+
+    /* register interrupt controller MMIO */
+    if(!la64_mmio_register(machine->mmio_bus, LA64_INTC_BASE, LA64_INTC_SIZE, machine->intc, la64_intc_read, la64_intc_write, "intc"))
+    {
+        goto out_release_intc;
+    }
+
+    /* allocate timer */
+    machine->timer = la64_timer_alloc(machine->core[0],  LA64_TIMER_FREQ,  LA64_IRQ_TIMER);
+
+    /* null pointer check */
+    if(machine->timer == NULL)
+    {
+        goto out_release_intc;
+    }
+
+    /* register timer MMIO */
+    if(!la64_mmio_register(machine->mmio_bus, LA64_TIMER_BASE, LA64_TIMER_SIZE, machine->timer, la64_timer_read, la64_timer_write, "timer"))
+    {
+        goto out_release_timer;
+    }
+
     return machine;
 
     /* much more compact error handling */
+out_release_timer:
+    la64_timer_dealloc(machine->timer);
+out_release_intc:
+    la64_intc_dealloc(machine->intc);
+out_release_cores:
+    for(uint8_t i = 0; i < 4; i++)
+    {
+        la64_core_dealloc(machine->core[i]);
+    }
+out_release_mmio:
+    la64_mmio_dealloc(machine->mmio_bus);
 out_release_memory:
     la64_memory_dealloc(machine->memory);
 out_release_machine:
@@ -85,10 +144,28 @@ void la64_machine_dealloc(la64_machine_t *machine)
         return;
     }
 
+    /* release timer */
+    if(machine->timer)
+    {
+        la64_timer_dealloc(machine->timer);
+    }
+
+    /* release interrupt controller */
+    if(machine->intc)
+    {
+        la64_intc_dealloc(machine->intc);
+    }
+
     /* release cores */
     for(unsigned char i = 0; i < 4; i++)
     {
         la64_core_dealloc(machine->core[i]);
+    }
+
+    /* release mmio */
+    if(machine->mmio_bus)
+    {
+        la64_mmio_dealloc(machine->mmio_bus);
     }
 
     /* release memory */
