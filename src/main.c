@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
     /* setting stack pointer of  */
     machine->core[0]->rl[LA64_REGISTER_SP] = machine->memory->memory_size - 8;
 
-    printf("[boot] set stack pointer @ 0x%llx\n", machine->core[0]->rl[LA64_REGISTER_PC]);
+    printf("[boot] set stack pointer @ 0x%llx\n", machine->core[0]->rl[LA64_REGISTER_SP]);
     printf("[exec] executing core\n");
 
     /* executing virtual machines 1st core TODO: Implement threading */
