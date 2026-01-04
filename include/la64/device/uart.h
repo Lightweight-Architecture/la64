@@ -28,6 +28,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <pthread.h>
+#include <stdatomic.h>
 
 #define UART_BUF_SIZE          64
 
@@ -54,7 +55,7 @@ typedef struct {
     
     pthread_t thread;
     pthread_mutex_t mutex;
-    volatile bool running;
+    atomic_bool running;
     
     la64_core_t *core;
     int irq_line;

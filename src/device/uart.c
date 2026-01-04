@@ -81,8 +81,23 @@ static void *uart_input_thread(void *arg)
 
     uint8_t ch;
     
-    while(u->running) 
+    while(atomic_load(&u->running)) 
     {
+        fd_set fds;
+        struct timeval tv;
+        
+        FD_ZERO(&fds);
+        FD_SET(STDIN_FILENO, &fds);
+        tv.tv_sec = 0;
+        tv.tv_usec = 100000;
+        
+        int ready = select(STDIN_FILENO + 1, &fds, NULL, NULL, &tv);
+        
+        if(ready <= 0)
+        {
+            continue;
+        }
+        
         ssize_t n = read(STDIN_FILENO, &ch, 1);
 
         if(n <= 0)
@@ -92,7 +107,7 @@ static void *uart_input_thread(void *arg)
 
         if(ch == 0x03)
         {
-            u->running = false;
+            atomic_store(&u->running, false);
             break;
         }
         
@@ -141,7 +156,7 @@ la64_uart_t *la64_uart_alloc(la64_core_t *core, int irq_line)
     u->status = UART_STATUS_TX_EMPTY;
     
     pthread_mutex_init(&u->mutex, NULL);
-    u->running = false;
+    atomic_store(&u->running, false);
 
     return u;
 }
@@ -166,7 +181,7 @@ void la64_uart_start(la64_uart_t *u)
         return;
     }
     
-    u->running = true;
+    atomic_store(&u->running, true);
     uart_set_raw_mode();
     pthread_create(&u->thread, NULL, uart_input_thread, u);
 }
@@ -178,7 +193,7 @@ void la64_uart_stop(la64_uart_t *u)
         return;
     }
     
-    u->running = false;
+    atomic_store(&u->running, false);
     pthread_join(u->thread, NULL);
     uart_restore_mode();
 }

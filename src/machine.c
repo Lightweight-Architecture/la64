@@ -71,34 +71,24 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
         goto out_release_memory;
     }
 
-    /* allocate new cores */
-    for(uint8_t i = 0; i < 4; i++)
+    /* allocate new core */
+    machine->core = la64_core_alloc();
+
+    /* null pointer check */
+    if(machine->core == NULL)
     {
-        machine->core[i] = la64_core_alloc();
-
-        /* null pointer check */
-        if(machine->core[i] == NULL)
-        {
-            /* now revert core allocation */
-            for(; 0 < i; i--)
-            {
-                la64_core_dealloc(machine->core[i]);
-            }
-
-            /* releasing */
-            goto out_release_mmio;
-        }
-
-        machine->core[i]->machine = machine;
+        goto out_release_mmio;
     }
 
+    machine->core->machine = machine;
+
     /* allocate interrupt controller */
-    machine->intc = la64_intc_alloc(machine->core[0]);
+    machine->intc = la64_intc_alloc(machine->core);
 
     /* null pointer check */
     if(machine->intc == NULL)
     {
-        goto out_release_cores;
+        goto out_release_core;
     }
 
     /* register interrupt controller MMIO */
@@ -108,7 +98,7 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
     }
 
     /* allocate timer */
-    machine->timer = la64_timer_alloc(machine->core[0],  LA64_TIMER_FREQ,  LA64_IRQ_TIMER);
+    machine->timer = la64_timer_alloc(machine->core,  LA64_TIMER_FREQ,  LA64_IRQ_TIMER);
 
     /* null pointer check */
     if(machine->timer == NULL)
@@ -123,7 +113,7 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
     }
 
     /* allocate uart */
-    machine->uart = la64_uart_alloc(machine->core[0], LA64_IRQ_UART);
+    machine->uart = la64_uart_alloc(machine->core, LA64_IRQ_UART);
 
     if(machine->uart == NULL)
     {
@@ -152,11 +142,8 @@ out_release_timer:
     la64_timer_dealloc(machine->timer);
 out_release_intc:
     la64_intc_dealloc(machine->intc);
-out_release_cores:
-    for(uint8_t i = 0; i < 4; i++)
-    {
-        la64_core_dealloc(machine->core[i]);
-    }
+out_release_core:
+    la64_core_dealloc(machine->core);
 out_release_mmio:
     la64_mmio_dealloc(machine->mmio_bus);
 out_release_memory:
@@ -194,10 +181,7 @@ void la64_machine_dealloc(la64_machine_t *machine)
     }
 
     /* release cores */
-    for(unsigned char i = 0; i < 4; i++)
-    {
-        la64_core_dealloc(machine->core[i]);
-    }
+    la64_core_dealloc(machine->core);
 
     /* release mmio */
     if(machine->mmio_bus)

@@ -36,7 +36,7 @@
 #include <stdint.h>
 
 typedef struct la64_machine {
-    la64_core_t *core[4];
+    la64_core_t *core;
     la64_memory_t *memory;
     la64_mmio_bus_t *mmio_bus;
     la64_intc_t *intc;

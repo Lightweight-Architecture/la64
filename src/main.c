@@ -51,22 +51,22 @@ int main(int argc, char *argv[])
      * getting entry point of boot image of virtual machine
      * and setting program pointer of first core to it
      */
-    machine->core[0]->rl[LA64_REGISTER_PC] = *((la64_memory_address_t*)&machine->memory->memory[0x0]);
+    machine->core->rl[LA64_REGISTER_PC] = *((la64_memory_address_t*)&machine->memory->memory[0x0]);
 
-    printf("[boot] found entry point @ 0x%llx\n", machine->core[0]->rl[LA64_REGISTER_PC]);
+    printf("[boot] found entry point @ 0x%llx\n", machine->core->rl[LA64_REGISTER_PC]);
 
     /* setting stack pointer of  */
-    machine->core[0]->rl[LA64_REGISTER_SP] = machine->memory->memory_size - 8;
+    machine->core->rl[LA64_REGISTER_SP] = machine->memory->memory_size - 8;
 
-    printf("[boot] set stack pointer @ 0x%llx\n", machine->core[0]->rl[LA64_REGISTER_SP]);
+    printf("[boot] set stack pointer @ 0x%llx\n", machine->core->rl[LA64_REGISTER_SP]);
     printf("[exec] executing core\n");
 
     /* executing virtual machines 1st core TODO: Implement threading */
-    la64_core_execute(machine->core[0]);
+    la64_core_execute(machine->core);
 
     /* deallocating machine */
     la64_machine_dealloc(machine);
-
+    
     return 0;
 
 usage:
