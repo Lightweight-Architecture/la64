@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#include <la64/uart.h>
-#include <la64/interrupt.h>
+#include <la64/device/uart.h>
+#include <la64/device/interrupt.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <termios.h>

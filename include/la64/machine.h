@@ -28,10 +28,11 @@
 #include <la64/core.h>
 #include <la64/memory.h>
 #include <la64/mmio.h>
-#include <la64/timer.h>
-#include <la64/interrupt.h>
-#include <la64/uart.h>
-#include <la64/rtc.h>
+
+#include <la64/device/timer.h>
+#include <la64/device/interrupt.h>
+#include <la64/device/uart.h>
+
 #include <stdint.h>
 
 typedef struct la64_machine {

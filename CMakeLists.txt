@@ -19,10 +19,11 @@ add_executable(la64
     src/machine.c
     src/memory.c
     src/mmio.c
-    src/timer.c
-    src/interrupt.c
-    src/uart.c
-    src/rtc.c
+    
+    src/device/timer.c
+    src/device/interrupt.c
+    src/device/uart.c
+    src/device/rtc.c
 
     src/instruction/core.c
     src/instruction/data.c

@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include <la64/rtc.h>
+#include <la64/device/rtc.h>
 #include <stdlib.h>
 #include <time.h>
 

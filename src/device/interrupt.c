@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <la64/interrupt.h>
+#include <la64/device/interrupt.h>
 #include <la64/core.h>
 #include <la64/machine.h>
 #include <la64/memory.h>

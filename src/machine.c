@@ -24,7 +24,8 @@
 
 #include <stdlib.h>
 #include <la64/machine.h>
-#include <la64/rtc.h>
+
+#include <la64/device/rtc.h>
 
 #define LA64_INTC_BASE      0x1FE00000
 #define LA64_INTC_SIZE      0x40

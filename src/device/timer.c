@@ -27,8 +27,8 @@
 #include <time.h>
 #include <unistd.h>
 
-#include <la64/timer.h>
-#include <la64/interrupt.h>
+#include <la64/device/timer.h>
+#include <la64/device/interrupt.h>
 
 uint64_t la64_get_host_cycles(void)
 {

@@ -30,8 +30,9 @@
 #include <la64/core.h>
 #include <la64/memory.h>
 #include <la64/machine.h>
-#include <la64/interrupt.h>
-#include <la64/timer.h>
+
+#include <la64/device/interrupt.h>
+#include <la64/device/timer.h>
 
 #include <la64/instruction/core.h>
 #include <la64/instruction/data.h>
