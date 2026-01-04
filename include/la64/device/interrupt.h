@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef LA64_INTERRUPT_H
-#define LA64_INTERRUPT_H
+#ifndef LA64_DEVICE_INTERRUPT_H
+#define LA64_DEVICE_INTERRUPT_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -71,4 +71,4 @@ bool la64_intc_check(la64_core_t *core);
 uint64_t la64_intc_read(void *device, uint64_t offset, int size);
 void la64_intc_write(void *device, uint64_t offset, uint64_t value, int size);
 
-#endif /* LA64_INTERRUPT_H */
+#endif /* LA64_DEVICE_INTERRUPT_H */

@@ -32,6 +32,7 @@
 #include <la64/device/timer.h>
 #include <la64/device/interrupt.h>
 #include <la64/device/uart.h>
+#include <la64/device/mc.h>
 
 #include <stdint.h>
 
@@ -42,6 +43,7 @@ typedef struct la64_machine {
     la64_intc_t *intc;
     la64_timer_t *timer;
     la64_uart_t *uart;
+    la64_mc_t *mc;
 } la64_machine_t;
 
 la64_machine_t *la64_machine_alloc(uint64_t memory_size);

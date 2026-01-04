@@ -22,21 +22,68 @@
  * SOFTWARE.
  */
 
-#ifndef LA64_DEVICE_RTC_H
-#define LA64_DEVICE_RTC_H
+#include <la64/machine.h>
 
-#include <stdint.h>
+#include <la64/device/mc.h>
 
-#define RTC_REG_SECONDS     0x00
-#define RTC_REG_MINUTES     0x04
-#define RTC_REG_HOURS       0x08
-#define RTC_REG_DAY         0x0C
-#define RTC_REG_MONTH       0x10
-#define RTC_REG_YEAR        0x14
-#define RTC_REG_WEEKDAY     0x18
-#define RTC_REG_UNIX        0x20
+#include <stdlib.h>
 
-uint64_t la64_rtc_read(void *device, uint64_t offset, int size);
-void la64_rtc_write(void *device, uint64_t offset, uint64_t value, int size);
+la64_mc_t *la64_mc_alloc(la64_core_t *core)
+{
+    /* null pointer check */
+    if(core == NULL)
+    {
+        return NULL;
+    }
 
-#endif /* LA64_DEVICE_RTC_H */
+    /* allocate memory controller */
+    la64_mc_t *mc = calloc(1, sizeof(la64_mc_t));
+
+    /* null pointer check again */
+    if(mc == NULL)
+    {
+        return NULL;
+    }
+
+    /* setting core */
+    mc->core = core;
+
+    return mc;
+}
+
+void la64_mc_dealloc(la64_mc_t *mc)
+{
+    /* null pointer check */
+    if(mc == NULL)
+    {
+        return;
+    }
+
+    free(mc);
+}
+
+uint64_t la64_mc_read(void *device,
+                      uint64_t offset,
+                      int size)
+{
+    /* null pointer check */
+    if(device == NULL)
+    {
+        return 0;
+    }
+
+    /* getting device */
+    la64_mc_t *mc = device;
+
+    /* returning memory size */
+    return mc->core->machine->memory->memory_size;
+}
+
+void la64_mc_write(void *device,
+                   uint64_t offset,
+                   uint64_t value,
+                   int size)
+{
+    /* ro device */
+    return;
+}

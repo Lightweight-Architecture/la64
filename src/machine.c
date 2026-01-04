@@ -40,6 +40,9 @@
 #define LA64_UART_BASE      0x1FE00300
 #define LA64_UART_SIZE      0x10
 
+#define LA64_MC_BASE        0x1FE00400
+#define LA64_MC_SIZE        0x08
+
 la64_machine_t *la64_machine_alloc(uint64_t memory_size)
 {
     /* allocating brand new machine */
@@ -133,9 +136,24 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
         goto out_release_uart;
     }
 
+    /* allocate mc */
+    machine->mc = la64_mc_alloc(machine->core);
+
+    if(machine->mc == NULL)
+    {
+        goto out_release_uart;
+    }
+
+    if(!la64_mmio_register(machine->mmio_bus, LA64_MC_BASE, LA64_MC_SIZE, machine->mc, la64_mc_read, la64_mc_write, "mc"))
+    {
+        goto out_release_mc;
+    }
+
     return machine;
 
     /* much more compact error handling */
+out_release_mc:
+    la64_mc_dealloc(machine->mc);
 out_release_uart:
     la64_uart_dealloc(machine->uart);
 out_release_timer:
@@ -159,6 +177,12 @@ void la64_machine_dealloc(la64_machine_t *machine)
     if(machine == NULL)
     {
         return;
+    }
+
+    /* release mc */
+    if(machine->mc)
+    {
+        la64_mc_dealloc(machine->mc);
     }
 
     /* release uart */

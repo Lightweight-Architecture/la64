@@ -22,21 +22,21 @@
  * SOFTWARE.
  */
 
-#ifndef LA64_DEVICE_RTC_H
-#define LA64_DEVICE_RTC_H
+#ifndef LA64_DEVICE_MC_H
+#define LA64_DEVICE_MC_H
 
 #include <stdint.h>
 
-#define RTC_REG_SECONDS     0x00
-#define RTC_REG_MINUTES     0x04
-#define RTC_REG_HOURS       0x08
-#define RTC_REG_DAY         0x0C
-#define RTC_REG_MONTH       0x10
-#define RTC_REG_YEAR        0x14
-#define RTC_REG_WEEKDAY     0x18
-#define RTC_REG_UNIX        0x20
+typedef struct la64_core la64_core_t;
 
-uint64_t la64_rtc_read(void *device, uint64_t offset, int size);
-void la64_rtc_write(void *device, uint64_t offset, uint64_t value, int size);
+typedef struct {
+    la64_core_t *core;
+} la64_mc_t;
 
-#endif /* LA64_DEVICE_RTC_H */
+la64_mc_t *la64_mc_alloc(la64_core_t *core);
+void la64_mc_dealloc(la64_mc_t *mc);
+
+uint64_t la64_mc_read(void *device, uint64_t offset, int size);
+void la64_mc_write(void *device, uint64_t offset, uint64_t value, int size);
+
+#endif /* LA64_DEVICE_MC_H */
