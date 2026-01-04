@@ -22,28 +22,49 @@
  * SOFTWARE.
  */
 
-#ifndef LA64_MACHINE_H
-#define LA64_MACHINE_H
-
-#include <la64/core.h>
-#include <la64/memory.h>
-#include <la64/mmio.h>
-#include <la64/timer.h>
-#include <la64/interrupt.h>
-#include <la64/uart.h>
 #include <la64/rtc.h>
-#include <stdint.h>
+#include <stdlib.h>
+#include <time.h>
 
-typedef struct la64_machine {
-    la64_core_t *core[4];
-    la64_memory_t *memory;
-    la64_mmio_bus_t *mmio_bus;
-    la64_intc_t *intc;
-    la64_timer_t *timer;
-    la64_uart_t *uart;
-} la64_machine_t;
+uint64_t la64_rtc_read(void *device,
+                       uint64_t offset,
+                       int size)
+{
+    /* get current time */
+    time_t now = time(NULL);
+    struct tm *t = localtime(&now);
 
-la64_machine_t *la64_machine_alloc(uint64_t memory_size);
-void la64_machine_dealloc(la64_machine_t *machine);
+    /* perform read */
+    switch(offset)
+    {
+        case RTC_REG_SECONDS:
+            return t->tm_sec;
+        case RTC_REG_MINUTES:
+            return t->tm_min;
+        case RTC_REG_HOURS:
+            return t->tm_hour;
+        case RTC_REG_DAY:
+            return t->tm_mday;
+        case RTC_REG_MONTH:
+            return t->tm_mon + 1;
+        case RTC_REG_YEAR:
+            return t->tm_year + 1900;
+        case RTC_REG_WEEKDAY:
+            return t->tm_wday;
+        case RTC_REG_UNIX:
+            return (uint64_t)now;
+        default:
+            return 0;
+    }
+}
 
-#endif /* LA64_MACHINE_H */
+void la64_rtc_write(void *device,
+                    uint64_t offset,
+                    uint64_t value,
+                    int size)
+{
+    (void)device;
+    (void)offset;
+    (void)value;
+    (void)size;
+}

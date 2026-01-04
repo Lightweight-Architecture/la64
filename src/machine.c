@@ -24,13 +24,19 @@
 
 #include <stdlib.h>
 #include <la64/machine.h>
+#include <la64/rtc.h>
 
 #define LA64_INTC_BASE      0x1FE00000
 #define LA64_INTC_SIZE      0x40
+
 #define LA64_TIMER_BASE     0x1FE00100
 #define LA64_TIMER_SIZE     0x28
 #define LA64_TIMER_FREQ     100000000
-#define LA64_UART_BASE      0x1FE00500
+
+#define LA64_RTC_BASE       0x1FE00200
+#define LA64_RTC_SIZE       0x28
+
+#define LA64_UART_BASE      0x1FE00300
 #define LA64_UART_SIZE      0x10
 
 la64_machine_t *la64_machine_alloc(uint64_t memory_size)
@@ -126,6 +132,12 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
     la64_uart_start(machine->uart);
 
     if(!la64_mmio_register(machine->mmio_bus, LA64_UART_BASE, LA64_UART_SIZE, machine->uart, (mmio_read_fn)la64_uart_read, (mmio_write_fn)la64_uart_write, "uart"))
+    {
+        goto out_release_uart;
+    }
+
+    /* register rtc */
+    if(!la64_mmio_register(machine->mmio_bus, LA64_RTC_BASE, LA64_RTC_SIZE, NULL, (mmio_read_fn)la64_rtc_read, (mmio_write_fn)la64_rtc_write, "rtc"))
     {
         goto out_release_uart;
     }

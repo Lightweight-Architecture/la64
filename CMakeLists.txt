@@ -22,6 +22,7 @@ add_executable(la64
     src/timer.c
     src/interrupt.c
     src/uart.c
+    src/rtc.c
 
     src/instruction/core.c
     src/instruction/data.c

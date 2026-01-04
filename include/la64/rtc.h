@@ -22,28 +22,21 @@
  * SOFTWARE.
  */
 
-#ifndef LA64_MACHINE_H
-#define LA64_MACHINE_H
+#ifndef LA64_RTC_H
+#define LA64_RTC_H
 
-#include <la64/core.h>
-#include <la64/memory.h>
-#include <la64/mmio.h>
-#include <la64/timer.h>
-#include <la64/interrupt.h>
-#include <la64/uart.h>
-#include <la64/rtc.h>
 #include <stdint.h>
 
-typedef struct la64_machine {
-    la64_core_t *core[4];
-    la64_memory_t *memory;
-    la64_mmio_bus_t *mmio_bus;
-    la64_intc_t *intc;
-    la64_timer_t *timer;
-    la64_uart_t *uart;
-} la64_machine_t;
+#define RTC_REG_SECONDS     0x00
+#define RTC_REG_MINUTES     0x04
+#define RTC_REG_HOURS       0x08
+#define RTC_REG_DAY         0x0C
+#define RTC_REG_MONTH       0x10
+#define RTC_REG_YEAR        0x14
+#define RTC_REG_WEEKDAY     0x18
+#define RTC_REG_UNIX        0x20
 
-la64_machine_t *la64_machine_alloc(uint64_t memory_size);
-void la64_machine_dealloc(la64_machine_t *machine);
+uint64_t la64_rtc_read(void *device, uint64_t offset, int size);
+void la64_rtc_write(void *device, uint64_t offset, uint64_t value, int size);
 
-#endif /* LA64_MACHINE_H */
+#endif /* LA64_RTC_H */
