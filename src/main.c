@@ -29,6 +29,8 @@
 
 #include <la64/machine.h>
 
+#include <lautils/bitwalker.h>
+
 int main(int argc, char *argv[])
 {
     if(argc < 2 || argv == NULL || argv[1] == NULL)
@@ -51,7 +53,9 @@ int main(int argc, char *argv[])
      * getting entry point of boot image of virtual machine
      * and setting program pointer of first core to it
      */
-    machine->core->rl[LA64_REGISTER_PC] = *((la64_memory_address_t*)&machine->memory->memory[0x0]);
+    bitwalker_t bw;
+    bitwalker_init_read(&bw, machine->memory->memory, 8, BW_LITTLE_ENDIAN);
+    machine->core->rl[LA64_REGISTER_PC] = bitwalker_read(&bw, 64);
 
     printf("[boot] found entry point @ 0x%llx\n", machine->core->rl[LA64_REGISTER_PC]);
 
@@ -66,7 +70,7 @@ int main(int argc, char *argv[])
 
     /* deallocating machine */
     la64_machine_dealloc(machine);
-    
+
     return 0;
 
 usage:
