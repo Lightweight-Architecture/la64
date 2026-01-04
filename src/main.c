@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     }
 
     /* creating new la16 virtual machine */
-    la64_machine_t *machine = la64_machine_alloc(0xFFFFFF);
+    la64_machine_t *machine = la64_machine_alloc(0x20000000);
 
     printf("[boot] memory size: %llu bytes\n", machine->memory->memory_size);
 
