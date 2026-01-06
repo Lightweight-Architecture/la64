@@ -49,13 +49,13 @@
     uint64_t *operand[2];                                                                           \
     if(core->op.param_cnt == 2)                                                                     \
     {                                                                                               \
-        operand[0] = core->op.param[0];     \
-        operand[1] = core->op.param[1];     \
+        operand[0] = core->op.param[0];                                                             \
+        operand[1] = core->op.param[1];                                                             \
     }                                                                                               \
     else                                                                                            \
     {                                                                                               \
-        operand[0] = core->op.param[1];     \
-        operand[1] = core->op.param[2];     \
+        operand[0] = core->op.param[1];                                                             \
+        operand[1] = core->op.param[2];                                                             \
     }                                                                                               \
     if(*operand[0] == 0 || *operand[1] == 0)                                                        \
     {                                                                                               \
