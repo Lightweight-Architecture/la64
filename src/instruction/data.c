@@ -63,27 +63,33 @@ void la64_op_swpz(la64_core_t *core)
 
 void la64_op_push(la64_core_t *core)
 {
-    la64_instr_termcond(core->op.param_cnt != 1);
+    la64_instr_termcond(core->op.param_cnt == 0);
 
-    if(!la64_memory_write(core, core->rl[LA64_REGISTER_SP], *(core->op.param[0]), sizeof(uint64_t)))
+    for(uint8_t i = 0; i < core->op.param_cnt; i++)
     {
-        core->term = LA64_TERM_BAD_ACCESS;
-        return;
-    }
+        if(!la64_memory_write(core, core->rl[LA64_REGISTER_SP], *(core->op.param[i]), sizeof(uint64_t)))
+        {
+            core->term = LA64_TERM_BAD_ACCESS;
+            return;
+        }
 
-    core->rl[LA64_REGISTER_SP] -= 8;
+        core->rl[LA64_REGISTER_SP] -= 8;
+    }
 }
 
 void la64_op_pop(la64_core_t *core)
 {
-    la64_instr_termcond(core->op.param_cnt != 1);
+    la64_instr_termcond(core->op.param_cnt == 0);
 
-    core->rl[LA64_REGISTER_SP] += 8;
-
-    if(!la64_memory_read(core, core->rl[LA64_REGISTER_SP], sizeof(uint64_t), core->op.param[0]))
+    for(uint8_t i = 0; i < core->op.param_cnt; i++)
     {
-        core->term = LA64_TERM_BAD_ACCESS;
-        return;
+        core->rl[LA64_REGISTER_SP] += 8;
+
+        if(!la64_memory_read(core, core->rl[LA64_REGISTER_SP], sizeof(uint64_t), core->op.param[i]))
+        {
+            core->term = LA64_TERM_BAD_ACCESS;
+            return;
+        }
     }
 }
 
