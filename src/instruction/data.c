@@ -27,11 +27,17 @@
 #include <la64/machine.h>
 #include <la64/memory.h>
 
+void la64_op_clr(la64_core_t *core)
+{
+    la64_instr_termcond(core->op.param_cnt != 2);
+
+    *(core->op.param[0]) = 0;
+}
+
 void la64_op_mov(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 2);
 
-    /* performing move */
     *(core->op.param[0]) = *(core->op.param[1]);
 }
 
@@ -39,7 +45,6 @@ void la64_op_swp(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 2);
 
-    /* performing swap */
     uint64_t param_backup = *(core->op.param[0]);
     *(core->op.param[0]) = *(core->op.param[1]);
     *(core->op.param[1]) = param_backup;
@@ -49,7 +54,6 @@ void la64_op_swpz(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 2);
 
-    /* performing zero out swap */
     *(core->op.param[0]) = *(core->op.param[1]);
     *(core->op.param[1]) = 0;
 }

@@ -47,6 +47,7 @@ la64_opfunc_t opfunc_table[LA64_OPCODE_MAX + 1] = {
     la64_op_nop,
 
     /* data operations */
+    la64_op_clr,
     la64_op_mov,
     la64_op_swp,
     la64_op_swpz,
