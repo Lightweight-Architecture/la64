@@ -22,33 +22,24 @@
  * SOFTWARE.
  */
 
-#ifndef LA64_MACHINE_H
-#define LA64_MACHINE_H
-
-#include <la64/core.h>
-#include <la64/memory.h>
-#include <la64/mmio.h>
-
-#include <la64/device/timer.h>
-#include <la64/device/interrupt.h>
-#include <la64/device/uart.h>
-#include <la64/device/mc.h>
-#include <la64/device/platform.h>
+#ifndef LA64_DEVICE_PLATFORM_H
+#define LA64_DEVICE_PLATFORM_H
 
 #include <stdint.h>
 
-typedef struct la64_machine {
+#define PLATFORM_REG_PWR    0x00
+
+typedef struct la64_core la64_core_t;
+
+typedef struct {
     la64_core_t *core;
-    la64_memory_t *memory;
-    la64_mmio_bus_t *mmio_bus;
-    la64_intc_t *intc;
-    la64_timer_t *timer;
-    la64_uart_t *uart;
-    la64_mc_t *mc;
-    la64_platform_t *platform;
-} la64_machine_t;
+    uint8_t on;
+} la64_platform_t;
 
-la64_machine_t *la64_machine_alloc(uint64_t memory_size);
-void la64_machine_dealloc(la64_machine_t *machine);
+la64_platform_t *la64_platform_alloc(la64_core_t *core);
+void la64_platform_dealloc(la64_platform_t *p);
 
-#endif /* LA64_MACHINE_H */
+uint64_t la64_platform_read(void *device, uint64_t offset, int size);
+void la64_platform_write(void *device, uint64_t offset, uint64_t value, int size);
+
+#endif /* LA64_DEVICE_PLATFORM_H */

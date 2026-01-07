@@ -28,7 +28,7 @@
 #define la64_instr_termcond(case)                           \
     if(case)                                                \
     {                                                       \
-        core->term = LA64_TERM_BAD_ACCESS;                  \
+        core->exception = LA64_EXCEPTION_BAD_ACCESS;        \
         return;                                             \
     }    
 

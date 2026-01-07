@@ -104,8 +104,6 @@ bool la64_memory_load_image(la64_memory_t *memory,
     /* loading boot image into memory */
     read(fd, memory->memory, image_size);
 
-    printf("[boot] loaded boot image: %zu bytes\n", image_size);
-
     close(fd);
 
     return true;

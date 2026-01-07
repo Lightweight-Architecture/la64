@@ -131,7 +131,7 @@ void la64_push(la64_core_t *core, uint64_t value)
 {
     if(!la64_memory_write(core, core->rl[LA64_REGISTER_SP], value, sizeof(uint64_t)))
     {
-        core->term = LA64_TERM_BAD_ACCESS;
+        core->exception = LA64_EXCEPTION_BAD_ACCESS;
         return;
     }
 
@@ -146,7 +146,7 @@ uint64_t la64_pop(la64_core_t *core)
 
     if(!la64_memory_read(core, core->rl[LA64_REGISTER_SP], sizeof(uint64_t), &value))
     {
-        core->term = LA64_TERM_BAD_ACCESS;
+        core->exception = LA64_EXCEPTION_BAD_ACCESS;
         return 0;
     }
 

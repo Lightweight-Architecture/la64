@@ -137,14 +137,13 @@
 #define LA64_CMP_L  0x2
 #define LA64_CMP_G  0x4
 
-#pragma mark - termination flags
+#pragma mark - exception flags
 
-#define LA64_TERM_NONE              0b000
-#define LA64_TERM_HALT              0b001
-#define LA64_TERM_BAD_ACCESS        0b010
-#define LA64_TERM_PERMISSION        0b011
-#define LA64_TERM_BAD_INSTRUCTION   0b100
-#define LA64_TERM_BAD_ARITHMETIC    0b101
+#define LA64_EXCEPTION_NONE              0b000
+#define LA64_EXCEPTION_BAD_ACCESS        0b001
+#define LA64_EXCEPTION_PERMISSION        0b010
+#define LA64_EXCEPTION_BAD_INSTRUCTION   0b011
+#define LA64_EXCEPTION_BAD_ARITHMETIC    0b100
 
 typedef struct la64_machine la64_machine_t;
 
@@ -157,17 +156,10 @@ typedef struct {
 } la64_operation_t;
 
 typedef struct la64_core {
-    /* registers */
     uint64_t rl[LA64_REGISTER_MAX + 1];
-
-    /* operation */
     la64_operation_t op;
-
-    /* Exec flags */
-    uint8_t runs;
-    uint8_t term;
-
-    /* Machine related things */
+    uint8_t exception;
+    bool halted;
     la64_machine_t *machine;
 } la64_core_t;
 

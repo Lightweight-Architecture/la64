@@ -25,6 +25,7 @@ add_executable(la64
     src/device/uart.c
     src/device/rtc.c
     src/device/mc.c
+    src/device/platform.c
 
     src/instruction/core.c
     src/instruction/data.c

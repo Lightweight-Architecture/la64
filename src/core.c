@@ -26,6 +26,7 @@
 #include <pthread.h>
 #include <string.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include <la64/core.h>
 #include <la64/memory.h>
@@ -120,7 +121,7 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
     /* null pointer check */
     if(iptr == NULL)
     {
-        core->term = LA64_TERM_BAD_ACCESS;
+        core->exception = LA64_EXCEPTION_BAD_ACCESS;
         return;
     }
 
@@ -137,7 +138,8 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
         case LA64_OPCODE_HLT:
         case LA64_OPCODE_NOP:
         case LA64_OPCODE_RET:
-            return;
+            core->op.ilen = 1;
+            goto skip_parsing;
         default:
             break;
     }
@@ -156,7 +158,8 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
                 reached_end = true;
                 break;
             case LA64_PARAMETER_CODING_REG:
-                core->op.param[core->op.param_cnt++] = &(core->rl[(uint8_t)bitwalker_read(&bw, 5)]);
+                core->op.param[core->op.param_cnt] = &(core->rl[(uint8_t)bitwalker_read(&bw, 5)]);
+                core->op.param_cnt++;
                 break;
             case LA64_PARAMETER_CODING_IMM8:
                 core->op.imm[core->op.param_cnt] = (uint8_t)bitwalker_read(&bw, 8);
@@ -179,11 +182,13 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
                 core->op.param_cnt++;
                 break;
             default:
-                core->term = LA64_TERM_BAD_INSTRUCTION;
+                core->exception = LA64_EXCEPTION_BAD_INSTRUCTION;
                 reached_end = true;
                 return;
         }
     }
+
+skip_parsing:
 
     /* finding out how many steps the the program counter has to jump */
     core->op.ilen = bitwalker_bytes_used(&bw);
@@ -202,68 +207,72 @@ static void *la64_core_execute_thread(void *arg)
     /* cast argument to core */
     la64_core_t *core = arg;
 
-    // Set runs flag
-    core->runs = 0b00000001;
-    core->term = LA64_TERM_NONE;
+    /* setting properties */
+    core->exception = LA64_EXCEPTION_NONE;
+    core->halted = false;
 
     while(1)
     {
-        switch(core->term)
+        /* checking if core is halted, if so simply skip execution */
+        if(core->halted)
         {
-            case LA64_TERM_NONE:
-                break;
-            case LA64_TERM_HALT:
-                printf("[exec] halt @ 0x%llx\n", core->rl[LA64_REGISTER_PC]);
-                core->runs = 0b00000000;
-                return NULL;
-            case LA64_TERM_BAD_ACCESS:
-                printf("[exec] bad access @ 0x%llx\n", core->rl[LA64_REGISTER_PC]);
-                core->runs = 0b00000000;
-                return NULL;
-            case LA64_TERM_PERMISSION:
-                printf("[exec] permission denied @ 0x%llx\n", core->rl[LA64_REGISTER_PC]);
-                core->runs = 0b00000000;
-                return NULL;
-            case LA64_TERM_BAD_INSTRUCTION:
+            /* yield cpu to not burn it */
+            usleep(100);
+            goto skip_execution;
+        }
+
+        /* checking for any exception */
+        switch(core->exception)
+        {
+            case LA64_EXCEPTION_BAD_ACCESS:
+                goto switch_raise_isoftware;
+            case LA64_EXCEPTION_PERMISSION:
+                goto switch_raise_isoftware;
+            case LA64_EXCEPTION_BAD_INSTRUCTION:
 bad_instruction_shortcut:
-                printf("[exec] bad instruction @ 0x%llx\n", core->rl[LA64_REGISTER_PC]);
-                core->runs = 0b00000000;
-                return NULL;
-            case LA64_TERM_BAD_ARITHMETIC:
-                printf("[exec] bad arithmetic @ 0x%llx\n", core->rl[LA64_REGISTER_PC]);
-                core->runs = 0b00000000;
-                return NULL;
+                goto switch_raise_isoftware;
+            case LA64_EXCEPTION_BAD_ARITHMETIC:
+switch_raise_isoftware:
+                core->halted = true;
+                la64_raise_interrupt(core, LA64_IRQ_SOFTWARE);
+                break;
             default:
-                printf("[exec] unknown exception @ 0x%llx\n", core->rl[LA64_REGISTER_PC]);
                 break;
         }
 
+        /* decoding instruction */
         la64_core_decode_instruction_at_pc(core);
 
-        if(core->op.op <= LA64_OPCODE_MAX && opfunc_table[core->op.op] != NULL)
-        {
-            opfunc_table[core->op.op](core);
-        }
-        else
+        /* sanity check */
+        if(core->op.op > LA64_OPCODE_MAX || opfunc_table[core->op.op] == NULL)
         {
             goto bad_instruction_shortcut;
         }
 
+        /* executing instruction */
+        opfunc_table[core->op.op](core);
+
+        /* incrementing program counter by instruction size */
         core->rl[LA64_REGISTER_PC] += core->op.ilen;
 
-        /* Check and handle pending interrupts */
-        if (core->machine && core->machine->intc) {
+        /* interrupt controller checking routine starts here */
+skip_execution:
+
+        /* check and handle pending interrupts */
+        if(core->machine && core->machine->intc && la64_intc_pending(core->machine->intc))
+        {
             la64_intc_check(core);
         }
 
-        /* Tick the timer (if present) */
-        if (core->machine && core->machine->timer) {
+        /* tick the timer always */
+        if(core->machine && core->machine->timer)
+        {
             extern uint64_t la64_get_host_cycles(void);
             la64_timer_tick(core->machine->timer, la64_get_host_cycles());
         }
     }
 
-    core->runs = 0b00000000;
+    //core->runs = 0b00000000;
     return NULL;
 }
 
@@ -271,10 +280,10 @@ bad_instruction_shortcut:
 void la64_core_execute(la64_core_t *core)
 {
     /* core running check */
-    if(core->runs)
+    /*if(core->runs)
     {
         return;
-    }
+    }*/
 
     /* invoking execution */
     pthread_t pthread;
@@ -285,5 +294,5 @@ void la64_core_execute(la64_core_t *core)
 void la64_core_terminate(la64_core_t *core)
 {
     /* setting termination flag (TODO: needs atomics) */
-    core->term = 0b00000001;
+    //core->term = 0b00000001;
 }

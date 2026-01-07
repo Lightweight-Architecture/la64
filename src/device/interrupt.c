@@ -177,6 +177,29 @@ bool la64_intc_check(la64_core_t *core)
     return true;
 }
 
+bool la64_intc_pending(la64_intc_t *intc)
+{
+    if(intc == NULL)
+    {
+        return false;
+    }
+    
+    /* check if interrupts are globally enabled */
+    if(!(intc->ctrl & LA64_INTC_CTRL_ENABLE))
+    {
+        return false;
+    }
+    
+    /* check if were already servicing (and nesting disabled) */
+    if(intc->current_irq >= 0 && !(intc->ctrl & LA64_INTC_CTRL_NESTING))
+    {
+        return false;
+    }
+    
+    /* check for any pending and enabled interrupt */
+    return (intc->pending & intc->enabled) != 0;
+}
+
 uint64_t la64_intc_read(void *device, uint64_t offset, int size)
 {
     la64_intc_t *intc = (la64_intc_t *)device;

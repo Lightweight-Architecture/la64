@@ -29,10 +29,7 @@ void la64_op_hlt(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 0);
 
-    if(core->term == LA64_TERM_NONE)
-    {
-        core->term = LA64_TERM_HALT;
-    }
+    core->halted = true;
 }
 
 void la64_op_nop(la64_core_t *core)

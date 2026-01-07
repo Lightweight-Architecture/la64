@@ -43,6 +43,9 @@
 #define LA64_MC_BASE        0x1FE00400
 #define LA64_MC_SIZE        0x08
 
+#define LA64_PLATFORM_BASE  0x1FE00500
+#define LA64_PLATFORM_SIZE  0x01
+
 la64_machine_t *la64_machine_alloc(uint64_t memory_size)
 {
     /* allocating brand new machine */
@@ -149,9 +152,24 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
         goto out_release_mc;
     }
 
+    /* allocate platform */
+    machine->platform = la64_platform_alloc(machine->core);
+
+    if(machine->platform == NULL)
+    {
+        goto out_release_mc;
+    }
+
+    if(!la64_mmio_register(machine->mmio_bus, LA64_PLATFORM_BASE, LA64_PLATFORM_SIZE, machine->platform, la64_platform_read, la64_platform_write, "platform"))
+    {
+        goto out_release_platform;
+    }
+
     return machine;
 
     /* much more compact error handling */
+out_release_platform:
+    la64_platform_dealloc(machine->platform);
 out_release_mc:
     la64_mc_dealloc(machine->mc);
 out_release_uart:
@@ -177,6 +195,12 @@ void la64_machine_dealloc(la64_machine_t *machine)
     if(machine == NULL)
     {
         return;
+    }
+
+    /* release platform */
+    if(machine->platform)
+    {
+        la64_platform_dealloc(machine->platform);
     }
 
     /* release mc */

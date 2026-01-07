@@ -67,6 +67,7 @@ void la64_intc_dealloc(la64_intc_t *intc);
 void la64_raise_interrupt(la64_core_t *core, int irq_line);
 void la64_clear_interrupt(la64_core_t *core, int irq_line);
 bool la64_intc_check(la64_core_t *core);
+bool la64_intc_pending(la64_intc_t *intc);
 
 uint64_t la64_intc_read(void *device, uint64_t offset, int size);
 void la64_intc_write(void *device, uint64_t offset, uint64_t value, int size);

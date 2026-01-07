@@ -59,7 +59,7 @@
     }                                                                                               \
     if(*operand[0] == 0 || *operand[1] == 0)                                                        \
     {                                                                                               \
-        core->term = LA64_TERM_BAD_ARITHMETIC;                                                      \
+        core->exception = LA64_EXCEPTION_BAD_ARITHMETIC;                                            \
         return;                                                                                     \
     }                                                                                               \
     *(core->op.param[0]) = *operand[0] act *operand[1];
@@ -78,7 +78,7 @@
     }                                                                                               \
     if(*operand[0] == 0 || *operand[1] == 0)                                                        \
     {                                                                                               \
-        core->term = LA64_TERM_BAD_ARITHMETIC;                                                      \
+        core->exception = LA64_EXCEPTION_BAD_ARITHMETIC;                                            \
         return;                                                                                     \
     }                                                                                               \
     *(core->op.param[0]) = (int64_t)*operand[0] act (int64_t)*operand[1];

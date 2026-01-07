@@ -22,33 +22,69 @@
  * SOFTWARE.
  */
 
-#ifndef LA64_MACHINE_H
-#define LA64_MACHINE_H
+#include <stdio.h>
+#include <stdlib.h>
 
-#include <la64/core.h>
-#include <la64/memory.h>
-#include <la64/mmio.h>
-
-#include <la64/device/timer.h>
-#include <la64/device/interrupt.h>
-#include <la64/device/uart.h>
-#include <la64/device/mc.h>
 #include <la64/device/platform.h>
+#include <la64/machine.h>
 
-#include <stdint.h>
+la64_platform_t *la64_platform_alloc(la64_core_t *core)
+{
+    if(core == NULL)
+    {
+        return NULL;
+    }
 
-typedef struct la64_machine {
-    la64_core_t *core;
-    la64_memory_t *memory;
-    la64_mmio_bus_t *mmio_bus;
-    la64_intc_t *intc;
-    la64_timer_t *timer;
-    la64_uart_t *uart;
-    la64_mc_t *mc;
-    la64_platform_t *platform;
-} la64_machine_t;
+    la64_platform_t *p = calloc(1, sizeof(la64_platform_t));
+    
+    if(p == NULL)
+    {
+        return NULL;
+    }
 
-la64_machine_t *la64_machine_alloc(uint64_t memory_size);
-void la64_machine_dealloc(la64_machine_t *machine);
+    p->core = core;
+    p->on = true;
 
-#endif /* LA64_MACHINE_H */
+    return p;
+}
+
+void la64_platform_dealloc(la64_platform_t *p)
+{
+    if(p == NULL)
+    {
+        return;
+    }
+
+    free(p);
+}
+
+uint64_t la64_platform_read(void *device, uint64_t offset, int size)
+{
+    if(device == NULL)
+    {
+        return 0;
+    }
+
+    la64_platform_t *p = (la64_platform_t*)device;
+
+    return p->on;
+}
+
+void la64_platform_write(void *device, uint64_t offset, uint64_t value, int size)
+{
+    if(device == NULL)
+    {
+        return;
+    }
+
+    la64_platform_t *p = (la64_platform_t*)device;
+
+    p->on = value;
+
+    if(!p->on)
+    {
+        /* to be fully implemented */
+        la64_machine_dealloc(p->core->machine);
+        exit(0);
+    }
+}

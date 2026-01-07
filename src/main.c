@@ -41,8 +41,6 @@ int main(int argc, char *argv[])
     /* creating new la16 virtual machine */
     la64_machine_t *machine = la64_machine_alloc(0x20000000);
 
-    printf("[boot] memory size: %llu bytes\n", machine->memory->memory_size);
-
     /* load boot image */
     if(!la64_memory_load_image(machine->memory, argv[1]))
     {
@@ -57,13 +55,8 @@ int main(int argc, char *argv[])
     bitwalker_init_read(&bw, machine->memory->memory, 8, BW_LITTLE_ENDIAN);
     machine->core->rl[LA64_REGISTER_PC] = bitwalker_read(&bw, 64);
 
-    printf("[boot] found entry point @ 0x%llx\n", machine->core->rl[LA64_REGISTER_PC]);
-
     /* setting stack pointer of  */
     machine->core->rl[LA64_REGISTER_SP] = machine->memory->memory_size - 8;
-
-    printf("[boot] set stack pointer @ 0x%llx\n", machine->core->rl[LA64_REGISTER_SP]);
-    printf("[exec] executing core\n");
 
     /* executing virtual machines 1st core TODO: Implement threading */
     la64_core_execute(machine->core);

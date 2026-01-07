@@ -69,7 +69,7 @@ void la64_op_push(la64_core_t *core)
     {
         if(!la64_memory_write(core, core->rl[LA64_REGISTER_SP], *(core->op.param[i]), sizeof(uint64_t)))
         {
-            core->term = LA64_TERM_BAD_ACCESS;
+            core->exception = LA64_EXCEPTION_BAD_ACCESS;
             return;
         }
 
@@ -87,7 +87,7 @@ void la64_op_pop(la64_core_t *core)
 
         if(!la64_memory_read(core, core->rl[LA64_REGISTER_SP], sizeof(uint64_t), core->op.param[i]))
         {
-            core->term = LA64_TERM_BAD_ACCESS;
+            core->exception = LA64_EXCEPTION_BAD_ACCESS;
             return;
         }
     }
@@ -99,7 +99,7 @@ void la64_op_ldb(la64_core_t *core)
 
     if(!la64_memory_read(core, *(core->op.param[1]), sizeof(uint8_t), core->op.param[0]))
     {
-        core->term = LA64_TERM_BAD_ACCESS;
+        core->exception = LA64_EXCEPTION_BAD_ACCESS;
         return;
     }
 }
@@ -110,7 +110,7 @@ void la64_op_ldw(la64_core_t *core)
 
     if(!la64_memory_read(core, *(core->op.param[1]), sizeof(uint16_t), core->op.param[0]))
     {
-        core->term = LA64_TERM_BAD_ACCESS;
+        core->exception = LA64_EXCEPTION_BAD_ACCESS;
         return;
     }
 }
@@ -121,7 +121,7 @@ void la64_op_ldd(la64_core_t *core)
 
     if(!la64_memory_read(core, *(core->op.param[1]), sizeof(uint32_t), core->op.param[0]))
     {
-        core->term = LA64_TERM_BAD_ACCESS;
+        core->exception = LA64_EXCEPTION_BAD_ACCESS;
         return;
     }
 }
@@ -132,7 +132,7 @@ void la64_op_ldq(la64_core_t *core)
 
     if(!la64_memory_read(core, *(core->op.param[1]), sizeof(uint64_t), core->op.param[0]))
     {
-        core->term = LA64_TERM_BAD_ACCESS;
+        core->exception = LA64_EXCEPTION_BAD_ACCESS;
         return;
     }
 }
@@ -143,7 +143,7 @@ void la64_op_stb(la64_core_t *core)
 
     if(!la64_memory_write(core, *(core->op.param[0]), *(core->op.param[1]), sizeof(uint8_t)))
     {
-        core->term = LA64_TERM_BAD_ACCESS;
+        core->exception = LA64_EXCEPTION_BAD_ACCESS;
         return;
     }
 }
@@ -154,7 +154,7 @@ void la64_op_stw(la64_core_t *core)
 
     if(!la64_memory_write(core, *(core->op.param[0]), *(core->op.param[1]), sizeof(uint16_t)))
     {
-        core->term = LA64_TERM_BAD_ACCESS;
+        core->exception = LA64_EXCEPTION_BAD_ACCESS;
         return;
     }
 }
@@ -165,7 +165,7 @@ void la64_op_std(la64_core_t *core)
 
     if(!la64_memory_write(core, *(core->op.param[0]), *(core->op.param[1]), sizeof(uint32_t)))
     {
-        core->term = LA64_TERM_BAD_ACCESS;
+        core->exception = LA64_EXCEPTION_BAD_ACCESS;
         return;
     }
 }
@@ -176,7 +176,7 @@ void la64_op_stq(la64_core_t *core)
 
     if(!la64_memory_write(core, *(core->op.param[0]), *(core->op.param[1]), sizeof(uint64_t)))
     {
-        core->term = LA64_TERM_BAD_ACCESS;
+        core->exception = LA64_EXCEPTION_BAD_ACCESS;
         return;
     }
 }
