@@ -191,14 +191,16 @@ void la64_op_ror(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 1);
 
-    uint64_t v = *(core->op.param[0]);
-    *(core->op.param[0]) = (v >> 1) | (v << 63);
+    uint64_t v = *core->op.param[0];
+    uint64_t n = (core->op.param_cnt == 2) ? (*core->op.param[1] & 63) : 1;
+    *core->op.param[0] = (v >> n) | (v << (64 - n));
 }
 
 void la64_op_rol(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 1);
 
-    uint64_t v = *(core->op.param[0]);
-    *(core->op.param[0]) = (v << 1) | (v >> 63);
+    int64_t v = *core->op.param[0];
+    uint64_t n = (core->op.param_cnt == 2) ? (*core->op.param[1] & 63) : 1;
+    *core->op.param[0] = (v << n) | (v >> (64 - n));
 }
