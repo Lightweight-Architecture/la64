@@ -113,14 +113,11 @@ void *la64_memory_access(la64_core_t *core,
                          uint64_t addr,
                          size_t size)
 {
-    /* null pointer check */
-    if(core == NULL || core->machine == NULL || core->machine->memory == NULL)
-    {
-        return NULL;
-    }
-
-    /* null size check */
-    if(size == 0)
+    /* sanity check */
+    if(core == NULL ||
+       core->machine == NULL ||
+       core->machine->memory == NULL ||
+       size == 0)
     {
         return NULL;
     }
@@ -152,42 +149,41 @@ bool la64_memory_read(la64_core_t *core,
     /* finding mmio device */
     la64_mmio_region_t *mmio = la64_mmio_find(core->machine->mmio_bus, addr);
 
-    /* null pointer check */
+    /* checking if address was indeed assigned to a MMIO device */
     if(mmio != NULL)
     {
-        /* mmio device found, try to fetch */
+        /* getting value of MMIO device */
         *value = mmio->read(mmio->device, addr - mmio->base_addr, size);
         return true;
     }
 
-    /* getting pointer */
+    /* accessing memory */
     void *ptr = la64_memory_access(core, addr, size);
-    if(!ptr)
+
+    /* checking if memory access was successful */
+    if(ptr == NULL)
     {
         return false;
     }
 
     /* perform read from memory */
-    switch (size)
+    switch(size)
     {
         case 1:
             *value = *(uint8_t *)ptr;
-            goto out_success;
+            return true;
         case 2:
             *value = *(uint16_t *)ptr;
-            goto out_success;
+            return true;
         case 4:
             *value = *(uint32_t *)ptr;
-            goto out_success;
+            return true;
         case 8:
             *value = *(uint64_t *)ptr;
-            goto out_success;
+            return true;
+        default:
+            return false;
     }
-
-    return true;
-
-out_success:
-    return true;
 }
 
 bool la64_memory_write(la64_core_t *core,
@@ -214,26 +210,28 @@ bool la64_memory_write(la64_core_t *core,
 
     /* accessing memory */
     void *ptr = la64_memory_access(core, addr, size);
-    if(!ptr) return false;
+
+    /* checking if memory access was successful */
+    if(ptr == NULL)
+    {
+        return false;
+    }
     
-    switch (size)
+    switch(size)
     {
         case 1:
             *(uint8_t *)ptr = value;
-            goto out_success;
+            return true;
         case 2:
             *(uint16_t *)ptr = value;
-            goto out_success;
+            return true;
         case 4:
             *(uint32_t *)ptr = value;
-            goto out_success;
+            return true;
         case 8:
             *(uint64_t *)ptr = value;
-            goto out_success;
+            return true;
+        default:
+            return false;
     }
-
-    return false;
-
-out_success:
-    return true;
 }
