@@ -19,7 +19,7 @@ add_executable(la64
     src/machine.c
     src/memory.c
     src/mmio.c
-    
+
     src/device/timer.c
     src/device/interrupt.c
     src/device/uart.c
@@ -50,3 +50,11 @@ target_include_directories(la64_headers
 )
 
 target_compile_features(la64 PRIVATE c_std_99)
+
+install(TARGETS la64
+    RUNTIME DESTINATION bin
+)
+
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
+    DESTINATION include
+)
