@@ -57,7 +57,7 @@
         operand[0] = core->op.param[1];                                                             \
         operand[1] = core->op.param[2];                                                             \
     }                                                                                               \
-    if(*operand[0] == 0 || *operand[1] == 0)                                                        \
+    if(*operand[1] == 0)                                                                            \
     {                                                                                               \
         core->exception = LA64_EXCEPTION_BAD_ARITHMETIC;                                            \
         return;                                                                                     \
@@ -76,7 +76,7 @@
         operand[0] = core->op.param[1];                                                             \
         operand[1] = core->op.param[2];                                                             \
     }                                                                                               \
-    if(*operand[0] == 0 || *operand[1] == 0)                                                        \
+    if(*operand[1] == 0)                                                                            \
     {                                                                                               \
         core->exception = LA64_EXCEPTION_BAD_ARITHMETIC;                                            \
         return;                                                                                     \
