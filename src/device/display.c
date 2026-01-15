@@ -22,8 +22,6 @@
  * SOFTWARE.
  */
 
-#if defined(__linux__)
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -35,6 +33,8 @@
 #include <lautils/bitwalker.h>
 
 #include <la64/device/display.h>
+
+#if defined(__linux__)
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -316,6 +316,8 @@ void *display_start(void *arg)
     return 0;
 }
 
+#endif /* __linux__ */
+
 uint64_t la64_fb_read(la64_core_t *core, 
                       void *device,
                       uint64_t offset,
@@ -395,5 +397,3 @@ void la64_fb_write(la64_core_t *core,
         display->enabled = (uint8_t)value;
     }
 }
-
-#endif /* __linux__ */

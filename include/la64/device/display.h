@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#if defined(__linux__)
+#if defined(__linux__) || defined(__APPLE__)
 
 #ifndef LA64_DEVICE_DISPLAY_H
 #define LA64_DEVICE_DISPLAY_H

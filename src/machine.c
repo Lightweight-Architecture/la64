@@ -138,7 +138,7 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
         goto out_release_platform;
     }
 
-#if defined(__linux__)
+#if defined(__linux__) || defined(__APPLE__)
     machine->display = la64_display_alloc();
 
     if(machine->display == NULL)
@@ -155,7 +155,7 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
     return machine;
 
     /* much more compact error handling */
-#if defined(__linux__)
+#if defined(__linux__)  || defined(__APPLE__)
 out_release_display:
     la64_display_dealloc(machine->display);
 #endif /* __linux__ */
@@ -186,7 +186,7 @@ void la64_machine_dealloc(la64_machine_t *machine)
         return;
     }
 
-#if defined(__linux__)
+#if defined(__linux__)  || defined(__APPLE__)
     /* release display */
     if(machine->display)
     {

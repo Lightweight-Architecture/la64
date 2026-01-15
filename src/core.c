@@ -295,7 +295,10 @@ void la64_core_execute(la64_core_t *core)
     /* invoking execution */
     pthread_t pthread;
     pthread_create(&pthread, NULL, la64_core_execute_thread, (void*)core);
+
+#if !defined(__APPLE__)
     pthread_join(pthread, NULL);
+#endif /* __APPLE__ */
 }
 
 void la64_core_terminate(la64_core_t *core)

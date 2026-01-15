@@ -63,6 +63,11 @@ int main(int argc, char *argv[])
     /* executing virtual machines 1st core TODO: Implement threading */
     la64_core_execute(machine->core);
 
+#if defined(__APPLE__)
+    extern void CFRunLoopRun();
+    CFRunLoopRun();
+#endif /* __APPLE__ */
+
     /* deallocating machine */
     la64_machine_dealloc(machine);
 
