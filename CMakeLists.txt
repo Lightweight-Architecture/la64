@@ -26,8 +26,7 @@ add_executable(la64
     src/device/rtc.c
     src/device/mc.c
     src/device/platform.c
-    src/device/display.c    # Linux/OpenGL backend
-    src/device/display.m    # macOS/Metal backend
+    src/device/display.c
 
     src/instruction/core.c
     src/instruction/data.c
@@ -53,6 +52,11 @@ if(UNIX AND NOT APPLE)
 endif()
 
 if(APPLE)
+    target_sources(la64
+        PRIVATE
+            src/device/display.m
+    )
+
     find_library(COCOA_FRAMEWORK Cocoa REQUIRED)
     find_library(OPENGL_FRAMEWORK OpenGL REQUIRED)
 
