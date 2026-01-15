@@ -35,6 +35,10 @@
 #include <la64/device/mc.h>
 #include <la64/device/platform.h>
 
+#if defined(__linux__)
+#include <la64/device/display.h>
+#endif /* __linux__ */
+
 #include <stdint.h>
 
 typedef struct la64_machine {
@@ -44,8 +48,10 @@ typedef struct la64_machine {
     la64_intc_t *intc;
     la64_timer_t *timer;
     la64_uart_t *uart;
-    la64_mc_t *mc;
     la64_platform_t *platform;
+#if defined(__linux__)
+    la64_display_t *display;
+#endif /* __linux__ */
 } la64_machine_t;
 
 la64_machine_t *la64_machine_alloc(uint64_t memory_size);

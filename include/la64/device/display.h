@@ -22,27 +22,44 @@
  * SOFTWARE.
  */
 
-#include <la64/machine.h>
+#if defined(__linux__)
 
-#include <la64/device/mc.h>
+#ifndef LA64_DEVICE_DISPLAY_H
+#define LA64_DEVICE_DISPLAY_H
 
-#include <stdlib.h>
+#define LA64_FB_WIDTH   256
+#define LA64_FB_HEIGHT  256
+#define LA64_FB_TICK_HZ 64.0
+#define LA64_FB_TICK_DT 1.0 / TICK_HZ
 
-uint64_t la64_mc_read(la64_core_t *core,
-                      void *device,
-                      uint64_t offset,
-                      int size)
-{
-    /* returning memory size */
-    return core->machine->memory->memory_size;
-}
+#define LA64_FB_REG_ENABLED 0x00
+#define LA64_FB_PALLETE     0x01
+#define LA64_FB_FRAMEBUFFER 0x301
 
-void la64_mc_write(la64_core_t *core,
-                   void *device,
-                   uint64_t offset,
-                   uint64_t value,
-                   int size)
-{
-    /* ro device */
-    return;
-}
+#define LA64_FB_BASE        0x1FE00700
+#define LA64_FB_SIZE        LA64_FB_FRAMEBUFFER + (LA64_FB_WIDTH * LA64_FB_HEIGHT)
+
+#include <stdatomic.h>
+#include <stdint.h>
+#include <pthread.h>
+
+typedef struct la64_core la64_core_t;
+
+typedef struct {
+    uint8_t enabled;
+    uint8_t *palette;
+    uint8_t *fb;
+    pthread_t pthread;
+} la64_display_t;
+
+la64_display_t *la64_display_alloc(void);
+void la64_display_dealloc(la64_display_t *display);
+
+void *display_start(void *arg);
+
+uint64_t la64_fb_read(la64_core_t *core, void *device, uint64_t offset, int size);
+void la64_fb_write(la64_core_t *core, void *device, uint64_t offset, uint64_t value, int size);
+
+#endif /* LA64_DEVICE_DISPLAY_H */
+
+#endif /* __linux__ */

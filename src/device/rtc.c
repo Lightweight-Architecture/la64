@@ -26,7 +26,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-uint64_t la64_rtc_read(void *device,
+uint64_t la64_rtc_read(la64_core_t *core,
+                       void *device,
                        uint64_t offset,
                        int size)
 {
@@ -58,7 +59,8 @@ uint64_t la64_rtc_read(void *device,
     }
 }
 
-void la64_rtc_write(void *device,
+void la64_rtc_write(la64_core_t *core, 
+                    void *device,
                     uint64_t offset,
                     uint64_t value,
                     int size)

@@ -26,8 +26,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <pthread.h>
 
 #include <la64/machine.h>
+#include <la64/device/display.h>
 
 #include <lautils/bitwalker.h>
 
@@ -58,8 +60,13 @@ int main(int argc, char *argv[])
     /* setting stack pointer of  */
     machine->core->rl[LA64_REGISTER_SP] = machine->memory->memory_size - 8;
 
+    pthread_t thread;
+    pthread_create(&thread, NULL, display_start, NULL);
+
     /* executing virtual machines 1st core TODO: Implement threading */
     la64_core_execute(machine->core);
+
+    pthread_cancel(thread);
 
     /* deallocating machine */
     la64_machine_dealloc(machine);

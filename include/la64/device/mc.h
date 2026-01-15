@@ -27,16 +27,12 @@
 
 #include <stdint.h>
 
+#define LA64_MC_BASE        0x1FE00400
+#define LA64_MC_SIZE        0x08
+
 typedef struct la64_core la64_core_t;
 
-typedef struct {
-    la64_core_t *core;
-} la64_mc_t;
-
-la64_mc_t *la64_mc_alloc(la64_core_t *core);
-void la64_mc_dealloc(la64_mc_t *mc);
-
-uint64_t la64_mc_read(void *device, uint64_t offset, int size);
-void la64_mc_write(void *device, uint64_t offset, uint64_t value, int size);
+uint64_t la64_mc_read(la64_core_t *core, void *device, uint64_t offset, int size);
+void la64_mc_write(la64_core_t *core, void *device, uint64_t offset, uint64_t value, int size);
 
 #endif /* LA64_DEVICE_MC_H */

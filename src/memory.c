@@ -153,7 +153,7 @@ bool la64_memory_read(la64_core_t *core,
     if(mmio != NULL)
     {
         /* getting value of MMIO device */
-        *value = mmio->read(mmio->device, addr - mmio->base_addr, size);
+        *value = mmio->read(core, mmio->device, addr - mmio->base_addr, size);
         return true;
     }
 
@@ -204,7 +204,7 @@ bool la64_memory_write(la64_core_t *core,
     if(mmio != NULL)
     {
         /* performing mmio write */
-        mmio->write(mmio->device, addr - mmio->base_addr, value, size);
+        mmio->write(core, mmio->device, addr - mmio->base_addr, value, size);
         return true;
     }
 

@@ -26,6 +26,7 @@ add_executable(la64
     src/device/rtc.c
     src/device/mc.c
     src/device/platform.c
+    src/device/display.c
 
     src/instruction/core.c
     src/instruction/data.c
@@ -40,6 +41,9 @@ target_include_directories(la64
 
 target_link_libraries(la64
     PRIVATE lautils
+    PRIVATE glfw
+    PRIVATE GLEW
+    PRIVATE GL
 )
 
 add_library(la64_headers INTERFACE)

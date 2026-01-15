@@ -27,6 +27,9 @@
 
 #include <stdint.h>
 
+#define LA64_PLATFORM_BASE  0x1FE00500
+#define LA64_PLATFORM_SIZE  0x01
+
 #define PLATFORM_REG_PWR    0x00
 
 typedef struct la64_core la64_core_t;
@@ -39,7 +42,7 @@ typedef struct {
 la64_platform_t *la64_platform_alloc(la64_core_t *core);
 void la64_platform_dealloc(la64_platform_t *p);
 
-uint64_t la64_platform_read(void *device, uint64_t offset, int size);
-void la64_platform_write(void *device, uint64_t offset, uint64_t value, int size);
+uint64_t la64_platform_read(la64_core_t *core, void *device, uint64_t offset, int size);
+void la64_platform_write(la64_core_t *core, void *device, uint64_t offset, uint64_t value, int size);
 
 #endif /* LA64_DEVICE_PLATFORM_H */

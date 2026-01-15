@@ -27,25 +27,6 @@
 
 #include <la64/device/rtc.h>
 
-#define LA64_INTC_BASE      0x1FE00000
-#define LA64_INTC_SIZE      0x40
-
-#define LA64_TIMER_BASE     0x1FE00100
-#define LA64_TIMER_SIZE     0x28
-#define LA64_TIMER_FREQ     100000000
-
-#define LA64_RTC_BASE       0x1FE00200
-#define LA64_RTC_SIZE       0x28
-
-#define LA64_UART_BASE      0x1FE00300
-#define LA64_UART_SIZE      0x10
-
-#define LA64_MC_BASE        0x1FE00400
-#define LA64_MC_SIZE        0x08
-
-#define LA64_PLATFORM_BASE  0x1FE00500
-#define LA64_PLATFORM_SIZE  0x01
-
 la64_machine_t *la64_machine_alloc(uint64_t memory_size)
 {
     /* allocating brand new machine */
@@ -104,7 +85,7 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
     }
 
     /* allocate timer */
-    machine->timer = la64_timer_alloc(machine->core,  LA64_TIMER_FREQ,  LA64_IRQ_TIMER);
+    machine->timer = la64_timer_alloc(LA64_TIMER_FREQ,  LA64_IRQ_TIMER);
 
     /* null pointer check */
     if(machine->timer == NULL)
@@ -128,28 +109,20 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
 
     la64_uart_start(machine->uart);
 
-    if(!la64_mmio_register(machine->mmio_bus, LA64_UART_BASE, LA64_UART_SIZE, machine->uart, (mmio_read_fn)la64_uart_read, (mmio_write_fn)la64_uart_write, "uart"))
+    if(!la64_mmio_register(machine->mmio_bus, LA64_UART_BASE, LA64_UART_SIZE, machine->uart, la64_uart_read, la64_uart_write, "uart"))
     {
         goto out_release_uart;
     }
 
     /* register rtc */
-    if(!la64_mmio_register(machine->mmio_bus, LA64_RTC_BASE, LA64_RTC_SIZE, NULL, (mmio_read_fn)la64_rtc_read, (mmio_write_fn)la64_rtc_write, "rtc"))
+    if(!la64_mmio_register(machine->mmio_bus, LA64_RTC_BASE, LA64_RTC_SIZE, NULL, la64_rtc_read, la64_rtc_write, "rtc"))
     {
         goto out_release_uart;
     }
 
-    /* allocate mc */
-    machine->mc = la64_mc_alloc(machine->core);
-
-    if(machine->mc == NULL)
+    if(!la64_mmio_register(machine->mmio_bus, LA64_MC_BASE, LA64_MC_SIZE, NULL, la64_mc_read, la64_mc_write, "mc"))
     {
         goto out_release_uart;
-    }
-
-    if(!la64_mmio_register(machine->mmio_bus, LA64_MC_BASE, LA64_MC_SIZE, machine->mc, la64_mc_read, la64_mc_write, "mc"))
-    {
-        goto out_release_mc;
     }
 
     /* allocate platform */
@@ -157,7 +130,7 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
 
     if(machine->platform == NULL)
     {
-        goto out_release_mc;
+        goto out_release_uart;
     }
 
     if(!la64_mmio_register(machine->mmio_bus, LA64_PLATFORM_BASE, LA64_PLATFORM_SIZE, machine->platform, la64_platform_read, la64_platform_write, "platform"))
@@ -165,13 +138,29 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
         goto out_release_platform;
     }
 
+#if defined(__linux__)
+    machine->display = la64_display_alloc();
+
+    if(machine->display == NULL)
+    {
+        goto out_release_display;
+    }
+
+    if(!la64_mmio_register(machine->mmio_bus, LA64_FB_BASE, LA64_FB_SIZE, machine->display, la64_fb_read, la64_fb_write, "fb"))
+    {
+        goto out_release_platform;
+    }
+#endif /* __linux__ */
+
     return machine;
 
     /* much more compact error handling */
+#if defined(__linux__)
+out_release_display:
+    la64_display_dealloc(machine->display);
+#endif /* __linux__ */
 out_release_platform:
     la64_platform_dealloc(machine->platform);
-out_release_mc:
-    la64_mc_dealloc(machine->mc);
 out_release_uart:
     la64_uart_dealloc(machine->uart);
 out_release_timer:
@@ -197,16 +186,18 @@ void la64_machine_dealloc(la64_machine_t *machine)
         return;
     }
 
+#if defined(__linux__)
+    /* release display */
+    if(machine->display)
+    {
+        la64_display_dealloc(machine->display);
+    }
+#endif /* __linux__ */
+
     /* release platform */
     if(machine->platform)
     {
         la64_platform_dealloc(machine->platform);
-    }
-
-    /* release mc */
-    if(machine->mc)
-    {
-        la64_mc_dealloc(machine->mc);
     }
 
     /* release uart */

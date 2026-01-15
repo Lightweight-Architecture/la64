@@ -30,6 +30,9 @@
 #include <pthread.h>
 #include <stdatomic.h>
 
+#define LA64_UART_BASE      0x1FE00300
+#define LA64_UART_SIZE      0x10
+
 #define UART_BUF_SIZE          64
 
 #define UART_REG_DATA          0x00
@@ -57,7 +60,6 @@ typedef struct {
     pthread_mutex_t mutex;
     atomic_bool running;
     
-    la64_core_t *core;
     int irq_line;
 } la64_uart_t;
 
@@ -66,7 +68,7 @@ void la64_uart_dealloc(la64_uart_t *u);
 void la64_uart_start(la64_uart_t *u);
 void la64_uart_stop(la64_uart_t *u);
 
-uint64_t la64_uart_read(void *device, uint64_t offset, int size);
-void la64_uart_write(void *device, uint64_t offset, uint64_t value, int size);
+uint64_t la64_uart_read(la64_core_t *core, void *device, uint64_t offset, int size);
+void la64_uart_write(la64_core_t *core, void *device, uint64_t offset, uint64_t value, int size);
 
 #endif /* LA64_DEVICE_UART_H */

@@ -27,6 +27,9 @@
 
 #include <stdint.h>
 
+#define LA64_RTC_BASE       0x1FE00200
+#define LA64_RTC_SIZE       0x28
+
 #define RTC_REG_SECONDS     0x00
 #define RTC_REG_MINUTES     0x04
 #define RTC_REG_HOURS       0x08
@@ -36,7 +39,9 @@
 #define RTC_REG_WEEKDAY     0x18
 #define RTC_REG_UNIX        0x20
 
-uint64_t la64_rtc_read(void *device, uint64_t offset, int size);
-void la64_rtc_write(void *device, uint64_t offset, uint64_t value, int size);
+typedef struct la64_core la64_core_t;
+
+uint64_t la64_rtc_read(la64_core_t *core, void *device, uint64_t offset, int size);
+void la64_rtc_write(la64_core_t *core, void *device, uint64_t offset, uint64_t value, int size);
 
 #endif /* LA64_DEVICE_RTC_H */

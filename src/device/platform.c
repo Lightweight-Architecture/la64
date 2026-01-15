@@ -58,7 +58,7 @@ void la64_platform_dealloc(la64_platform_t *p)
     free(p);
 }
 
-uint64_t la64_platform_read(void *device, uint64_t offset, int size)
+uint64_t la64_platform_read(la64_core_t *core, void *device, uint64_t offset, int size)
 {
     if(device == NULL)
     {
@@ -70,7 +70,7 @@ uint64_t la64_platform_read(void *device, uint64_t offset, int size)
     return p->on;
 }
 
-void la64_platform_write(void *device, uint64_t offset, uint64_t value, int size)
+void la64_platform_write(la64_core_t *core, void *device, uint64_t offset, uint64_t value, int size)
 {
     if(device == NULL)
     {

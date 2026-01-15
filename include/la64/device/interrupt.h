@@ -28,7 +28,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-typedef struct la64_core la64_core_t;
+#define LA64_INTC_BASE      0x1FE00000
+#define LA64_INTC_SIZE      0x40
 
 #define LA64_IRQ_TIMER      0
 #define LA64_IRQ_UART       1
@@ -51,6 +52,8 @@ typedef struct la64_core la64_core_t;
 #define LA64_INTC_CTRL_ENABLE   (1 << 0)
 #define LA64_INTC_CTRL_NESTING  (1 << 1)
 
+typedef struct la64_core la64_core_t;
+
 typedef struct la64_intc {
     uint64_t pending;
     uint64_t enabled;
@@ -69,7 +72,7 @@ void la64_clear_interrupt(la64_core_t *core, int irq_line);
 bool la64_intc_check(la64_core_t *core);
 bool la64_intc_pending(la64_intc_t *intc);
 
-uint64_t la64_intc_read(void *device, uint64_t offset, int size);
-void la64_intc_write(void *device, uint64_t offset, uint64_t value, int size);
+uint64_t la64_intc_read(la64_core_t *core, void *device, uint64_t offset, int size);
+void la64_intc_write(la64_core_t *core, void *device, uint64_t offset, uint64_t value, int size);
 
 #endif /* LA64_DEVICE_INTERRUPT_H */

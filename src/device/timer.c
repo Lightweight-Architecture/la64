@@ -111,8 +111,7 @@ static uint64_t detect_host_freq(void)
 #endif
 }
 
-la64_timer_t *la64_timer_alloc(la64_core_t *core, 
-                               uint64_t virtual_freq,
+la64_timer_t *la64_timer_alloc(uint64_t virtual_freq,
                                int irq_line)
 {
     /* allocate timer */
@@ -125,7 +124,7 @@ la64_timer_t *la64_timer_alloc(la64_core_t *core,
     }
 
     /* setting up timer */
-    timer->core = core;
+    //timer->core = core;
     timer->irq_line = irq_line;
     timer->compare = UINT64_MAX;
     
@@ -203,12 +202,13 @@ void la64_timer_tick(la64_timer_t *timer,
         
         if(timer->ctrl & TIMER_CTRL_IRQ_EN)
         {
-            la64_raise_interrupt(timer->core, timer->irq_line);
+            //la64_raise_interrupt(timer->core, timer->irq_line);
         }
     }
 }
 
-uint64_t la64_timer_read(void *device,
+uint64_t la64_timer_read(la64_core_t *core,
+                         void *device,
                          uint64_t offset,
                          int size)
 {
@@ -239,7 +239,8 @@ uint64_t la64_timer_read(void *device,
     }
 }
 
-void la64_timer_write(void *device,
+void la64_timer_write(la64_core_t *core,
+                      void *device,
                       uint64_t offset,
                       uint64_t value,
                       int size)

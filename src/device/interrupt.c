@@ -200,7 +200,7 @@ bool la64_intc_pending(la64_intc_t *intc)
     return (intc->pending & intc->enabled) != 0;
 }
 
-uint64_t la64_intc_read(void *device, uint64_t offset, int size)
+uint64_t la64_intc_read(la64_core_t *core, void *device, uint64_t offset, int size)
 {
     la64_intc_t *intc = (la64_intc_t *)device;
 
@@ -229,7 +229,7 @@ uint64_t la64_intc_read(void *device, uint64_t offset, int size)
     }
 }
 
-void la64_intc_write(void *device, uint64_t offset, uint64_t value, int size)
+void la64_intc_write(la64_core_t *core, void *device, uint64_t offset, uint64_t value, int size)
 {
     la64_intc_t *intc = (la64_intc_t *)device;
 
