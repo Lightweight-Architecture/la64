@@ -81,7 +81,11 @@
 #define LA64_OPCODE_BL              0b00101010
 #define LA64_OPCODE_RET             0b00101011
 
-#define LA64_OPCODE_MAX             LA64_OPCODE_RET
+/* alu v2 operations */
+#define LA64_OPCODE_PDEP            0b00101100
+#define LA64_OPCODE_PNEXT           0b00101101
+
+#define LA64_OPCODE_MAX             LA64_OPCODE_PNEXT
 
 #pragma mark - parameter modes
 

@@ -204,3 +204,87 @@ void la64_op_rol(la64_core_t *core)
     uint64_t n = (core->op.param_cnt == 2) ? (*core->op.param[1] & 63) : 1;
     *core->op.param[0] = (v << n) | (v >> (64 - n));
 }
+
+void la64_op_pdep(la64_core_t *core)
+{
+    la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
+
+    uint64_t src, mask;
+    uint64_t *dest;
+
+    if(core->op.param_cnt == 2)
+    {
+        dest = core->op.param[0];
+        src = *core->op.param[0];
+        mask = *core->op.param[1];
+    }
+    else
+    {
+        dest = core->op.param[0];
+        src = *core->op.param[1];
+        mask = *core->op.param[2];
+    }
+
+#ifdef __BMI2__
+    *dest = _pdep_u64(src, mask);
+#else
+    uint64_t result = 0;
+    uint64_t src_bit = 0;
+
+    for(int i = 0; i < 64; i++)
+    {
+        if(mask & (1ULL << i))
+        {
+            if(src & (1ULL << src_bit))
+            {
+                result |= (1ULL << i);
+            }
+            src_bit++;
+        }
+    }
+
+    *dest = result;
+#endif
+}
+
+void la64_op_pext(la64_core_t *core)
+{
+    la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
+
+    uint64_t src, mask;
+    uint64_t *dest;
+
+    if(core->op.param_cnt == 2)
+    {
+        dest = core->op.param[0];
+        src = *core->op.param[0];
+        mask = *core->op.param[1];
+    }
+    else
+    {
+        dest = core->op.param[0];
+        src = *core->op.param[1];
+        mask = *core->op.param[2];
+    }
+
+#ifdef __BMI2__
+    *dest = _pext_u64(src, mask);
+#else
+    uint64_t result = 0;
+    uint64_t dest_bit = 0;
+
+    for(int i = 0; i < 64; i++)
+    {
+        if(mask & (1ULL << i))
+        {
+            if(src & (1ULL << i))
+            {
+                result |= (1ULL << dest_bit);
+            }
+            dest_bit++;
+        }
+    }
+
+    *dest = result;
+#endif
+}

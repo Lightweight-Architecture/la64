@@ -93,7 +93,11 @@ la64_opfunc_t opfunc_table[LA64_OPCODE_MAX + 1] = {
     la64_op_jz,
     la64_op_jnz,
     la64_op_bl,
-    la64_op_ret
+    la64_op_ret,
+
+    /* alu v2 operations */
+    la64_op_pdep,
+    la64_op_pext
 };
 
 la64_core_t *la64_core_alloc()
