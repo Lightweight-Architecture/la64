@@ -83,9 +83,12 @@
 
 /* alu v2 operations */
 #define LA64_OPCODE_PDEP            0b00101100
-#define LA64_OPCODE_PNEXT           0b00101101
+#define LA64_OPCODE_PEXT            0b00101101
+#define LA64_OPCODE_BSWAPW          0b00101110
+#define LA64_OPCODE_BSWAPD          0b00101111
+#define LA64_OPCODE_BSWAPQ          0b00110000
 
-#define LA64_OPCODE_MAX             LA64_OPCODE_PNEXT
+#define LA64_OPCODE_MAX             LA64_OPCODE_BSWAPQ
 
 #pragma mark - parameter modes
 

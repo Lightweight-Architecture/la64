@@ -288,3 +288,24 @@ void la64_op_pext(la64_core_t *core)
     *dest = result;
 #endif
 }
+
+void la64_op_bswapw(la64_core_t *core)
+{
+    la64_instr_termcond(core->op.param_cnt != 1);
+    uint64_t v = *core->op.param[0];
+    *core->op.param[0] = __builtin_bswap16(v);
+}
+
+void la64_op_bswapd(la64_core_t *core)
+{
+    la64_instr_termcond(core->op.param_cnt != 1);
+    uint64_t v = *core->op.param[0];
+    *core->op.param[0] = __builtin_bswap32(v);
+}
+
+void la64_op_bswapq(la64_core_t *core)
+{
+    la64_instr_termcond(core->op.param_cnt != 1);
+    uint64_t v = *core->op.param[0];
+    *core->op.param[0] = __builtin_bswap64(v);
+}

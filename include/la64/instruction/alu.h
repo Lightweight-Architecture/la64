@@ -43,7 +43,11 @@ void la64_op_shr(la64_core_t *core);
 void la64_op_shl(la64_core_t *core);
 void la64_op_ror(la64_core_t *core);
 void la64_op_rol(la64_core_t *core);
+
 void la64_op_pdep(la64_core_t *core);
 void la64_op_pext(la64_core_t *core);
+void la64_op_bswapw(la64_core_t *core);
+void la64_op_bswapd(la64_core_t *core);
+void la64_op_bswapq(la64_core_t *core);
 
 #endif /* LA64_INSTRUCTION_ALU_H */
