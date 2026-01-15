@@ -41,10 +41,15 @@ target_include_directories(la64
 
 target_link_libraries(la64
     PRIVATE lautils
-    PRIVATE glfw
-    PRIVATE GLEW
-    PRIVATE GL
 )
+
+if(UNIX AND NOT APPLE)
+    target_link_libraries(la64
+        PRIVATE glfw
+        PRIVATE GLEW
+        PRIVATE GL
+    )
+endif()
 
 add_library(la64_headers INTERFACE)
 
