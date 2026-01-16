@@ -48,7 +48,7 @@ la64_intc_t *la64_intc_alloc(la64_core_t *core)
     intc->enabled = 0;
     intc->ctrl = 0;
     intc->vector_base = 0;
-    
+
     return intc;
 }
 

@@ -26,6 +26,7 @@
 #define LA64_CORE_H
 
 #include <stdint.h>
+#include <pthread.h>
 
 #pragma mark - opcode
 
@@ -98,15 +99,59 @@
 #define LA64_PARAMETER_CODING_IMM16     0b011
 #define LA64_PARAMETER_CODING_IMM32     0b100
 #define LA64_PARAMETER_CODING_IMM64     0b101
-/* leaving 0x110/0x111 open for later additions */
+#define LA64_PARAMETER_CODING_CRREG     0b110
+/* leaving 0x111 open for later additions */
 
-#pragma mark - register
+/* registers */
 
+/*
+ * program counter: it points to the current address at
+ * which the CPU currently is, it increments by the
+ * lenght of the instruction when the CPU is done
+ * executing the instruction at which PC points to at
+ * that time.
+ */
 #define LA64_REGISTER_PC    0b00000
+
+/*
+ * stack pointer: it points to the current address at
+ * which the stack lives, stack grows downwards on
+ * allocation and upwards on deallocation.
+ *
+ * stack allocation is meant to be done for small
+ * things, as heap allocation is way more expensive,
+ * than a simple register decrement.
+ */
 #define LA64_REGISTER_SP    0b00001
+
+/*
+ * frame pointer: it points to the address at which the
+ * stack frame of the last function call lives,
+ * basically empowering you to branch and link and
+ * return back without destroying values stored
+ * in registers previously.
+ *
+ * a stack frame on the LA64 architecture is a full
+ * backup of all registers stored onto stack memory
+ * that is expensive(256 bytes per frame) but its also
+ * simplistic, for now that will be the soulution,
+ * cannot be guranteed that this ABI choice wont change.
+ */
 #define LA64_REGISTER_FP    0b00010
+
+/*
+ * control flag: used by control flow instructions like
+ * cmp, je, jne.. basically used for if else statements.
+ */
 #define LA64_REGISTER_CF    0b00011
 
+/*
+ * general purpose registers: these registers arent used
+ * for anything other than the software, these registers
+ * can be used for any purpose, thats why they are called
+ * general purpose registers, because they got no fixed
+ * purpose like pc, sp, fp, cf.
+ */
 #define LA64_REGISTER_R0    0b00100
 #define LA64_REGISTER_R1    0b00101
 #define LA64_REGISTER_R2    0b00110
@@ -134,42 +179,132 @@
 #define LA64_REGISTER_R24   0b11100
 #define LA64_REGISTER_R25   0b11101
 #define LA64_REGISTER_R26   0b11110
+
+/*
+ * return register: also a general purpose register but
+ * it is not affected by bl and ret, this register
+ * has the purpose of a called symbol to be able to
+ * return without any crazy memory math a value for
+ * example.
+ */
 #define LA64_REGISTER_RR    0b11111
 
 #define LA64_REGISTER_MAX   LA64_REGISTER_RR
 
-#pragma mark - compare flags
+/* compare flags */
 
+/*
+ * these flags is what CF contains of, yk we talked
+ * about the control flag, those flags here are set
+ * by cmp, when you compare two values or registers
+ * with eachother, in this case the compare flag
+ * gets set to one of the following.
+ *
+ * Z = EQUAL
+ * L = LESS
+ * G = GREATER
+ *
+ */
 #define LA64_CMP_Z  0x1
 #define LA64_CMP_L  0x2
 #define LA64_CMP_G  0x4
 
-#pragma mark - exception flags
+/* exception flags */
 
+/*
+ * normal state, simply a marker to say nothing
+ * to trigger a interrupt for.
+ */
 #define LA64_EXCEPTION_NONE              0b000
+
+/*
+ * this exception means that a memory address was
+ * accessed inappropriately, which means memory
+ * if the cpu writes to memory that it doesnt have
+ * access to this exception is triggered.
+ */
 #define LA64_EXCEPTION_BAD_ACCESS        0b001
+
+/*
+ * this exception means that the current cpu state
+ * did not have the appropriate permissions to
+ * access a certain register for example.
+ */
 #define LA64_EXCEPTION_PERMISSION        0b010
+
+/*
+ * this exception means that the cpu regocnised a
+ * instruction that was not valid was being tried
+ * to decode.
+ */
 #define LA64_EXCEPTION_BAD_INSTRUCTION   0b011
+
+/*
+ * the alu tried to perform illegal math operations
+ * like for example N / 0 or N % 0.
+ */
 #define LA64_EXCEPTION_BAD_ARITHMETIC    0b100
 
 typedef struct la64_machine la64_machine_t;
-
-typedef struct {
-    uint8_t ilen;
-    uint8_t op;
-    uint64_t imm[32];
-    uint8_t param_cnt;
-    uint64_t *param[32];
-} la64_operation_t;
+typedef struct la64_operation la64_operation_t;
 
 typedef struct la64_core {
+
+    /* the pthread this core is running on on the host */
+    pthread_t pthread;
+
+    /* a array of all registers */
     uint64_t rl[LA64_REGISTER_MAX + 1];
-    la64_operation_t op;
+
+    /* data of currently decoding or decoded operation */
+    struct la64_operation {
+
+        /*
+         * lenght of decoded instruction so that the cpu
+         * can correctly increment the program counter.
+         */
+        uint8_t ilen;
+
+        /*
+         * the opcode it self, so the cpu knows what to
+         * execute.
+         */
+        uint8_t op;
+
+        /*
+         * a array of intermediate values that can go from
+         * 8 to 64 bits in width, the cpu stuffs that cache
+         * on time of decoding.
+         */
+        uint64_t imm[32];
+
+        /* count of parameters */
+        uint8_t param_cnt;
+
+        /*
+         * pointer array for parameters, at emulation we
+         * dont have many emulation options so we stuff
+         * each parameter into this array.. register
+         * intermediate, etc.
+         */
+        uint64_t *param[32];
+    } op;
+
+    /* exception register which is not a control register */
     uint8_t exception;
+
+    /*
+     * cpu halting status (will later be in the same
+     * control register as the exception register CR0).
+     */
     bool halted;
+
+    /* pointer back to machine */
     la64_machine_t *machine;
+
 } la64_core_t;
 
+/* definition of the handler of each operation */
 typedef void (*la64_opfunc_t)(la64_core_t *core);
 
 la64_core_t *la64_core_alloc(void);
