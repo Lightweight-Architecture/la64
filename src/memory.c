@@ -71,8 +71,13 @@ void la64_memory_dealloc(la64_memory_t *memory)
         return;
     }
 
-    /* release that shit */
-    munmap(memory->memory, memory->memory_size);
+    /* release the memory in case that its allocated */
+    if(memory->memory != MAP_FAILED ||
+       memory->memory != NULL)
+    {
+        munmap(memory->memory, memory->memory_size);
+    }
+
     free(memory);
 }
 
@@ -91,7 +96,13 @@ bool la64_memory_load_image(la64_memory_t *memory,
 
     /* gather size of boot image */
     struct stat image_stat;
-    fstat(fd, &image_stat);
+
+    if(fstat(fd, &image_stat) != 0)
+    {
+        printf("[boot] failed to gather size of file at path %s\n", image_path);
+        return false;
+    }
+
     size_t image_size = image_stat.st_size;
 
     /* checking if memory is big enough for our memory */
@@ -102,7 +113,11 @@ bool la64_memory_load_image(la64_memory_t *memory,
     }
 
     /* loading boot image into memory */
-    read(fd, memory->memory, image_size);
+    if(read(fd, memory->memory, image_size) <= 0)
+    {
+        printf("[boot] error: reading boot image failed\n");
+        return false;
+    }
 
     close(fd);
 
@@ -216,7 +231,7 @@ bool la64_memory_write(la64_core_t *core,
     {
         return false;
     }
-    
+
     switch(size)
     {
         case 1:
