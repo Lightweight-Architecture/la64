@@ -279,30 +279,39 @@ skip_execution:
         }
     }
 
-    //core->runs = 0b00000000;
     return NULL;
 }
 
 
 void la64_core_execute(la64_core_t *core)
 {
-    /* core running check */
-    /*if(core->runs)
+    /* sanity check */
+    if(core == NULL ||
+       core->pthread != 0)
     {
         return;
-    }*/
+    }
 
     /* invoking execution */
-    pthread_t pthread;
-    pthread_create(&pthread, NULL, la64_core_execute_thread, (void*)core);
+    pthread_create(&(core->pthread), NULL, la64_core_execute_thread, (void*)core);
 
-#if !defined(__APPLE__)
-    pthread_join(pthread, NULL);
+#if defined(__APPLE__)
+    pthread_detach(core->pthread);
+    CFRunLoopRun();
+#else
+    pthread_join(core->pthread, NULL);
 #endif /* __APPLE__ */
 }
 
 void la64_core_terminate(la64_core_t *core)
 {
-    /* setting termination flag (TODO: needs atomics) */
-    //core->term = 0b00000001;
+    /* sanity check */
+    if(core == NULL ||
+       core->pthread == 0)
+    {
+        return;
+    }
+
+    pthread_cancel(core->pthread);
+    core->pthread = 0;
 }
