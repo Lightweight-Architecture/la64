@@ -172,8 +172,6 @@ typedef struct la64_core {
 
 typedef void (*la64_opfunc_t)(la64_core_t *core);
 
-extern la64_opfunc_t opfunc_table[LA64_OPCODE_MAX + 1];
-
 la64_core_t *la64_core_alloc(void);
 void la64_core_dealloc(la64_core_t *core);
 void la64_core_execute(la64_core_t *core);
