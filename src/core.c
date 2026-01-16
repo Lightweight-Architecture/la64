@@ -297,6 +297,7 @@ void la64_core_execute(la64_core_t *core)
 
 #if defined(__APPLE__)
     pthread_detach(core->pthread);
+    extern void CFRunLoopRun();
     CFRunLoopRun();
 #else
     pthread_join(core->pthread, NULL);
