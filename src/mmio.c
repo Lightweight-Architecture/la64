@@ -34,6 +34,12 @@ la64_mmio_bus_t *la64_mmio_alloc(void)
 
 void la64_mmio_dealloc(la64_mmio_bus_t *bus)
 {
+    /* null pointer check */
+    if(bus == NULL)
+    {
+        return;
+    }
+
     free(bus);
 }
 
@@ -77,13 +83,28 @@ bool la64_mmio_register(la64_mmio_bus_t *bus,
 la64_mmio_region_t *la64_mmio_find(la64_mmio_bus_t *bus,
                                    uint64_t addr)
 {
-    /* finding mmio region hopefully */
+    /* null pointer check */
+    if(bus == NULL)
+    {
+        return NULL;
+    }
+
+    /* fast path */
+    if (bus->last_region != NULL &&
+        addr >= bus->last_region->base_addr &&
+        addr < bus->last_region->base_addr + bus->last_region->size)
+    {
+        return bus->last_region;
+    }
+
+    /* finding mmio region, hopefully x3 */
     for(int i = 0; i < bus->region_count; i++)
     {
         la64_mmio_region_t *r = &bus->regions[i];
         if(addr >= r->base_addr &&
            addr < r->base_addr + r->size)
         {
+            bus->last_region = r;
             return r;
         }
     }

@@ -45,6 +45,7 @@ typedef struct {
 #define MAX_MMIO_REGIONS 32
 
 typedef struct {
+    la64_mmio_region_t *last_region;
     la64_mmio_region_t regions[MAX_MMIO_REGIONS];
     int region_count;
 } la64_mmio_bus_t;
