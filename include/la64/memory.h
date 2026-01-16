@@ -29,20 +29,17 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-typedef uint64_t la64_memory_address_t;
-typedef uint64_t la64_memory_size_t;
+#include <la64/core.h>
 
 typedef struct la64_memory {
     uint8_t *memory;
     uint64_t memory_size;
 } la64_memory_t;
 
-la64_memory_t *la64_memory_alloc(la64_memory_size_t size);
+la64_memory_t *la64_memory_alloc(uint64_t size);
 void la64_memory_dealloc(la64_memory_t *memory);
 
 bool la64_memory_load_image(la64_memory_t *memory, const char *image_path);
-
-typedef struct la64_core la64_core_t;
 
 void *la64_memory_access(la64_core_t *core, uint64_t addr, size_t size);
 bool la64_memory_read(la64_core_t *core, uint64_t addr, size_t size, uint64_t *value);

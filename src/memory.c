@@ -35,7 +35,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-la64_memory_t *la64_memory_alloc(la64_memory_size_t size)
+la64_memory_t *la64_memory_alloc(uint64_t size)
 {
     /* allocating memory */
     la64_memory_t *memory = calloc(1, sizeof(la64_memory_t));
