@@ -318,7 +318,7 @@ void *display_start(void *arg)
 
 #endif /* __linux__ */
 
-uint64_t la64_fb_read(la64_core_t *core, 
+uint64_t la64_fb_read(la64_core_t *core,
                       void *device,
                       uint64_t offset,
                       int size)
@@ -341,7 +341,7 @@ uint64_t la64_fb_read(la64_core_t *core,
     else if(offset >= LA64_FB_PALLETE)
     {
         offset -= LA64_FB_PALLETE;
-        
+
         bitwalker_t bw;
         bitwalker_init_read(&bw, &(display->palette[offset]), size, BW_LITTLE_ENDIAN);
         return bitwalker_read(&bw, size * 8);
@@ -377,7 +377,7 @@ void la64_fb_write(la64_core_t *core,
     else if(offset >= LA64_FB_PALLETE)
     {
         offset -= LA64_FB_PALLETE;
-        
+
         bitwalker_t bw;
         bitwalker_init(&bw, &(display->palette[offset]), size, BW_LITTLE_ENDIAN);
         bitwalker_write(&bw, value, size * 8);
