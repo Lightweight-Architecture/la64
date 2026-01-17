@@ -52,7 +52,8 @@ bool la64_mmio_register(la64_mmio_bus_t *bus,
                         const char *name)
 {
     /* sanity check */
-    if(bus->region_count >= MAX_MMIO_REGIONS)
+    if(bus == NULL ||
+       bus->region_count >= MAX_MMIO_REGIONS)
     {
         return false;
     }
@@ -77,14 +78,28 @@ bool la64_mmio_register(la64_mmio_bus_t *bus,
     region->write = write;
     region->name = name;
 
+    /* check and set addresses */
+    if(bus->start_addr > base)
+    {
+        bus->start_addr = base;
+    }
+
+    uint64_t end_addr_canditate = base + size;
+    if(bus->end_addr < end_addr_canditate)
+    {
+        bus->end_addr = end_addr_canditate;
+    }
+
     return true;
 }
 
 la64_mmio_region_t *la64_mmio_find(la64_mmio_bus_t *bus,
                                    uint64_t addr)
 {
-    /* null pointer check */
-    if(bus == NULL)
+    /* sanity check */
+    if(bus == NULL ||
+       addr < bus->start_addr ||
+       addr > bus->end_addr)
     {
         return NULL;
     }
