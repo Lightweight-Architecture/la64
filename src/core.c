@@ -80,7 +80,7 @@ la64_opfunc_t opfunc_table[LA64_OPCODE_MAX + 1] = {
     la64_op_shl,
     la64_op_ror,
     la64_op_rol,
-    
+
     /* control flow operations */
     la64_op_jmp,
     la64_op_cmp,
@@ -113,6 +113,12 @@ la64_core_t *la64_core_alloc()
 
 void la64_core_dealloc(la64_core_t *core)
 {
+    /* null pointer check */
+    if(core == NULL)
+    {
+        return;
+    }
+
     /* release core */
     free(core);
 }
@@ -139,21 +145,69 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
     /* getting opcode */
     core->op.op = (uint8_t)bitwalker_read(&bw, 8);
 
-    /* making shortcuts for argless opcodes */
+    uint8_t maxargs = 32;
+
+    /* making shortcuts for opcodes with fixed arguments */
     switch(core->op.op)
     {
         case LA64_OPCODE_HLT:
         case LA64_OPCODE_NOP:
         case LA64_OPCODE_RET:
-            core->op.ilen = 1;
-            goto skip_parsing;
+            maxargs = 0;
+            break;
+        case LA64_OPCODE_NOT:
+        case LA64_OPCODE_JMP:
+        case LA64_OPCODE_JE:
+        case LA64_OPCODE_JNE:
+        case LA64_OPCODE_JLT:
+        case LA64_OPCODE_JGT:
+        case LA64_OPCODE_JLE:
+        case LA64_OPCODE_JGE:
+        case LA64_OPCODE_BSWAPW:
+        case LA64_OPCODE_BSWAPD:
+        case LA64_OPCODE_BSWAPQ:
+            maxargs = 1;
+            break;
+        case LA64_OPCODE_MOV:
+        case LA64_OPCODE_SWP:
+        case LA64_OPCODE_SWPZ:
+        case LA64_OPCODE_LDB:
+        case LA64_OPCODE_LDW:
+        case LA64_OPCODE_LDD:
+        case LA64_OPCODE_LDQ:
+        case LA64_OPCODE_STB:
+        case LA64_OPCODE_STW:
+        case LA64_OPCODE_STD:
+        case LA64_OPCODE_STQ:
+        case LA64_OPCODE_CMP:
+        case LA64_OPCODE_JZ:
+        case LA64_OPCODE_JNZ:
+            maxargs = 2;
+            break;
+        case LA64_OPCODE_ADD:
+        case LA64_OPCODE_SUB:
+        case LA64_OPCODE_MUL:
+        case LA64_OPCODE_DIV:
+        case LA64_OPCODE_IDIV:
+        case LA64_OPCODE_MOD:
+        case LA64_OPCODE_AND:
+        case LA64_OPCODE_OR:
+        case LA64_OPCODE_XOR:
+        case LA64_OPCODE_SHR:
+        case LA64_OPCODE_SHL:
+        case LA64_OPCODE_ROR:
+        case LA64_OPCODE_ROL:
+        case LA64_OPCODE_PDEP:
+        case LA64_OPCODE_PEXT:
+            maxargs = 3;
+            break;
         default:
             break;
     }
 
     /* parsing loop */
     bool reached_end = false;
-    for(uint8_t i = 0; i < 32 && !reached_end; i++)
+    for(uint8_t i = 0; i < maxargs && !reached_end; i++)
     {
         /* next mode */
         uint8_t mode = (uint8_t)bitwalker_read(&bw, 3);
@@ -194,8 +248,6 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
                 return;
         }
     }
-
-skip_parsing:
 
     /* finding out how many steps the the program counter has to jump */
     core->op.ilen = bitwalker_bytes_used(&bw);
