@@ -367,7 +367,7 @@ void la64_fb_write(la64_core_t *core,
 
     if(offset >= LA64_FB_FRAMEBUFFER)
     {
-        offset -= LA64_FB_PALLETE;
+        offset -= LA64_FB_FRAMEBUFFER;
 
         bitwalker_t bw;
         bitwalker_init(&bw, &(display->fb[offset]), size, BW_LITTLE_ENDIAN);
