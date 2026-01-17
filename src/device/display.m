@@ -190,179 +190,179 @@ void *display_start(void *arg)
     @autoreleasepool
     {
         run_on_main(^{
-        la64_display_t *display = (la64_display_t*)arg;
-        if(display == NULL) return;
+            la64_display_t *display = (la64_display_t*)arg;
+            if(display == NULL) return;
 
-        [NSApplication sharedApplication];
-        [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
-        [NSApp activateIgnoringOtherApps:YES];
+            [NSApplication sharedApplication];
+            [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+            [NSApp activateIgnoringOtherApps:YES];
 
-        NSRect r = NSMakeRect(100, 100, 500, 500);
-        NSWindow *win = [[NSWindow alloc] initWithContentRect:r styleMask:(NSWindowStyleMaskTitled |  NSWindowStyleMaskClosable | NSWindowStyleMaskResizable | NSWindowStyleMaskMiniaturizable) backing:NSBackingStoreBuffered defer:NO];
-        [win setTitle:@"LA64LCD @ 64Hz"];
-        [win makeKeyAndOrderFront:nil];
+            NSRect r = NSMakeRect(100, 100, 500, 500);
+            NSWindow *win = [[NSWindow alloc] initWithContentRect:r styleMask:(NSWindowStyleMaskTitled |  NSWindowStyleMaskClosable | NSWindowStyleMaskResizable | NSWindowStyleMaskMiniaturizable) backing:NSBackingStoreBuffered defer:NO];
+            [win setTitle:@"LA64LCD @ 64Hz"];
+            [win makeKeyAndOrderFront:nil];
 
-        NSView *view = [win contentView];
-        [view setAutoresizingMask: NSViewWidthSizable | NSViewHeightSizable];
-        [view setWantsBestResolutionOpenGLSurface:YES];
+            NSView *view = [win contentView];
+            [view setAutoresizingMask: NSViewWidthSizable | NSViewHeightSizable];
+            [view setWantsBestResolutionOpenGLSurface:YES];
 
-        NSOpenGLContext *ctx = makeGLContext(view);
+            NSOpenGLContext *ctx = makeGLContext(view);
 
-        const char* vsSrc =
-            "#version 150 core\n"
-            "in vec2 aPos;\n"
-            "in vec2 aUV;\n"
-            "out vec2 vUV;\n"
-            "void main(){\n"
-            "  vUV = aUV;\n"
-            "  gl_Position = vec4(aPos, 0.0, 1.0);\n"
-            "}\n";
+            const char* vsSrc =
+                "#version 150 core\n"
+                "in vec2 aPos;\n"
+                "in vec2 aUV;\n"
+                "out vec2 vUV;\n"
+                "void main(){\n"
+                "  vUV = aUV;\n"
+                "  gl_Position = vec4(aPos, 0.0, 1.0);\n"
+                "}\n";
 
-        const char* fsSrc =
-            "#version 150 core\n"
-            "in vec2 vUV;\n"
-            "out vec4 FragColor;\n"
-            "uniform sampler2D uIndexTex;\n"
-            "uniform sampler2D uPalette; // 2D 256x1 instead of 1D (more compatible)\n"
-            "void main(){\n"
-            "  float idxN = texture(uIndexTex, vUV).r;\n"
-            "  float idx  = floor(idxN * 255.0 + 0.5);\n"
-            "  float u    = (idx + 0.5) / 256.0;\n"
-            "  vec3 rgb   = texture(uPalette, vec2(u, 0.5)).rgb;\n"
-            "  FragColor  = vec4(rgb, 1.0);\n"
-            "}\n";
+            const char* fsSrc =
+                "#version 150 core\n"
+                "in vec2 vUV;\n"
+                "out vec4 FragColor;\n"
+                "uniform sampler2D uIndexTex;\n"
+                "uniform sampler2D uPalette; // 2D 256x1 instead of 1D (more compatible)\n"
+                "void main(){\n"
+                "  float idxN = texture(uIndexTex, vUV).r;\n"
+                "  float idx  = floor(idxN * 255.0 + 0.5);\n"
+                "  float u    = (idx + 0.5) / 256.0;\n"
+                "  vec3 rgb   = texture(uPalette, vec2(u, 0.5)).rgb;\n"
+                "  FragColor  = vec4(rgb, 1.0);\n"
+                "}\n";
 
-        GLuint prog = linkProgram(
-            compileShader(GL_VERTEX_SHADER, vsSrc),
-            compileShader(GL_FRAGMENT_SHADER, fsSrc)
-        );
+            GLuint prog = linkProgram(
+                compileShader(GL_VERTEX_SHADER, vsSrc),
+                compileShader(GL_FRAGMENT_SHADER, fsSrc)
+            );
 
-        float verts[] = {
-            -1.f,-1.f,  0.f,0.f,
-             1.f,-1.f,  1.f,0.f,
-             1.f, 1.f,  1.f,1.f,
-            -1.f, 1.f,  0.f,1.f
-        };
-        uint16_t idxs[] = { 0,1,2, 2,3,0 };
+            float verts[] = {
+                -1.f,-1.f,  0.f,0.f,
+                1.f,-1.f,  1.f,0.f,
+                1.f, 1.f,  1.f,1.f,
+                -1.f, 1.f,  0.f,1.f
+            };
+            uint16_t idxs[] = { 0,1,2, 2,3,0 };
 
-        GLuint vao,vbo,ebo;
-        glGenVertexArrays(1,&vao);
-        glGenBuffers(1,&vbo);
-        glGenBuffers(1,&ebo);
+            GLuint vao,vbo,ebo;
+            glGenVertexArrays(1,&vao);
+            glGenBuffers(1,&vbo);
+            glGenBuffers(1,&ebo);
 
-        glBindVertexArray(vao);
-        glBindBuffer(GL_ARRAY_BUFFER,vbo);
-        glBufferData(GL_ARRAY_BUFFER,sizeof(verts),verts,GL_STATIC_DRAW);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(idxs),idxs,GL_STATIC_DRAW);
+            glBindVertexArray(vao);
+            glBindBuffer(GL_ARRAY_BUFFER,vbo);
+            glBufferData(GL_ARRAY_BUFFER,sizeof(verts),verts,GL_STATIC_DRAW);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ebo);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(idxs),idxs,GL_STATIC_DRAW);
 
-        GLint locPos = glGetAttribLocation(prog, "aPos");
-        GLint locUV  = glGetAttribLocation(prog, "aUV");
-        glEnableVertexAttribArray((GLuint)locPos);
-        glVertexAttribPointer((GLuint)locPos, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)0);
-        glEnableVertexAttribArray((GLuint)locUV);
-        glVertexAttribPointer((GLuint)locUV, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)(2*sizeof(float)));
-        glBindVertexArray(0);
+            GLint locPos = glGetAttribLocation(prog, "aPos");
+            GLint locUV  = glGetAttribLocation(prog, "aUV");
+            glEnableVertexAttribArray((GLuint)locPos);
+            glVertexAttribPointer((GLuint)locPos, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)0);
+            glEnableVertexAttribArray((GLuint)locUV);
+            glVertexAttribPointer((GLuint)locUV, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)(2*sizeof(float)));
+            glBindVertexArray(0);
 
-        GLuint texIndex, texPal;
-        glGenTextures(1, &texIndex);
-        glBindTexture(GL_TEXTURE_2D, texIndex);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, LA64_FB_WIDTH, LA64_FB_HEIGHT, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-        glGenTextures(1, &texPal);
-        glBindTexture(GL_TEXTURE_2D, texPal);
-
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 256, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, display->palette);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-        glUseProgram(prog);
-        glUniform1i(glGetUniformLocation(prog, "uIndexTex"), 0);
-        glUniform1i(glGetUniformLocation(prog, "uPalette"), 1);
-
-        double prev = now_sec();
-        double acc  = 0.0;
-
-        while(1)
-        {
-            NSEvent *event = nil;
-            do
-            {
-                event = [NSApp nextEventMatchingMask:NSEventMaskAny untilDate:[NSDate dateWithTimeIntervalSinceNow:0.0] inMode:NSDefaultRunLoopMode dequeue:YES];
-                if(event) [NSApp sendEvent:event];
-            } while(event);
-
-            if(![win isVisible]) break;
-
-            double now = now_sec();
-            acc += (now - prev);
-            prev = now;
-
-            if(acc < (1.0/64.0))
-            {
-                struct timespec ts = {0, 1000000};
-                nanosleep(&ts, NULL);
-                continue;
-            }
-            acc = 0.0;
-
-            glActiveTexture(GL_TEXTURE0);
+            GLuint texIndex, texPal;
+            glGenTextures(1, &texIndex);
             glBindTexture(GL_TEXTURE_2D, texIndex);
-            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, LA64_FB_WIDTH, LA64_FB_HEIGHT, GL_RED, GL_UNSIGNED_BYTE, display->fb);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, LA64_FB_WIDTH, LA64_FB_HEIGHT, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-            glActiveTexture(GL_TEXTURE1);
+            glGenTextures(1, &texPal);
             glBindTexture(GL_TEXTURE_2D, texPal);
-            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 1, GL_RGB, GL_UNSIGNED_BYTE, display->palette);
 
-            NSRect bounds = [view bounds];
-            GLint ww = (GLint)bounds.size.width;
-            GLint wh = (GLint)bounds.size.height;
-            [ctx update];
-
-            NSRect boundsPts = [view bounds];
-            NSRect boundsPx  = [view convertRectToBacking:boundsPts];
-
-            GLint winW = (GLint)boundsPx.size.width;
-            GLint winH = (GLint)boundsPx.size.height;
-
-            const float fbAspect  = (float)LA64_FB_WIDTH / (float)LA64_FB_HEIGHT;
-            const float winAspect = (float)winW / (float)winH;
-
-            GLint vpX = 0, vpY = 0, vpW = winW, vpH = winH;
-
-            if(winAspect > fbAspect)
-            {
-                vpH = winH;
-                vpW = (GLint)lroundf((float)vpH * fbAspect);
-                vpX = (winW - vpW) / 2;
-                vpY = 0;
-            }
-            else
-            {
-                vpW = winW;
-                vpH = (GLint)lroundf((float)vpW / fbAspect);
-                vpX = 0;
-                vpY = (winH - vpH) / 2;
-            }
-
-            glViewport(vpX, vpY, vpW, vpH);
-            glClear(GL_COLOR_BUFFER_BIT);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 256, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, display->palette);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
             glUseProgram(prog);
-            glBindVertexArray(vao);
-            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+            glUniform1i(glGetUniformLocation(prog, "uIndexTex"), 0);
+            glUniform1i(glGetUniformLocation(prog, "uPalette"), 1);
 
-            [ctx flushBuffer];
-        }
+            double prev = now_sec();
+            double acc  = 0.0;
 
-        [NSOpenGLContext clearCurrentContext];
-        return;
-    });
+            while(1)
+            {
+                NSEvent *event = nil;
+                do
+                {
+                    event = [NSApp nextEventMatchingMask:NSEventMaskAny untilDate:[NSDate dateWithTimeIntervalSinceNow:0.0] inMode:NSDefaultRunLoopMode dequeue:YES];
+                    if(event) [NSApp sendEvent:event];
+                } while(event);
+
+                if(![win isVisible]) break;
+
+                double now = now_sec();
+                acc += (now - prev);
+                prev = now;
+
+                if(acc < (1.0/64.0))
+                {
+                    struct timespec ts = {0, 1000000};
+                    nanosleep(&ts, NULL);
+                    continue;
+                }
+                acc = 0.0;
+
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, texIndex);
+                glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, LA64_FB_WIDTH, LA64_FB_HEIGHT, GL_RED, GL_UNSIGNED_BYTE, display->fb);
+
+                glActiveTexture(GL_TEXTURE1);
+                glBindTexture(GL_TEXTURE_2D, texPal);
+                glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 1, GL_RGB, GL_UNSIGNED_BYTE, display->palette);
+
+                NSRect bounds = [view bounds];
+                GLint ww = (GLint)bounds.size.width;
+                GLint wh = (GLint)bounds.size.height;
+                [ctx update];
+
+                NSRect boundsPts = [view bounds];
+                NSRect boundsPx  = [view convertRectToBacking:boundsPts];
+
+                GLint winW = (GLint)boundsPx.size.width;
+                GLint winH = (GLint)boundsPx.size.height;
+
+                const float fbAspect  = (float)LA64_FB_WIDTH / (float)LA64_FB_HEIGHT;
+                const float winAspect = (float)winW / (float)winH;
+
+                GLint vpX = 0, vpY = 0, vpW = winW, vpH = winH;
+
+                if(winAspect > fbAspect)
+                {
+                    vpH = winH;
+                    vpW = (GLint)lroundf((float)vpH * fbAspect);
+                    vpX = (winW - vpW) / 2;
+                    vpY = 0;
+                }
+                else
+                {
+                    vpW = winW;
+                    vpH = (GLint)lroundf((float)vpW / fbAspect);
+                    vpX = 0;
+                    vpY = (winH - vpH) / 2;
+                }
+
+                glViewport(vpX, vpY, vpW, vpH);
+                glClear(GL_COLOR_BUFFER_BIT);
+
+                glUseProgram(prog);
+                glBindVertexArray(vao);
+                glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+
+                [ctx flushBuffer];
+            }
+
+            [NSOpenGLContext clearCurrentContext];
+            return;
+        });
     }
 
     return NULL;
