@@ -238,11 +238,12 @@ void *display_start(void *arg)
             );
 
             float verts[] = {
-                -1.f,-1.f,  0.f,0.f,
-                1.f,-1.f,  1.f,0.f,
-                1.f, 1.f,  1.f,1.f,
-                -1.f, 1.f,  0.f,1.f
+                -1.f,-1.f,  0.f,1.f,
+                1.f,-1.f,  1.f,1.f,
+                1.f, 1.f,  1.f,0.f,
+                -1.f, 1.f,  0.f,0.f
             };
+
             uint16_t idxs[] = { 0,1,2, 2,3,0 };
 
             GLuint vao,vbo,ebo;
