@@ -26,6 +26,7 @@
 #define LA64_CORE_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <pthread.h>
 
 #pragma mark - opcode
