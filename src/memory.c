@@ -161,18 +161,21 @@ bool la64_memory_read(la64_core_t *core,
         return false;
     }
 
-    /* finding mmio device */
-    la64_mmio_region_t *mmio = la64_mmio_find(core->machine->mmio_bus, addr);
-
-    /* checking if address was indeed assigned to a MMIO device */
-    if(mmio != NULL)
+    if(core->crl[LA64_CONTROL_REGISTER_CR0] > LA64_ELEVATION_USER)
     {
-        /* getting value of MMIO device */
-        *value = mmio->read(core, mmio->device, addr - mmio->base_addr, size);
-        return true;
+        /* finding mmio device */
+        la64_mmio_region_t *mmio = la64_mmio_find(core->machine->mmio_bus, addr);
+
+        /* checking if address was indeed assigned to a MMIO device */
+        if(mmio != NULL)
+        {
+            /* getting value of MMIO device */
+            *value = mmio->read(core, mmio->device, addr - mmio->base_addr, size);
+            return true;
+        }
     }
 
-    /* accessing memory */
+    /* accessing memory TODO: implement page tables */
     void *ptr = la64_memory_access(core, addr, size);
 
     /* checking if memory access was successful */
@@ -212,18 +215,21 @@ bool la64_memory_write(la64_core_t *core,
         return false;
     }
 
-    /* trying to find mmio device */
-    la64_mmio_region_t *mmio = la64_mmio_find(core->machine->mmio_bus, addr);
-
-    /* null pointer checking potential mmio device */
-    if(mmio != NULL)
+    if(core->crl[LA64_CONTROL_REGISTER_CR0] > LA64_ELEVATION_USER)
     {
-        /* performing mmio write */
-        mmio->write(core, mmio->device, addr - mmio->base_addr, value, size);
-        return true;
+        /* trying to find mmio device */
+        la64_mmio_region_t *mmio = la64_mmio_find(core->machine->mmio_bus, addr);
+
+        /* null pointer checking potential mmio device */
+        if(mmio != NULL)
+        {
+            /* performing mmio write */
+            mmio->write(core, mmio->device, addr - mmio->base_addr, value, size);
+            return true;
+        }
     }
 
-    /* accessing memory */
+    /* accessing memory TODO: implement page tables */
     void *ptr = la64_memory_access(core, addr, size);
 
     /* checking if memory access was successful */

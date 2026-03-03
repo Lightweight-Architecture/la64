@@ -230,9 +230,8 @@
 
 /* elevation levels */
 #define LA64_ELEVATION_USER             0b00
-#define LA64_ELEVATION_HYPERVISOR       0b01
-#define LA64_ELEVATION_KERNEL           0b10
-#define LA64_ELEVATION_SYSTEM_MONITOR   0b11    /* used for software kernel secure mechanism like the apples PPL */
+#define LA64_ELEVATION_KERNEL           0b01
+#define LA64_ELEVATION_SECURE_MONITOR   0b10    /* used for software kernel secure mechanism like the apples PPL */
 
 /* compare flags */
 
