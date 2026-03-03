@@ -94,13 +94,13 @@
 
 #pragma mark - parameter modes
 
-#define LA64_PARAMETER_CODING_INSTR_END 0b000
-#define LA64_PARAMETER_CODING_REG       0b001
-#define LA64_PARAMETER_CODING_IMM8      0b010
-#define LA64_PARAMETER_CODING_IMM16     0b011
-#define LA64_PARAMETER_CODING_IMM32     0b100
-#define LA64_PARAMETER_CODING_IMM64     0b101
-#define LA64_PARAMETER_CODING_CRREG     0b110
+#define LA64_PARAMETER_CODING_INSTR_END 0b000   /* instruction end marker for instructions dynamic in lenght */
+#define LA64_PARAMETER_CODING_REG       0b001   /* register */
+#define LA64_PARAMETER_CODING_IMM8      0b010   /* 8bit intermediate */
+#define LA64_PARAMETER_CODING_IMM16     0b011   /* 16bit intermediate */
+#define LA64_PARAMETER_CODING_IMM32     0b100   /* 32bit intermediate */
+#define LA64_PARAMETER_CODING_IMM64     0b101   /* 64bit intermediate */
+#define LA64_PARAMETER_CODING_CREG      0b110   /* control register */
 /* leaving 0x111 open for later additions */
 
 /* registers */
@@ -192,6 +192,15 @@
 
 #define LA64_REGISTER_MAX   LA64_REGISTER_RR
 
+/* control register */
+#define LA64_CONTROL_REGISTER_CR0   0b00000 /* elevation control register */
+
+/* elevation levels */
+#define LA64_ELEVATION_USER             0b00
+#define LA64_ELEVATION_HYPERVISOR       0b01
+#define LA64_ELEVATION_KERNEL           0b10
+#define LA64_ELEVATION_SYSTEM_MONITOR   0b11    /* used for software kernel secure mechanism like the apples PPL */
+
 /* compare flags */
 
 /*
@@ -254,8 +263,9 @@ typedef struct la64_core {
     /* the pthread this core is running on on the host */
     pthread_t pthread;
 
-    /* a array of all registers */
+    /* a array of all (control) registers */
     uint64_t rl[LA64_REGISTER_MAX + 1];
+    uint64_t crl[1];
 
     /* data of currently decoding or decoded operation */
     struct la64_operation {

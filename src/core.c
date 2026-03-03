@@ -42,7 +42,7 @@
 
 #include <lautils/bitwalker.h>
 
-la64_opfunc_t opfunc_table[LA64_OPCODE_MAX + 1] = {
+la64_opfunc_t opfunc_table[] = {
     /* core operations */
     la64_op_hlt,
     la64_op_nop,
@@ -106,7 +106,9 @@ la64_opfunc_t opfunc_table[LA64_OPCODE_MAX + 1] = {
 la64_core_t *la64_core_alloc()
 {
     /* allocate a brand new core */
-    la64_core_t *core = calloc(1, sizeof(la64_core_t));
+    la64_core_t *core = malloc(sizeof(la64_core_t));
+
+    bzero(core, sizeof(la64_core_t));
 
     return core;
 }
@@ -222,6 +224,15 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
                 core->op.param[core->op.param_cnt] = &(core->rl[(uint8_t)bitwalker_read(&bw, 5)]);
                 core->op.param_cnt++;
                 break;
+            case LA64_PARAMETER_CODING_CREG:
+                if(core->crl[LA64_CONTROL_REGISTER_CR0] < LA64_ELEVATION_KERNEL)
+                {
+                    core->exception = LA64_EXCEPTION_BAD_INSTRUCTION;
+                    return;
+                }
+                core->op.param[core->op.param_cnt] = &(core->crl[(uint8_t)bitwalker_read(&bw, 5)]);
+                core->op.param_cnt++;
+                break;
             case LA64_PARAMETER_CODING_IMM8:
                 core->op.imm[core->op.param_cnt] = (uint8_t)bitwalker_read(&bw, 8);
                 core->op.param[core->op.param_cnt] = &(core->op.imm[core->op.param_cnt]);
@@ -301,6 +312,12 @@ switch_raise_isoftware:
 
         /* decoding instruction */
         la64_core_decode_instruction_at_pc(core);
+
+        if(core->exception != LA64_EXCEPTION_NONE)
+        {
+            /* trap! */
+            continue;
+        }
 
         /* sanity check */
         if(core->op.op > LA64_OPCODE_MAX || opfunc_table[core->op.op] == NULL)
