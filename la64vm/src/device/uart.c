@@ -48,19 +48,18 @@ static void uart_restore_mode(void)
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &uart_orig_termios);
 }
 
-static void uart_update_irq(la64_core_t *core,
-                            la64_uart_t *u)
+static void uart_update_irq(la64_uart_t *u)
 {    
     int level = ((u->control & UART_CTRL_RX_IRQ_EN) && (u->status & UART_STATUS_RX_READY)) || ((u->control & UART_CTRL_TX_IRQ_EN) && (u->status & UART_STATUS_TX_EMPTY));
 
     /* updating interrupt */
     if(level)
     {
-        //la64_raise_interrupt(core, u->irq_line);
+        la64_raise_interrupt(u->core, u->irq_line);
     }
     else
     {
-        //la64_clear_interrupt(core, u->irq_line);
+        la64_clear_interrupt(u->core, u->irq_line);
     }
 }
 
@@ -125,7 +124,7 @@ static void *uart_input_thread(void *arg)
                 u->status |= UART_STATUS_RX_FULL;
             }
             
-            //uart_update_irq(core, u);
+            uart_update_irq(u);
         }
         
         pthread_mutex_unlock(&u->mutex);
@@ -146,7 +145,7 @@ la64_uart_t *la64_uart_alloc(la64_core_t *core, int irq_line)
     }
 
     /* setting up uart */
-    //u->core = core;
+    u->core = core;
     u->irq_line = irq_line;
     u->status = UART_STATUS_TX_EMPTY;
     
@@ -220,7 +219,7 @@ uint64_t la64_uart_read(la64_core_t *core, void *device, uint64_t offset, int si
                     u->status &= ~UART_STATUS_RX_READY;
                 }
                 u->status &= ~UART_STATUS_RX_FULL;
-                //uart_update_irq(u);
+                uart_update_irq(u);
             }
             break;
         case UART_REG_STATUS:
@@ -257,7 +256,7 @@ void la64_uart_write(la64_core_t *core, void *device, uint64_t offset, uint64_t 
             putchar((char)(value & 0xFF));
             fflush(stdout);
             u->status |= UART_STATUS_TX_EMPTY;
-            //uart_update_irq(u);
+            uart_update_irq(u);
             break;
         case UART_REG_CONTROL:
             u->control = value;
@@ -267,7 +266,7 @@ void la64_uart_write(la64_core_t *core, void *device, uint64_t offset, uint64_t 
                 u->status = UART_STATUS_TX_EMPTY;
                 u->control &= ~UART_CTRL_RESET;
             }
-            //uart_update_irq(u);
+            uart_update_irq(u);
             break;
         default:
             break;

@@ -28,6 +28,10 @@
 #include <la64vm/device/platform.h>
 #include <la64vm/machine.h>
 
+#if defined(__APPLE__)
+#include <CoreFoundation/CFRunLoop.h>
+#endif /* __APPLE__ */
+
 la64_platform_t *la64_platform_alloc(la64_core_t *core)
 {
     if(core == NULL)
@@ -85,5 +89,9 @@ void la64_platform_write(la64_core_t *core, void *device, uint64_t offset, uint6
     {
         /* to be fully implemented */
         la64_core_terminate(p->core);
+
+        #if defined(__APPLE__)
+        CFRunLoopStop(CFRunLoopGetMain());
+        #endif /* __APPLE__ */
     }
 }

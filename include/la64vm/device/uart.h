@@ -61,6 +61,8 @@ typedef struct {
     atomic_bool running;
     
     int irq_line;
+
+    la64_core_t *core;
 } la64_uart_t;
 
 la64_uart_t *la64_uart_alloc(la64_core_t *core, int irq_line);

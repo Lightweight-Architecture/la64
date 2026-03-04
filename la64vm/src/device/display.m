@@ -132,6 +132,10 @@ static GLuint linkProgram(GLuint vs, GLuint fs)
 
     _display = display;
     [self setWantsBestResolutionOpenGLSurface:YES];
+    __weak typeof(self) weakSelf = self;
+    _timer = [NSTimer scheduledTimerWithTimeInterval:1.0/64.0 repeats:YES block:^(NSTimer *timer){
+        [weakSelf setNeedsDisplay:YES];
+    }];
     return self;
 }
 
@@ -269,6 +273,12 @@ static GLuint linkProgram(GLuint vs, GLuint fs)
 {
     [super reshape];
     [[self openGLContext] update];
+}
+
+- (void)dealloc
+{
+    [_timer invalidate];
+    _timer = nil;
 }
 
 @end

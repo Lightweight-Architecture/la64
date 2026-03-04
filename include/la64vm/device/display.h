@@ -66,6 +66,8 @@ typedef struct {
     GLuint _prog;
     GLuint _vao, _vbo, _ebo;
     GLuint _texIndex, _texPal;
+
+    NSTimer *_timer;
 }
 
 - (instancetype)initWithFrame:(NSRect)frame display:(la64_display_t *)display;
