@@ -268,7 +268,7 @@ inline static parser_value_type_t parse_type(const char *line,
 
 parser_return_t parse_value_from_string(const char *s)
 {
-    parser_return_t pr = {};
+    parser_return_t pr;
     pr.type = parse_type(s, &(pr.value), &(pr.len));
     return pr;
 }

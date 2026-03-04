@@ -55,6 +55,10 @@ if(APPLE)
             ${COCOA_FRAMEWORK}
             ${OPENGL_FRAMEWORK}
     )
+
+    set_source_files_properties(src/device/display.m PROPERTIES
+        COMPILE_FLAGS "-fobjc-arc"
+    )
 endif()
 
 target_compile_features(la64vm PRIVATE c_std_99)

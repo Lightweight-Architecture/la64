@@ -42,6 +42,11 @@
 #include <stdatomic.h>
 #include <stdint.h>
 #include <pthread.h>
+#if defined(__APPLE__) && defined(__OBJC__)
+#import <Cocoa/Cocoa.h>
+#import <OpenGL/gl3.h>
+#import <OpenGL/OpenGL.h>
+#endif /* __APPLE__ */
 
 typedef struct la64_core la64_core_t;
 
@@ -51,6 +56,23 @@ typedef struct {
     uint8_t *fb;
     pthread_t pthread;
 } la64_display_t;
+
+#if defined(__APPLE__) && defined(__OBJC__)
+
+@interface LA64GLView : NSOpenGLView
+{
+    la64_display_t *_display;
+
+    GLuint _prog;
+    GLuint _vao, _vbo, _ebo;
+    GLuint _texIndex, _texPal;
+}
+
+- (instancetype)initWithFrame:(NSRect)frame display:(la64_display_t *)display;
+
+@end
+
+#endif /* __APPLE__ */
 
 la64_display_t *la64_display_alloc(void);
 void la64_display_dealloc(la64_display_t *display);
