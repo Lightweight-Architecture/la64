@@ -87,11 +87,11 @@ void la64_platform_write(la64_core_t *core, void *device, uint64_t offset, uint6
 
     if(!p->on)
     {
-        /* to be fully implemented */
-        la64_core_terminate(p->core);
-
         #if defined(__APPLE__)
         CFRunLoopStop(CFRunLoopGetMain());
         #endif /* __APPLE__ */
+        
+        /* to be fully implemented */
+        la64_core_terminate(p->core);
     }
 }

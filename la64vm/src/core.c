@@ -384,12 +384,11 @@ void la64_core_execute(la64_core_t *core)
     pthread_create(&(core->pthread), NULL, la64_core_execute_thread, (void*)core);
 
 #if defined(__APPLE__)
-    pthread_detach(core->pthread);
     extern void CFRunLoopRun();
     CFRunLoopRun();
-#else
-    pthread_join(core->pthread, NULL);
 #endif /* __APPLE__ */
+    
+    pthread_join(core->pthread, NULL);
 }
 
 void la64_core_terminate(la64_core_t *core)
@@ -400,7 +399,11 @@ void la64_core_terminate(la64_core_t *core)
     {
         return;
     }
-
+    
+    if(pthread_self() == core->pthread)
+    {
+        pthread_exit(NULL);
+    }
+    
     pthread_cancel(core->pthread);
-    core->pthread = 0;
 }
