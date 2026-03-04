@@ -29,7 +29,7 @@
 #include <stdbool.h>
 
 #define LA64_INTC_BASE      0x1FE00000
-#define LA64_INTC_SIZE      0x40
+#define LA64_INTC_SIZE      0x30
 
 #define LA64_IRQ_TIMER      0
 #define LA64_IRQ_UART       1
@@ -46,7 +46,6 @@
 #define LA64_INTC_REG_VECTOR    0x18
 #define LA64_INTC_REG_ACK       0x20
 #define LA64_INTC_REG_CURRENT   0x28
-#define LA64_INTC_REG_SAVED_PC  0x30
 
 /* control register bits */
 #define LA64_INTC_CTRL_ENABLE   (1 << 0)
@@ -60,7 +59,6 @@ typedef struct la64_intc {
     uint64_t ctrl;
     uint64_t vector_base;
     int64_t  current_irq;
-    uint64_t saved_pc;
     la64_core_t *core;
 } la64_intc_t;
 

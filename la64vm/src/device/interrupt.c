@@ -265,8 +265,6 @@ uint64_t la64_intc_read(la64_core_t *core, void *device, uint64_t offset, int si
             return intc->vector_base;
         case LA64_INTC_REG_CURRENT:
             return (uint64_t)intc->current_irq;
-        case LA64_INTC_REG_SAVED_PC:
-            return intc->saved_pc;
         default:
             return 0;
     }
@@ -300,8 +298,6 @@ void la64_intc_write(la64_core_t *core, void *device, uint64_t offset, uint64_t 
             {
                 intc->current_irq = -1;
             }
-            break;
-        case LA64_INTC_REG_SAVED_PC:
             break;
         default:
             break;
