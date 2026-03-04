@@ -90,7 +90,10 @@
 #define LA64_OPCODE_BSWAPD          0b00101111
 #define LA64_OPCODE_BSWAPQ          0b00110000
 
-#define LA64_OPCODE_MAX             LA64_OPCODE_BSWAPQ
+/* control flow v2 operations */
+#define LA64_OPCODE_IRET            0b00110001
+
+#define LA64_OPCODE_MAX             LA64_OPCODE_IRET
 
 #pragma mark - parameter modes
 
@@ -194,7 +197,7 @@
 
 /* control register */
 #define LA64_CONTROL_REGISTER_CR0   0b00000 /* elevation control register */
-#define LA64_CONTROL_REGISTER_CR1   0b00001
+#define LA64_CONTROL_REGISTER_CR1   0b00001 /* kernel stack pointer (the stack pointer the interrupt controller will use when receiving interrupt) */
 #define LA64_CONTROL_REGISTER_CR2   0b00010
 #define LA64_CONTROL_REGISTER_CR3   0b00011
 #define LA64_CONTROL_REGISTER_CR4   0b00100
@@ -341,6 +344,12 @@ typedef struct la64_core {
      * control register as the exception register CR0).
      */
     bool halted;
+
+    /*
+     * cpu cant get a second interrupt while handling
+     * one, but will be unset when the cpu calls iret.
+     */
+    bool in_interrupt;
 
     /* pointer back to machine */
     la64_machine_t *machine;

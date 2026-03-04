@@ -251,3 +251,55 @@ void la64_op_ret(la64_core_t *core)
     core->rl[LA64_REGISTER_PC] = la64_pop(core);
     core->op.ilen = 0;
 }
+
+void la64_op_iret(la64_core_t *core)
+{
+    la64_instr_termcond(core->op.param_cnt != 0);
+
+    if(!core->in_interrupt)
+    {
+        core->exception = LA64_EXCEPTION_BAD_INSTRUCTION;
+        return;
+    }
+
+    core->rl[LA64_REGISTER_SP] = core->rl[LA64_REGISTER_FP];
+
+    core->rl[LA64_REGISTER_R26] = la64_pop(core);
+    core->rl[LA64_REGISTER_R25] = la64_pop(core);
+    core->rl[LA64_REGISTER_R24] = la64_pop(core);
+    core->rl[LA64_REGISTER_R23] = la64_pop(core);
+    core->rl[LA64_REGISTER_R22] = la64_pop(core);
+    core->rl[LA64_REGISTER_R21] = la64_pop(core);
+    core->rl[LA64_REGISTER_R20] = la64_pop(core);
+    core->rl[LA64_REGISTER_R19] = la64_pop(core);
+    core->rl[LA64_REGISTER_R18] = la64_pop(core);
+    core->rl[LA64_REGISTER_R17] = la64_pop(core);
+    core->rl[LA64_REGISTER_R16] = la64_pop(core);
+    core->rl[LA64_REGISTER_R15] = la64_pop(core);
+    core->rl[LA64_REGISTER_R14] = la64_pop(core);
+    core->rl[LA64_REGISTER_R13] = la64_pop(core);
+    core->rl[LA64_REGISTER_R12] = la64_pop(core);
+    core->rl[LA64_REGISTER_R11] = la64_pop(core);
+    core->rl[LA64_REGISTER_R10] = la64_pop(core);
+    core->rl[LA64_REGISTER_R9] = la64_pop(core);
+    core->rl[LA64_REGISTER_R8] = la64_pop(core);
+    core->rl[LA64_REGISTER_R7] = la64_pop(core);
+    core->rl[LA64_REGISTER_R6] = la64_pop(core);
+    core->rl[LA64_REGISTER_R5] = la64_pop(core);
+    core->rl[LA64_REGISTER_R4] = la64_pop(core);
+    core->rl[LA64_REGISTER_R3] = la64_pop(core);
+    core->rl[LA64_REGISTER_R2] = la64_pop(core);
+    core->rl[LA64_REGISTER_R1] = la64_pop(core);
+    core->rl[LA64_REGISTER_R0] = la64_pop(core);
+    core->rl[LA64_REGISTER_CF] = la64_pop(core);
+    core->rl[LA64_REGISTER_FP] = la64_pop(core);
+    uint64_t oldsp = la64_pop(core);
+    core->rl[LA64_REGISTER_PC] = la64_pop(core);
+    core->crl[LA64_CONTROL_REGISTER_CR0] = la64_pop(core);
+    core->op.ilen = 0;
+
+    core->rl[LA64_REGISTER_SP] = oldsp;
+
+    core->machine->intc->current_irq = -1;
+    core->in_interrupt = false;
+}

@@ -84,7 +84,10 @@ const opcode_entry_t opcode_table[LA64_OPCODE_MAX + 1] = {
     { .name = "pext",   .opcode = LA64_OPCODE_PEXT,     .minargs = 2, .maxargs = 3,  .argmask = 0b10000000000000000000000000000000 },
     { .name = "bswapw", .opcode = LA64_OPCODE_BSWAPW,   .minargs = 1, .maxargs = 1,  .argmask = 0b10000000000000000000000000000000 },
     { .name = "bswapd", .opcode = LA64_OPCODE_BSWAPD,   .minargs = 1, .maxargs = 1,  .argmask = 0b10000000000000000000000000000000 },
-    { .name = "bswapq", .opcode = LA64_OPCODE_BSWAPQ,   .minargs = 1, .maxargs = 1,  .argmask = 0b10000000000000000000000000000000 }
+    { .name = "bswapq", .opcode = LA64_OPCODE_BSWAPQ,   .minargs = 1, .maxargs = 1,  .argmask = 0b10000000000000000000000000000000 },
+
+    /* contol flow v2 operations */
+    { .name = "iret",    .opcode = LA64_OPCODE_IRET,    .minargs = 0, .maxargs = 0,  .argmask = 0b00000000000000000000000000000000 }
 };
 
 const opcode_entry_t *opcode_from_string(const char *name)

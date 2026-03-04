@@ -37,7 +37,12 @@ void la64_op_jle(la64_core_t *core);
 void la64_op_jge(la64_core_t *core);
 void la64_op_jz(la64_core_t *core);
 void la64_op_jnz(la64_core_t *core);
+
+void la64_push(la64_core_t *core, uint64_t value);
+uint64_t la64_pop(la64_core_t *core);
+
 void la64_op_bl(la64_core_t *core);
 void la64_op_ret(la64_core_t *core);
+void la64_op_iret(la64_core_t *core);
 
 #endif /* LA64_INSTRUCTION_CTRL_H */

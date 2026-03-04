@@ -100,7 +100,10 @@ la64_opfunc_t opfunc_table[] = {
     la64_op_pext,
     la64_op_bswapw,
     la64_op_bswapd,
-    la64_op_bswapq
+    la64_op_bswapq,
+
+    /* control flow v2 operations */
+    la64_op_iret
 };
 
 la64_core_t *la64_core_alloc()
@@ -155,6 +158,7 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
         case LA64_OPCODE_HLT:
         case LA64_OPCODE_NOP:
         case LA64_OPCODE_RET:
+        case LA64_OPCODE_IRET:
             maxargs = 0;
             break;
         case LA64_OPCODE_NOT:
@@ -305,7 +309,7 @@ bad_instruction_shortcut:
 switch_raise_isoftware:
                 core->halted = true;
                 la64_raise_interrupt(core, LA64_IRQ_SOFTWARE);
-                break;
+                goto skip_execution;
             default:
                 break;
         }
@@ -331,17 +335,28 @@ switch_raise_isoftware:
         /* incrementing program counter by instruction size */
         core->rl[LA64_REGISTER_PC] += core->op.ilen;
 
+        /* if we aint in interrupt then there is no reason */
+        if(core->in_interrupt)
+        {
+            goto tick_timer;
+        }
+
         /* interrupt controller checking routine starts here */
 skip_execution:
 
         /* check and handle pending interrupts */
         if(core->machine && core->machine->intc && la64_intc_pending(core->machine->intc))
         {
-            la64_intc_check(core);
+            if(la64_intc_check(core))
+            {
+                core->halted = false;
+                core->exception = LA64_EXCEPTION_NONE;
+            }
         }
 
         /* tick the timer always */
         if(core->machine && core->machine->timer)
+    tick_timer:
         {
             extern uint64_t la64_get_host_cycles(void);
             la64_timer_tick(core->machine->timer, la64_get_host_cycles());

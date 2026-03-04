@@ -30,6 +30,7 @@
 #include <la64vm/core.h>
 #include <la64vm/machine.h>
 #include <la64vm/memory.h>
+#include <la64vm/instruction/ctrl.h>
 
 la64_intc_t *la64_intc_alloc(la64_core_t *core)
 {
@@ -149,9 +150,6 @@ bool la64_intc_check(la64_core_t *core)
         return false;
     }
     
-    /* save current PC */
-    core->machine->intc->saved_pc = core->rl[LA64_REGISTER_PC];
-    
     /* mark which IRQ were servicing */
     core->machine->intc->current_irq = irq;
     
@@ -167,12 +165,57 @@ bool la64_intc_check(la64_core_t *core)
         core->machine->intc->current_irq = -1;
         return false;
     }
-    
+
     uint64_t handler_addr = *(uint64_t *)vector_ptr;
-    
+
     /* jump to handler */
+    uint64_t oldsp = core->rl[LA64_REGISTER_SP];
+    uint64_t oldel = core->crl[LA64_CONTROL_REGISTER_CR0];
+
+    core->crl[LA64_CONTROL_REGISTER_CR0] = LA64_ELEVATION_KERNEL;
+    core->rl[LA64_REGISTER_SP] = core->crl[LA64_CONTROL_REGISTER_CR1];
+
+    /* creating interrupt stack frame */
+    la64_push(core, oldel);
+    la64_push(core, core->rl[LA64_REGISTER_PC]);
+    la64_push(core, oldsp);
+    la64_push(core, core->rl[LA64_REGISTER_FP]);
+    la64_push(core, core->rl[LA64_REGISTER_CF]);
+    la64_push(core, core->rl[LA64_REGISTER_R0]);
+    la64_push(core, core->rl[LA64_REGISTER_R1]);
+    la64_push(core, core->rl[LA64_REGISTER_R2]);
+    la64_push(core, core->rl[LA64_REGISTER_R3]);
+    la64_push(core, core->rl[LA64_REGISTER_R4]);
+    la64_push(core, core->rl[LA64_REGISTER_R5]);
+    la64_push(core, core->rl[LA64_REGISTER_R6]);
+    la64_push(core, core->rl[LA64_REGISTER_R7]);
+    la64_push(core, core->rl[LA64_REGISTER_R8]);
+    la64_push(core, core->rl[LA64_REGISTER_R9]);
+    la64_push(core, core->rl[LA64_REGISTER_R10]);
+    la64_push(core, core->rl[LA64_REGISTER_R11]);
+    la64_push(core, core->rl[LA64_REGISTER_R12]);
+    la64_push(core, core->rl[LA64_REGISTER_R13]);
+    la64_push(core, core->rl[LA64_REGISTER_R14]);
+    la64_push(core, core->rl[LA64_REGISTER_R15]);
+    la64_push(core, core->rl[LA64_REGISTER_R16]);
+    la64_push(core, core->rl[LA64_REGISTER_R17]);
+    la64_push(core, core->rl[LA64_REGISTER_R18]);
+    la64_push(core, core->rl[LA64_REGISTER_R19]);
+    la64_push(core, core->rl[LA64_REGISTER_R20]);
+    la64_push(core, core->rl[LA64_REGISTER_R21]);
+    la64_push(core, core->rl[LA64_REGISTER_R22]);
+    la64_push(core, core->rl[LA64_REGISTER_R23]);
+    la64_push(core, core->rl[LA64_REGISTER_R24]);
+    la64_push(core, core->rl[LA64_REGISTER_R25]);
+    la64_push(core, core->rl[LA64_REGISTER_R26]);
+
+    /* storing it as frame pointer  */
+    core->rl[LA64_REGISTER_FP] = core->rl[LA64_REGISTER_SP];
+
+    /* performing jump */
     core->rl[LA64_REGISTER_PC] = handler_addr;
     core->op.ilen = 0;
+    core->in_interrupt = true;
     
     return true;
 }
