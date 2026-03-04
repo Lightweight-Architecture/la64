@@ -64,6 +64,37 @@ register_entry_t register_table[] = {
 
 register_entry_t control_register_table[] = {
     { .name = "cr0", .reg = LA64_CONTROL_REGISTER_CR0 },
+    { .name = "cr1", .reg = LA64_CONTROL_REGISTER_CR1 },
+    { .name = "cr2", .reg = LA64_CONTROL_REGISTER_CR2 },
+    { .name = "cr3", .reg = LA64_CONTROL_REGISTER_CR3 },
+    { .name = "cr4", .reg = LA64_CONTROL_REGISTER_CR4 },
+    { .name = "cr5", .reg = LA64_CONTROL_REGISTER_CR5 },
+    { .name = "cr6", .reg = LA64_CONTROL_REGISTER_CR6 },
+    { .name = "cr7", .reg = LA64_CONTROL_REGISTER_CR7 },
+    { .name = "cr8", .reg = LA64_CONTROL_REGISTER_CR8 },
+    { .name = "cr9", .reg = LA64_CONTROL_REGISTER_CR9 },
+    { .name = "cr10", .reg = LA64_CONTROL_REGISTER_CR10 },
+    { .name = "cr11", .reg = LA64_CONTROL_REGISTER_CR11 },
+    { .name = "cr12", .reg = LA64_CONTROL_REGISTER_CR12 },
+    { .name = "cr13", .reg = LA64_CONTROL_REGISTER_CR13 },
+    { .name = "cr14", .reg = LA64_CONTROL_REGISTER_CR14 },
+    { .name = "cr15", .reg = LA64_CONTROL_REGISTER_CR15 },
+    { .name = "cr16", .reg = LA64_CONTROL_REGISTER_CR16 },
+    { .name = "cr17", .reg = LA64_CONTROL_REGISTER_CR17 },
+    { .name = "cr18", .reg = LA64_CONTROL_REGISTER_CR18 },
+    { .name = "cr19", .reg = LA64_CONTROL_REGISTER_CR19 },
+    { .name = "cr20", .reg = LA64_CONTROL_REGISTER_CR20 },
+    { .name = "cr21", .reg = LA64_CONTROL_REGISTER_CR21 },
+    { .name = "cr22", .reg = LA64_CONTROL_REGISTER_CR22 },
+    { .name = "cr23", .reg = LA64_CONTROL_REGISTER_CR23 },
+    { .name = "cr24", .reg = LA64_CONTROL_REGISTER_CR24 },
+    { .name = "cr25", .reg = LA64_CONTROL_REGISTER_CR25 },
+    { .name = "cr26", .reg = LA64_CONTROL_REGISTER_CR26 },
+    { .name = "cr27", .reg = LA64_CONTROL_REGISTER_CR27 },
+    { .name = "cr28", .reg = LA64_CONTROL_REGISTER_CR28 },
+    { .name = "cr29", .reg = LA64_CONTROL_REGISTER_CR29 },
+    { .name = "cr30", .reg = LA64_CONTROL_REGISTER_CR30 },
+    { .name = "cr31", .reg = LA64_CONTROL_REGISTER_CR31 },
 };
 
 register_entry_t *register_from_string(const char *name)
@@ -97,7 +128,7 @@ register_entry_t *control_register_from_string(const char *name)
     }
 
     /* iterating through table */
-    for(unsigned char reg = 0x00; reg < (1); reg++)
+    for(unsigned char reg = 0x00; reg < (LA64_CONTROL_REGISTER_MAX + 1); reg++)
     {
         /* check if opcode name matches */
         if(strcmp(control_register_table[reg].name, name) == 0)
