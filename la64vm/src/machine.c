@@ -85,7 +85,7 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
     }
 
     /* allocate timer */
-    machine->timer = la64_timer_alloc(LA64_TIMER_FREQ,  LA64_IRQ_TIMER);
+    machine->timer = la64_timer_alloc(machine->core, LA64_TIMER_FREQ,  LA64_IRQ_TIMER);
 
     /* null pointer check */
     if(machine->timer == NULL)
