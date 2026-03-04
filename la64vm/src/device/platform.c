@@ -84,7 +84,6 @@ void la64_platform_write(la64_core_t *core, void *device, uint64_t offset, uint6
     if(!p->on)
     {
         /* to be fully implemented */
-        la64_machine_dealloc(p->core->machine);
-        exit(0);
+        la64_core_terminate(p->core);
     }
 }
