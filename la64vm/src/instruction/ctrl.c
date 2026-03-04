@@ -131,7 +131,7 @@ void la64_push(la64_core_t *core, uint64_t value)
 {
     if(!la64_memory_write(core, core->rl[LA64_REGISTER_SP], value, sizeof(uint64_t)))
     {
-        core->exception = LA64_EXCEPTION_BAD_ACCESS;
+        core->crl[LA64_CONTROL_REGISTER_CR2] = LA64_EXCEPTION_BAD_ACCESS;
         return;
     }
 
@@ -146,7 +146,7 @@ uint64_t la64_pop(la64_core_t *core)
 
     if(!la64_memory_read(core, core->rl[LA64_REGISTER_SP], sizeof(uint64_t), &value))
     {
-        core->exception = LA64_EXCEPTION_BAD_ACCESS;
+        core->crl[LA64_CONTROL_REGISTER_CR2] = LA64_EXCEPTION_BAD_ACCESS;
         return 0;
     }
 
@@ -258,7 +258,7 @@ void la64_op_iret(la64_core_t *core)
 
     if(!core->in_interrupt)
     {
-        core->exception = LA64_EXCEPTION_BAD_INSTRUCTION;
+        core->crl[LA64_CONTROL_REGISTER_CR2] = LA64_EXCEPTION_BAD_INSTRUCTION;
         return;
     }
 
@@ -302,4 +302,6 @@ void la64_op_iret(la64_core_t *core)
 
     core->machine->intc->current_irq = -1;
     core->in_interrupt = false;
+    core->halted = false;
+    core->crl[LA64_CONTROL_REGISTER_CR2] = LA64_EXCEPTION_NONE;
 }

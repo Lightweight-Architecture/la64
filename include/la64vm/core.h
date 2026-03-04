@@ -198,7 +198,7 @@
 /* control register */
 #define LA64_CONTROL_REGISTER_CR0   0b00000 /* elevation control register */
 #define LA64_CONTROL_REGISTER_CR1   0b00001 /* kernel stack pointer (the stack pointer the interrupt controller will use when receiving interrupt) */
-#define LA64_CONTROL_REGISTER_CR2   0b00010
+#define LA64_CONTROL_REGISTER_CR2   0b00010 /* exception register */
 #define LA64_CONTROL_REGISTER_CR3   0b00011
 #define LA64_CONTROL_REGISTER_CR4   0b00100
 #define LA64_CONTROL_REGISTER_CR5   0b00101
@@ -335,9 +335,6 @@ typedef struct la64_core {
          */
         uint64_t *param[32];
     } op;
-
-    /* exception register which is not a control register */
-    uint8_t exception;
 
     /*
      * cpu halting status (will later be in the same

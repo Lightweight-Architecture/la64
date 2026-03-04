@@ -25,11 +25,11 @@
 #ifndef LA64_INSTRUCTION_H
 #define LA64_INSTRUCTION_H
 
-#define la64_instr_termcond(case)                           \
-    if(case)                                                \
-    {                                                       \
-        core->exception = LA64_EXCEPTION_BAD_ACCESS;        \
-        return;                                             \
+#define la64_instr_termcond(case)                                               \
+    if(case)                                                                    \
+    {                                                                           \
+        core->crl[LA64_CONTROL_REGISTER_CR2] = LA64_EXCEPTION_BAD_ACCESS;       \
+        return;                                                                 \
     }    
 
 #endif /* LA64_INSTRUCTION_H */

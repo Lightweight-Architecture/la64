@@ -139,7 +139,7 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
     /* null pointer check */
     if(iptr == NULL)
     {
-        core->exception = LA64_EXCEPTION_BAD_ACCESS;
+        core->crl[LA64_CONTROL_REGISTER_CR2] = LA64_EXCEPTION_BAD_ACCESS;
         return;
     }
 
@@ -231,7 +231,7 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
             case LA64_PARAMETER_CODING_CREG:
                 if(core->crl[LA64_CONTROL_REGISTER_CR0] < LA64_ELEVATION_KERNEL)
                 {
-                    core->exception = LA64_EXCEPTION_BAD_INSTRUCTION;
+                    core->crl[LA64_CONTROL_REGISTER_CR2] = LA64_EXCEPTION_BAD_INSTRUCTION;
                     return;
                 }
                 core->op.param[core->op.param_cnt] = &(core->crl[(uint8_t)bitwalker_read(&bw, 5)]);
@@ -258,7 +258,7 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
                 core->op.param_cnt++;
                 break;
             default:
-                core->exception = LA64_EXCEPTION_BAD_INSTRUCTION;
+                core->crl[LA64_CONTROL_REGISTER_CR2] = LA64_EXCEPTION_BAD_INSTRUCTION;
                 reached_end = true;
                 return;
         }
@@ -282,11 +282,16 @@ static void *la64_core_execute_thread(void *arg)
     la64_core_t *core = arg;
 
     /* setting properties */
-    core->exception = LA64_EXCEPTION_NONE;
+    core->crl[LA64_CONTROL_REGISTER_CR2] = LA64_EXCEPTION_NONE;
     core->halted = false;
 
     while(1)
     {
+        if(core->in_interrupt)
+        {
+            goto interrupt_fp;
+        }
+
         /* checking if core is halted, if so simply skip execution */
         if(core->halted)
         {
@@ -296,7 +301,7 @@ static void *la64_core_execute_thread(void *arg)
         }
 
         /* checking for any exception */
-        switch(core->exception)
+        switch(core->crl[LA64_CONTROL_REGISTER_CR2])
         {
             case LA64_EXCEPTION_BAD_ACCESS:
                 goto switch_raise_isoftware;
@@ -314,10 +319,13 @@ switch_raise_isoftware:
                 break;
         }
 
+    interrupt_fp:
+
         /* decoding instruction */
         la64_core_decode_instruction_at_pc(core);
 
-        if(core->exception != LA64_EXCEPTION_NONE)
+        if(!core->in_interrupt &&
+           core->crl[LA64_CONTROL_REGISTER_CR2] != LA64_EXCEPTION_NONE)
         {
             /* trap! */
             continue;
@@ -347,11 +355,7 @@ skip_execution:
         /* check and handle pending interrupts */
         if(core->machine && core->machine->intc && la64_intc_pending(core->machine->intc))
         {
-            if(la64_intc_check(core))
-            {
-                core->halted = false;
-                core->exception = LA64_EXCEPTION_NONE;
-            }
+            la64_intc_check(core);
         }
 
         /* tick the timer always */
