@@ -303,5 +303,4 @@ void la64_op_iret(la64_core_t *core)
     core->machine->intc->current_irq = -1;
     core->in_interrupt = false;
     core->halted = false;
-    core->crl[LA64_CONTROL_REGISTER_CR2] = LA64_EXCEPTION_NONE;
 }

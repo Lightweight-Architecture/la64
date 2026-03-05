@@ -31,12 +31,13 @@
 #define LA64_INTC_BASE      0x1FE00000
 #define LA64_INTC_SIZE      0x30
 
-#define LA64_IRQ_TIMER      0
-#define LA64_IRQ_UART       1
-#define LA64_IRQ_DISK       2
-#define LA64_IRQ_NETWORK    3
-#define LA64_IRQ_SOFTWARE   4
-/* IRQ 5-63 available for user devices */
+#define LA64_IRQ_EXCEPTION  0
+#define LA64_IRQ_TIMER      1
+#define LA64_IRQ_UART       2
+#define LA64_IRQ_DISK       3
+#define LA64_IRQ_NETWORK    4
+#define LA64_IRQ_SOFTWARE   5
+/* IRQ 6-63 available for user devices */
 
 #define LA64_IRQ_MAX        63
 

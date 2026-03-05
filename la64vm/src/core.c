@@ -287,54 +287,35 @@ static void *la64_core_execute_thread(void *arg)
 
     while(1)
     {
-        if(core->in_interrupt)
+        /* checking if exception is non-NONE */
+        if(!core->in_interrupt &&
+           core->crl[LA64_CONTROL_REGISTER_CR2] != LA64_EXCEPTION_NONE)
         {
-            goto interrupt_fp;
+exception_shortcut:
+            core->halted = true;
+            la64_raise_interrupt(core, LA64_IRQ_EXCEPTION);
         }
 
         /* checking if core is halted, if so simply skip execution */
-        if(core->halted)
+        if(!core->in_interrupt &&
+           core->halted)
         {
             /* yield cpu to not burn it */
             usleep(100);
             goto skip_execution;
         }
 
-        /* checking for any exception */
-        switch(core->crl[LA64_CONTROL_REGISTER_CR2])
-        {
-            case LA64_EXCEPTION_BAD_ACCESS:
-                goto switch_raise_isoftware;
-            case LA64_EXCEPTION_PERMISSION:
-                goto switch_raise_isoftware;
-            case LA64_EXCEPTION_BAD_INSTRUCTION:
-bad_instruction_shortcut:
-                goto switch_raise_isoftware;
-            case LA64_EXCEPTION_BAD_ARITHMETIC:
-switch_raise_isoftware:
-                core->halted = true;
-                la64_raise_interrupt(core, LA64_IRQ_SOFTWARE);
-                goto skip_execution;
-            default:
-                break;
-        }
-
-    interrupt_fp:
-
         /* decoding instruction */
         la64_core_decode_instruction_at_pc(core);
 
-        if(!core->in_interrupt &&
-           core->crl[LA64_CONTROL_REGISTER_CR2] != LA64_EXCEPTION_NONE)
-        {
-            /* trap! */
-            continue;
-        }
-
         /* sanity check */
-        if(core->op.op > LA64_OPCODE_MAX || opfunc_table[core->op.op] == NULL)
+        if((core->crl[LA64_CONTROL_REGISTER_CR2] != LA64_EXCEPTION_NONE ||
+            core->op.op > LA64_OPCODE_MAX ||
+            opfunc_table[core->op.op] == NULL) &&
+           !core->in_interrupt)
         {
-            goto bad_instruction_shortcut;
+            core->crl[LA64_CONTROL_REGISTER_CR2] = LA64_EXCEPTION_BAD_INSTRUCTION;
+            continue;
         }
 
         /* executing instruction */
@@ -343,8 +324,17 @@ switch_raise_isoftware:
         /* incrementing program counter by instruction size */
         core->rl[LA64_REGISTER_PC] += core->op.ilen;
 
-        /* if we aint in interrupt then there is no reason */
-        if(core->in_interrupt)
+        /*
+         * if we are in a interrupt then there is no reason
+         * to check if we shall serve another interrupt.
+         * if we dont check if the instruction executes was
+         * the return from interrupt controller then there is
+         * a potential for a hardware occuring TOCTOU vulnerability,
+         * because we would just immediately interrupt into another
+         * interrupt handler in the interrupt vector table.
+         */
+        if(core->in_interrupt ||
+           core->op.op == LA64_OPCODE_IRET)
         {
             goto tick_timer;
         }
