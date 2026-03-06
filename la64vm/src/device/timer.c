@@ -111,9 +111,7 @@ static uint64_t detect_host_freq(void)
 #endif
 }
 
-la64_timer_t *la64_timer_alloc(la64_core_t *core,
-                               uint64_t virtual_freq,
-                               int irq_line)
+la64_timer_t *la64_timer_alloc(la64_core_t *core)
 {
     /* allocate timer */
     la64_timer_t *timer = malloc(sizeof(la64_timer_t));
@@ -125,11 +123,8 @@ la64_timer_t *la64_timer_alloc(la64_core_t *core,
 
     /* setting up timer */
     timer->core = core;
-    timer->irq_line = irq_line;
     timer->compare = UINT64_MAX;
     
-    timer->virtual_freq = virtual_freq;
-    timer->freq = virtual_freq;
     timer->host_freq = detect_host_freq();
     timer->last_host_cycles = la64_get_host_cycles();
     timer->remainder = 0;
@@ -163,7 +158,7 @@ void la64_timer_tick(la64_timer_t *timer,
     }
 
     /*  calculating using virtual frequency the actual timer count */
-    __uint128_t total = (__uint128_t)elapsed_host * timer->virtual_freq + timer->remainder;
+    __uint128_t total = (__uint128_t)elapsed_host * LA64_TIMER_FREQ + timer->remainder;
     uint64_t virtual_ticks = total / timer->host_freq;
     timer->remainder = total % timer->host_freq;
     
@@ -193,7 +188,7 @@ void la64_timer_tick(la64_timer_t *timer,
         
         if(timer->ctrl & TIMER_CTRL_IRQ_EN)
         {
-            la64_raise_interrupt(timer->core->machine, timer->irq_line);
+            la64_raise_interrupt(timer->core->machine, LA64_IRQ_TIMER);
         }
     }
 }

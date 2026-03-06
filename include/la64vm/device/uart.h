@@ -59,13 +59,11 @@ typedef struct {
     pthread_t thread;
     pthread_mutex_t mutex;
     atomic_bool running;
-    
-    int irq_line;
 
     la64_core_t *core;
 } la64_uart_t;
 
-la64_uart_t *la64_uart_alloc(la64_core_t *core, int irq_line);
+la64_uart_t *la64_uart_alloc(la64_core_t *core);
 void la64_uart_dealloc(la64_uart_t *u);
 
 uint64_t la64_uart_read(la64_core_t *core, void *device, uint64_t offset, int size);

@@ -57,23 +57,17 @@ static void uart_update_irq(la64_uart_t *u)
     /* updating interrupt */
     if(level)
     {
-        la64_raise_interrupt(u->core->machine, u->irq_line);
+        la64_raise_interrupt(u->core->machine, LA64_IRQ_UART);
     }
     else
     {
-        la64_clear_interrupt(u->core->machine, u->irq_line);
+        la64_clear_interrupt(u->core->machine, LA64_IRQ_UART);
     }
 }
 
 static void *uart_input_thread(void *arg)
 {
     la64_uart_t *u = (la64_uart_t *)arg;
-
-    /* null pointer check */
-    if(u == NULL)
-    {
-        return NULL;
-    }
 
     uint8_t ch;
     
@@ -159,7 +153,7 @@ static inline void la64_uart_stop(la64_uart_t *u)
     uart_restore_mode();
 }
 
-la64_uart_t *la64_uart_alloc(la64_core_t *core, int irq_line)
+la64_uart_t *la64_uart_alloc(la64_core_t *core)
 {
     /* allocate uart */
     la64_uart_t *u = malloc(sizeof(la64_uart_t));
@@ -172,7 +166,6 @@ la64_uart_t *la64_uart_alloc(la64_core_t *core, int irq_line)
 
     /* setting up uart */
     u->core = core;
-    u->irq_line = irq_line;
     u->status = UART_STATUS_TX_EMPTY;
     
     pthread_mutex_init(&u->mutex, NULL);

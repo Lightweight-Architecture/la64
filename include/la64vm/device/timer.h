@@ -53,16 +53,13 @@ typedef struct la64_timer {
     uint64_t freq;
     
     uint64_t host_freq;
-    uint64_t virtual_freq;
     uint64_t last_host_cycles;
     uint64_t remainder;
-    
-    int irq_line;
     
     la64_core_t *core;
 } la64_timer_t;
 
-la64_timer_t *la64_timer_alloc(la64_core_t *core, uint64_t virtual_freq, int irq_line);
+la64_timer_t *la64_timer_alloc(la64_core_t *core);
 void la64_timer_dealloc(la64_timer_t *timer);
 void la64_timer_tick(la64_timer_t *timer, uint64_t host_cycles);
 uint64_t la64_get_host_cycles(void);

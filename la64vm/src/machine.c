@@ -87,7 +87,7 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
     }
 
     /* allocate timer */
-    machine->timer = la64_timer_alloc(machine->core, LA64_TIMER_FREQ,  LA64_IRQ_TIMER);
+    machine->timer = la64_timer_alloc(machine->core);
 
     /* null pointer check */
     if(machine->timer == NULL)
@@ -102,7 +102,7 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
     }
 
     /* allocate uart */
-    machine->uart = la64_uart_alloc(machine->core, LA64_IRQ_UART);
+    machine->uart = la64_uart_alloc(machine->core);
 
     if(machine->uart == NULL)
     {
