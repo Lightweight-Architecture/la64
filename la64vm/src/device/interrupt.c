@@ -170,10 +170,10 @@ bool la64_intc_check(la64_core_t *core)
 
     /* jump to handler */
     uint64_t oldsp = core->rl[LA64_REGISTER_SP];
-    uint64_t oldel = core->crl[LA64_CONTROL_REGISTER_CR0];
+    uint64_t oldel = core->rl[LA64_REGISTER_CR0];
 
-    core->crl[LA64_CONTROL_REGISTER_CR0] = LA64_ELEVATION_KERNEL;
-    core->rl[LA64_REGISTER_SP] = core->crl[LA64_CONTROL_REGISTER_CR1];
+    core->rl[LA64_REGISTER_CR0] = LA64_ELEVATION_KERNEL;
+    core->rl[LA64_REGISTER_SP] = core->rl[LA64_REGISTER_CR1];
 
     /* creating interrupt stack frame */
     la64_push(core, oldel);
@@ -193,21 +193,6 @@ bool la64_intc_check(la64_core_t *core)
     la64_push(core, core->rl[LA64_REGISTER_R9]);
     la64_push(core, core->rl[LA64_REGISTER_R10]);
     la64_push(core, core->rl[LA64_REGISTER_R11]);
-    la64_push(core, core->rl[LA64_REGISTER_R12]);
-    la64_push(core, core->rl[LA64_REGISTER_R13]);
-    la64_push(core, core->rl[LA64_REGISTER_R14]);
-    la64_push(core, core->rl[LA64_REGISTER_R15]);
-    la64_push(core, core->rl[LA64_REGISTER_R16]);
-    la64_push(core, core->rl[LA64_REGISTER_R17]);
-    la64_push(core, core->rl[LA64_REGISTER_R18]);
-    la64_push(core, core->rl[LA64_REGISTER_R19]);
-    la64_push(core, core->rl[LA64_REGISTER_R20]);
-    la64_push(core, core->rl[LA64_REGISTER_R21]);
-    la64_push(core, core->rl[LA64_REGISTER_R22]);
-    la64_push(core, core->rl[LA64_REGISTER_R23]);
-    la64_push(core, core->rl[LA64_REGISTER_R24]);
-    la64_push(core, core->rl[LA64_REGISTER_R25]);
-    la64_push(core, core->rl[LA64_REGISTER_R26]);
 
     /* storing it as frame pointer  */
     core->rl[LA64_REGISTER_FP] = core->rl[LA64_REGISTER_SP];

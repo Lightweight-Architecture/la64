@@ -32,9 +32,8 @@ typedef struct {
     unsigned char reg;
 } register_entry_t;
 
-extern register_entry_t register_table[LA64_REGISTER_MAX + 1];
+extern register_entry_t register_table[];
 
 register_entry_t *register_from_string(const char *name);
-register_entry_t *control_register_from_string(const char *name);
 
 #endif /* COMPILER_REGISTER_H */

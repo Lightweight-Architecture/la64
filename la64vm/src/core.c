@@ -139,7 +139,7 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
     /* null pointer check */
     if(iptr == NULL)
     {
-        core->crl[LA64_CONTROL_REGISTER_CR2] = LA64_EXCEPTION_BAD_ACCESS;
+        core->rl[LA64_REGISTER_CR2] = LA64_EXCEPTION_BAD_ACCESS;
         return;
     }
 
@@ -225,18 +225,21 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
                 reached_end = true;
                 break;
             case LA64_PARAMETER_CODING_REG:
-                core->op.param[core->op.param_cnt] = &(core->rl[(uint8_t)bitwalker_read(&bw, 5)]);
-                core->op.param_cnt++;
-                break;
-            case LA64_PARAMETER_CODING_CREG:
-                if(core->crl[LA64_CONTROL_REGISTER_CR0] < LA64_ELEVATION_KERNEL)
+            {
+                uint8_t rcnt = (uint8_t)bitwalker_read(&bw, 5);
+
+                if(rcnt > LA64_REGISTER_RR &&
+                   core->rl[LA64_REGISTER_CR0] < LA64_ELEVATION_KERNEL)
                 {
-                    core->crl[LA64_CONTROL_REGISTER_CR2] = LA64_EXCEPTION_BAD_INSTRUCTION;
+                    core->rl[LA64_REGISTER_CR2] = LA64_EXCEPTION_BAD_INSTRUCTION;
                     return;
                 }
-                core->op.param[core->op.param_cnt] = &(core->crl[(uint8_t)bitwalker_read(&bw, 5)]);
+
+                core->op.param[core->op.param_cnt] = &(core->rl[rcnt]);
                 core->op.param_cnt++;
+
                 break;
+            }
             case LA64_PARAMETER_CODING_IMM8:
                 core->op.imm[core->op.param_cnt] = (uint8_t)bitwalker_read(&bw, 8);
                 core->op.param[core->op.param_cnt] = &(core->op.imm[core->op.param_cnt]);
@@ -258,7 +261,7 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
                 core->op.param_cnt++;
                 break;
             default:
-                core->crl[LA64_CONTROL_REGISTER_CR2] = LA64_EXCEPTION_BAD_INSTRUCTION;
+                core->rl[LA64_REGISTER_CR2] = LA64_EXCEPTION_BAD_INSTRUCTION;
                 reached_end = true;
                 return;
         }
@@ -281,15 +284,12 @@ static void *la64_core_execute_thread(void *arg)
     /* cast argument to core */
     la64_core_t *core = arg;
 
-    /* setting properties */
-    core->crl[LA64_CONTROL_REGISTER_CR2] = LA64_EXCEPTION_NONE;
-    core->halted = false;
-
+    /* going into da execution loop */
     while(1)
     {
         /* checking if exception is non-NONE */
         if(!core->in_interrupt &&
-           core->crl[LA64_CONTROL_REGISTER_CR2] != LA64_EXCEPTION_NONE)
+           core->rl[LA64_REGISTER_CR2] != LA64_EXCEPTION_NONE)
         {
 exception_shortcut:
             core->halted = true;
@@ -309,12 +309,12 @@ exception_shortcut:
         la64_core_decode_instruction_at_pc(core);
 
         /* sanity check */
-        if((core->crl[LA64_CONTROL_REGISTER_CR2] != LA64_EXCEPTION_NONE ||
+        if((core->rl[LA64_REGISTER_CR2] != LA64_EXCEPTION_NONE ||
             core->op.op > LA64_OPCODE_MAX ||
             opfunc_table[core->op.op] == NULL) &&
            !core->in_interrupt)
         {
-            core->crl[LA64_CONTROL_REGISTER_CR2] = LA64_EXCEPTION_BAD_INSTRUCTION;
+            core->rl[LA64_REGISTER_CR2] = LA64_EXCEPTION_BAD_INSTRUCTION;
             continue;
         }
 

@@ -131,7 +131,7 @@ void la64_push(la64_core_t *core, uint64_t value)
 {
     if(!la64_memory_write(core, core->rl[LA64_REGISTER_SP], value, sizeof(uint64_t)))
     {
-        core->crl[LA64_CONTROL_REGISTER_CR2] = LA64_EXCEPTION_BAD_ACCESS;
+        core->rl[LA64_REGISTER_CR2] = LA64_EXCEPTION_BAD_ACCESS;
         return;
     }
 
@@ -146,7 +146,7 @@ uint64_t la64_pop(la64_core_t *core)
 
     if(!la64_memory_read(core, core->rl[LA64_REGISTER_SP], sizeof(uint64_t), &value))
     {
-        core->crl[LA64_CONTROL_REGISTER_CR2] = LA64_EXCEPTION_BAD_ACCESS;
+        core->rl[LA64_REGISTER_CR2] = LA64_EXCEPTION_BAD_ACCESS;
         return 0;
     }
 
@@ -181,24 +181,9 @@ void la64_op_bl(la64_core_t *core)
     la64_push(core, core->rl[LA64_REGISTER_R9]);
     la64_push(core, core->rl[LA64_REGISTER_R10]);
     la64_push(core, core->rl[LA64_REGISTER_R11]);
-    la64_push(core, core->rl[LA64_REGISTER_R12]);
-    la64_push(core, core->rl[LA64_REGISTER_R13]);
-    la64_push(core, core->rl[LA64_REGISTER_R14]);
-    la64_push(core, core->rl[LA64_REGISTER_R15]);
-    la64_push(core, core->rl[LA64_REGISTER_R16]);
-    la64_push(core, core->rl[LA64_REGISTER_R17]);
-    la64_push(core, core->rl[LA64_REGISTER_R18]);
-    la64_push(core, core->rl[LA64_REGISTER_R19]);
-    la64_push(core, core->rl[LA64_REGISTER_R20]);
-    la64_push(core, core->rl[LA64_REGISTER_R21]);
-    la64_push(core, core->rl[LA64_REGISTER_R22]);
-    la64_push(core, core->rl[LA64_REGISTER_R23]);
-    la64_push(core, core->rl[LA64_REGISTER_R24]);
-    la64_push(core, core->rl[LA64_REGISTER_R25]);
-    la64_push(core, core->rl[LA64_REGISTER_R26]);
 
     /* writing parameters */
-    for(uint8_t i = 1; i < core->op.param_cnt && i < (LA64_REGISTER_R26 - 1); i++)
+    for(uint8_t i = 1; i < core->op.param_cnt && i < (LA64_REGISTER_R11 - 1); i++)
     {
         core->rl[(LA64_REGISTER_R0 - 1) + i] = param_imm[i];
     }
@@ -219,21 +204,6 @@ void la64_op_ret(la64_core_t *core)
 
     core->rl[LA64_REGISTER_SP] = core->rl[LA64_REGISTER_FP];
 
-    core->rl[LA64_REGISTER_R26] = la64_pop(core);
-    core->rl[LA64_REGISTER_R25] = la64_pop(core);
-    core->rl[LA64_REGISTER_R24] = la64_pop(core);
-    core->rl[LA64_REGISTER_R23] = la64_pop(core);
-    core->rl[LA64_REGISTER_R22] = la64_pop(core);
-    core->rl[LA64_REGISTER_R21] = la64_pop(core);
-    core->rl[LA64_REGISTER_R20] = la64_pop(core);
-    core->rl[LA64_REGISTER_R19] = la64_pop(core);
-    core->rl[LA64_REGISTER_R18] = la64_pop(core);
-    core->rl[LA64_REGISTER_R17] = la64_pop(core);
-    core->rl[LA64_REGISTER_R16] = la64_pop(core);
-    core->rl[LA64_REGISTER_R15] = la64_pop(core);
-    core->rl[LA64_REGISTER_R14] = la64_pop(core);
-    core->rl[LA64_REGISTER_R13] = la64_pop(core);
-    core->rl[LA64_REGISTER_R12] = la64_pop(core);
     core->rl[LA64_REGISTER_R11] = la64_pop(core);
     core->rl[LA64_REGISTER_R10] = la64_pop(core);
     core->rl[LA64_REGISTER_R9] = la64_pop(core);
@@ -258,27 +228,12 @@ void la64_op_iret(la64_core_t *core)
 
     if(!core->in_interrupt)
     {
-        core->crl[LA64_CONTROL_REGISTER_CR2] = LA64_EXCEPTION_BAD_INSTRUCTION;
+        core->rl[LA64_REGISTER_CR2] = LA64_EXCEPTION_BAD_INSTRUCTION;
         return;
     }
 
     core->rl[LA64_REGISTER_SP] = core->rl[LA64_REGISTER_FP];
 
-    core->rl[LA64_REGISTER_R26] = la64_pop(core);
-    core->rl[LA64_REGISTER_R25] = la64_pop(core);
-    core->rl[LA64_REGISTER_R24] = la64_pop(core);
-    core->rl[LA64_REGISTER_R23] = la64_pop(core);
-    core->rl[LA64_REGISTER_R22] = la64_pop(core);
-    core->rl[LA64_REGISTER_R21] = la64_pop(core);
-    core->rl[LA64_REGISTER_R20] = la64_pop(core);
-    core->rl[LA64_REGISTER_R19] = la64_pop(core);
-    core->rl[LA64_REGISTER_R18] = la64_pop(core);
-    core->rl[LA64_REGISTER_R17] = la64_pop(core);
-    core->rl[LA64_REGISTER_R16] = la64_pop(core);
-    core->rl[LA64_REGISTER_R15] = la64_pop(core);
-    core->rl[LA64_REGISTER_R14] = la64_pop(core);
-    core->rl[LA64_REGISTER_R13] = la64_pop(core);
-    core->rl[LA64_REGISTER_R12] = la64_pop(core);
     core->rl[LA64_REGISTER_R11] = la64_pop(core);
     core->rl[LA64_REGISTER_R10] = la64_pop(core);
     core->rl[LA64_REGISTER_R9] = la64_pop(core);
@@ -295,7 +250,7 @@ void la64_op_iret(la64_core_t *core)
     core->rl[LA64_REGISTER_FP] = la64_pop(core);
     uint64_t oldsp = la64_pop(core);
     core->rl[LA64_REGISTER_PC] = la64_pop(core);
-    core->crl[LA64_CONTROL_REGISTER_CR0] = la64_pop(core);
+    core->rl[LA64_REGISTER_CR0] = la64_pop(core);
     core->op.ilen = 0;
 
     core->rl[LA64_REGISTER_SP] = oldsp;

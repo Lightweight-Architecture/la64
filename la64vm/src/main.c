@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
     machine->core->rl[LA64_REGISTER_SP] = machine->memory->memory_size - 8;
 
     /* setting elevation to system monitor */
-    machine->core->crl[LA64_CONTROL_REGISTER_CR0] = LA64_ELEVATION_SECURE_MONITOR;
+    machine->core->rl[LA64_REGISTER_CR0] = LA64_ELEVATION_SECURE_MONITOR;
 
     /* executing virtual machines 1st core TODO: Implement threading */
     la64_core_execute(machine->core);

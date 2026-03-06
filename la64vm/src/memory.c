@@ -128,6 +128,9 @@ void *la64_memory_access(la64_core_t *core,
                          uint64_t addr,
                          size_t size)
 {
+    /* this is where MMU access happens */
+
+
     /* sanity check */
     if(core == NULL ||
        core->machine == NULL ||
@@ -161,7 +164,7 @@ bool la64_memory_read(la64_core_t *core,
         return false;
     }
 
-    if(core->crl[LA64_CONTROL_REGISTER_CR0] > LA64_ELEVATION_USER)
+    if(core->rl[LA64_REGISTER_CR0] > LA64_ELEVATION_USER)
     {
         /* finding mmio device */
         la64_mmio_region_t *mmio = la64_mmio_find(core->machine->mmio_bus, addr);
@@ -215,7 +218,7 @@ bool la64_memory_write(la64_core_t *core,
         return false;
     }
 
-    if(core->crl[LA64_CONTROL_REGISTER_CR0] > LA64_ELEVATION_USER)
+    if(core->rl[LA64_REGISTER_CR0] > LA64_ELEVATION_USER)
     {
         /* trying to find mmio device */
         la64_mmio_region_t *mmio = la64_mmio_find(core->machine->mmio_bus, addr);

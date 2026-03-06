@@ -95,16 +95,6 @@ bool la64_compiler_emit(compiler_line_t *cl)
             continue;
         }
 
-        /* checking for control register */
-        reg = control_register_from_string(cl->token[i].str);
-
-        if(reg != NULL)
-        {
-            bitwalker_write(&bw, LA64_PARAMETER_CODING_CREG, 3);
-            bitwalker_write(&bw, reg->reg, 5);
-            continue;
-        }
-
         /* checking if allowed to be something else than a register */
         if(reg_only)
         {

@@ -103,8 +103,7 @@
 #define LA64_PARAMETER_CODING_IMM16     0b011   /* 16bit intermediate */
 #define LA64_PARAMETER_CODING_IMM32     0b100   /* 32bit intermediate */
 #define LA64_PARAMETER_CODING_IMM64     0b101   /* 64bit intermediate */
-#define LA64_PARAMETER_CODING_CREG      0b110   /* control register */
-/* leaving 0x111 open for later additions */
+/* leaving 0b110 and 0b111 open for later additions */
 
 /* registers */
 
@@ -173,16 +172,6 @@
 #define LA64_REGISTER_R14   0b10010
 #define LA64_REGISTER_R15   0b10011
 #define LA64_REGISTER_R16   0b10100
-#define LA64_REGISTER_R17   0b10101
-#define LA64_REGISTER_R18   0b10110
-#define LA64_REGISTER_R19   0b10111
-#define LA64_REGISTER_R20   0b11000
-#define LA64_REGISTER_R21   0b11001
-#define LA64_REGISTER_R22   0b11010
-#define LA64_REGISTER_R23   0b11011
-#define LA64_REGISTER_R24   0b11100
-#define LA64_REGISTER_R25   0b11101
-#define LA64_REGISTER_R26   0b11110
 
 /*
  * return register: also a general purpose register but
@@ -191,45 +180,21 @@
  * return without any crazy memory math a value for
  * example.
  */
-#define LA64_REGISTER_RR    0b11111
+#define LA64_REGISTER_RR    0b10101
 
-#define LA64_REGISTER_MAX   LA64_REGISTER_RR
+/* control registers */
+#define LA64_REGISTER_CR0   0b10110 /* CREL:    elevation control register */
+#define LA64_REGISTER_CR1   0b10111 /* CRKSP:   kernel stack pointer (the stack pointer the interrupt controller will use when receiving interrupt) */
+#define LA64_REGISTER_CR2   0b11000 /* CREXC:   exception register (first 3bits for the exception) */
+#define LA64_REGISTER_CR3   0b11001 /* CRVEC:   cpu vector table */
+#define LA64_REGISTER_CR4   0b11010
+#define LA64_REGISTER_CR5   0b11011
+#define LA64_REGISTER_CR6   0b11100
+#define LA64_REGISTER_CR7   0b11101
+#define LA64_REGISTER_CR8   0b11110
+#define LA64_REGISTER_CR9   0b11111
 
-/* control register */
-#define LA64_CONTROL_REGISTER_CR0   0b00000 /* elevation control register */
-#define LA64_CONTROL_REGISTER_CR1   0b00001 /* kernel stack pointer (the stack pointer the interrupt controller will use when receiving interrupt) */
-#define LA64_CONTROL_REGISTER_CR2   0b00010 /* exception register */
-#define LA64_CONTROL_REGISTER_CR3   0b00011
-#define LA64_CONTROL_REGISTER_CR4   0b00100
-#define LA64_CONTROL_REGISTER_CR5   0b00101
-#define LA64_CONTROL_REGISTER_CR6   0b00110
-#define LA64_CONTROL_REGISTER_CR7   0b00111
-#define LA64_CONTROL_REGISTER_CR8   0b01000
-#define LA64_CONTROL_REGISTER_CR9   0b01001
-#define LA64_CONTROL_REGISTER_CR10  0b01010
-#define LA64_CONTROL_REGISTER_CR11  0b01011
-#define LA64_CONTROL_REGISTER_CR12  0b01100
-#define LA64_CONTROL_REGISTER_CR13  0b01101
-#define LA64_CONTROL_REGISTER_CR14  0b01110
-#define LA64_CONTROL_REGISTER_CR15  0b01111
-#define LA64_CONTROL_REGISTER_CR16  0b10000
-#define LA64_CONTROL_REGISTER_CR17  0b10001
-#define LA64_CONTROL_REGISTER_CR18  0b10010
-#define LA64_CONTROL_REGISTER_CR19  0b10011
-#define LA64_CONTROL_REGISTER_CR20  0b10100
-#define LA64_CONTROL_REGISTER_CR21  0b10101
-#define LA64_CONTROL_REGISTER_CR22  0b10110
-#define LA64_CONTROL_REGISTER_CR23  0b10111
-#define LA64_CONTROL_REGISTER_CR24  0b11000
-#define LA64_CONTROL_REGISTER_CR25  0b11001
-#define LA64_CONTROL_REGISTER_CR26  0b11010
-#define LA64_CONTROL_REGISTER_CR27  0b11011
-#define LA64_CONTROL_REGISTER_CR28  0b11100
-#define LA64_CONTROL_REGISTER_CR29  0b11101
-#define LA64_CONTROL_REGISTER_CR30  0b11110
-#define LA64_CONTROL_REGISTER_CR31  0b11111
-
-#define LA64_CONTROL_REGISTER_MAX   LA64_CONTROL_REGISTER_CR31
+#define LA64_REGISTER_MAX   LA64_REGISTER_CR9
 
 /* elevation levels */
 #define LA64_ELEVATION_USER             0b00
@@ -300,7 +265,6 @@ typedef struct la64_core {
 
     /* a array of all (control) registers */
     uint64_t rl[LA64_REGISTER_MAX + 1];
-    uint64_t crl[LA64_CONTROL_REGISTER_MAX + 1];
 
     /* data of currently decoding or decoded operation */
     struct la64_operation {
