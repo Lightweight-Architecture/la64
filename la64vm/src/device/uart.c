@@ -135,6 +135,30 @@ static void *uart_input_thread(void *arg)
     return NULL;
 }
 
+static inline void la64_uart_start(la64_uart_t *u)
+{
+    if(u->running)
+    {
+        return;
+    }
+    
+    atomic_store(&u->running, true);
+    uart_set_raw_mode();
+    pthread_create(&u->thread, NULL, uart_input_thread, u);
+}
+
+static inline void la64_uart_stop(la64_uart_t *u)
+{
+    if(!u->running)
+    {
+        return;
+    }
+    
+    atomic_store(&u->running, false);
+    pthread_join(u->thread, NULL);
+    uart_restore_mode();
+}
+
 la64_uart_t *la64_uart_alloc(la64_core_t *core, int irq_line)
 {
     /* allocate uart */
@@ -154,6 +178,8 @@ la64_uart_t *la64_uart_alloc(la64_core_t *core, int irq_line)
     pthread_mutex_init(&u->mutex, NULL);
     atomic_store(&u->running, false);
 
+    la64_uart_start(u);
+
     return u;
 }
 
@@ -162,30 +188,6 @@ void la64_uart_dealloc(la64_uart_t *u)
     la64_uart_stop(u);
     pthread_mutex_destroy(&u->mutex);
     free(u);
-}
-
-void la64_uart_start(la64_uart_t *u)
-{
-    if(u->running)
-    {
-        return;
-    }
-    
-    atomic_store(&u->running, true);
-    uart_set_raw_mode();
-    pthread_create(&u->thread, NULL, uart_input_thread, u);
-}
-
-void la64_uart_stop(la64_uart_t *u)
-{
-    if(!u->running)
-    {
-        return;
-    }
-    
-    atomic_store(&u->running, false);
-    pthread_join(u->thread, NULL);
-    uart_restore_mode();
 }
 
 uint64_t la64_uart_read(la64_core_t *core, void *device, uint64_t offset, int size)

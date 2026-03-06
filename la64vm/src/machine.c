@@ -109,8 +109,6 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
         goto out_release_timer;
     }
 
-    la64_uart_start(machine->uart);
-
     if(!la64_mmio_register(machine->mmio_bus, LA64_UART_BASE, LA64_UART_SIZE, machine->uart, la64_uart_read, la64_uart_write, "uart"))
     {
         goto out_release_uart;
@@ -184,7 +182,6 @@ void la64_machine_dealloc(la64_machine_t *machine)
     /* release uart */
     if(machine->uart)
     {
-        la64_uart_stop(machine->uart);
         la64_uart_dealloc(machine->uart);
     }
 
