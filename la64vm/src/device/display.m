@@ -133,7 +133,7 @@ static GLuint linkProgram(GLuint vs, GLuint fs)
     _display = display;
     [self setWantsBestResolutionOpenGLSurface:YES];
     __weak typeof(self) weakSelf = self;
-    _timer = [NSTimer scheduledTimerWithTimeInterval:1.0/64.0 repeats:YES block:^(NSTimer *timer){
+    _timer = [NSTimer scheduledTimerWithTimeInterval:1.0/LA64_FB_TICK_HZ repeats:YES block:^(NSTimer *timer){
         [weakSelf setNeedsDisplay:YES];
     }];
     return self;
