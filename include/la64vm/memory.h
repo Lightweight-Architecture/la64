@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef LA64_MEMORY_H
-#define LA64_MEMORY_H
+#ifndef LA64VM_MEMORY_H
+#define LA64VM_MEMORY_H
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -45,4 +45,4 @@ void *la64_memory_access(la64_core_t *core, uint64_t addr, size_t size);
 bool la64_memory_read(la64_core_t *core, uint64_t addr, size_t size, uint64_t *value);
 bool la64_memory_write(la64_core_t *core, uint64_t addr, uint64_t value, size_t size);
 
-#endif /* LA64_MEMORY_H */
+#endif /* LA64VM_MEMORY_H */

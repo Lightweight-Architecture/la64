@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef LA64_INSTRUCTION_H
-#define LA64_INSTRUCTION_H
+#ifndef LA64VM_INSTRUCTION_H
+#define LA64VM_INSTRUCTION_H
 
 #define la64_instr_termcond(case)                                               \
     if(case)                                                                    \
@@ -32,4 +32,4 @@
         return;                                                                 \
     }    
 
-#endif /* LA64_INSTRUCTION_H */
+#endif /* LA64VM_INSTRUCTION_H */

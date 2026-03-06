@@ -116,7 +116,12 @@ la64_timer_t *la64_timer_alloc(la64_core_t *core,
                                int irq_line)
 {
     /* allocate timer */
-    la64_timer_t *timer = calloc(1, sizeof(la64_timer_t));
+    la64_timer_t *timer = malloc(sizeof(la64_timer_t));
+
+    if(timer == NULL)
+    {
+        return NULL;
+    }
 
     /* setting up timer */
     timer->core = core;
@@ -188,7 +193,7 @@ void la64_timer_tick(la64_timer_t *timer,
         
         if(timer->ctrl & TIMER_CTRL_IRQ_EN)
         {
-            la64_raise_interrupt(timer->core, timer->irq_line);
+            la64_raise_interrupt(timer->core->machine, timer->irq_line);
         }
     }
 }
@@ -251,7 +256,6 @@ void la64_timer_write(la64_core_t *core,
             /* Read-only */
             break;
         default:
-            printf("[timer] write to unknown offset 0x%llx\n", (unsigned long long)offset);
             break;
     }
 }

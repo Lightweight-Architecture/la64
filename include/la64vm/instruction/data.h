@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef LA64_INSTRUCTION_DATA_H
-#define LA64_INSTRUCTION_DATA_H
+#ifndef LA64VM_INSTRUCTION_DATA_H
+#define LA64VM_INSTRUCTION_DATA_H
 
 #include <la64vm/core.h>
 
@@ -42,4 +42,4 @@ void la64_op_stw(la64_core_t *core);
 void la64_op_std(la64_core_t *core);
 void la64_op_stq(la64_core_t *core);
 
-#endif /* LA64_INSTRUCTION_DATA_H */
+#endif /* LA64VM_INSTRUCTION_DATA_H */

@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef LA64_INSTRUCTION_CTRL_H
-#define LA64_INSTRUCTION_CTRL_H
+#ifndef LA64VM_INSTRUCTION_CTRL_H
+#define LA64VM_INSTRUCTION_CTRL_H
 
 #include <la64vm/core.h>
 
@@ -45,4 +45,4 @@ void la64_op_bl(la64_core_t *core);
 void la64_op_ret(la64_core_t *core);
 void la64_op_iret(la64_core_t *core);
 
-#endif /* LA64_INSTRUCTION_CTRL_H */
+#endif /* LA64VM_INSTRUCTION_CTRL_H */

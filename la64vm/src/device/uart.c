@@ -22,6 +22,7 @@
  * SOFTWARE.
  */
 
+#include <la64vm/core.h>
 #include <la64vm/device/uart.h>
 #include <la64vm/device/interrupt.h>
 #include <stdlib.h>
@@ -34,6 +35,7 @@ static struct termios uart_orig_termios;
 
 static void uart_set_raw_mode(void)
 {
+    /* TODO: make this rawer, or make a GUI terminal */
     struct termios raw;
     tcgetattr(STDIN_FILENO, &uart_orig_termios);
     raw = uart_orig_termios;
@@ -55,11 +57,11 @@ static void uart_update_irq(la64_uart_t *u)
     /* updating interrupt */
     if(level)
     {
-        la64_raise_interrupt(u->core, u->irq_line);
+        la64_raise_interrupt(u->core->machine, u->irq_line);
     }
     else
     {
-        la64_clear_interrupt(u->core, u->irq_line);
+        la64_clear_interrupt(u->core->machine, u->irq_line);
     }
 }
 
@@ -136,7 +138,7 @@ static void *uart_input_thread(void *arg)
 la64_uart_t *la64_uart_alloc(la64_core_t *core, int irq_line)
 {
     /* allocate uart */
-    la64_uart_t *u = calloc(1, sizeof(la64_uart_t));
+    la64_uart_t *u = malloc(sizeof(la64_uart_t));
 
     /* null pointer check */
     if(u == NULL)

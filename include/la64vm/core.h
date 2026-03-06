@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef LA64_CORE_H
-#define LA64_CORE_H
+#ifndef LA64VM_CORE_H
+#define LA64VM_CORE_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -325,4 +325,4 @@ void la64_core_dealloc(la64_core_t *core);
 void la64_core_execute(la64_core_t *core);
 void la64_core_terminate(la64_core_t *core);
 
-#endif /* LA64_CORE_H */
+#endif /* LA64VM_CORE_H */

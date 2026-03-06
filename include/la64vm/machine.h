@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef LA64_MACHINE_H
-#define LA64_MACHINE_H
+#ifndef LA64VM_MACHINE_H
+#define LA64VM_MACHINE_H
 
 #include <la64vm/core.h>
 #include <la64vm/memory.h>
@@ -32,8 +32,6 @@
 #include <la64vm/device/timer.h>
 #include <la64vm/device/interrupt.h>
 #include <la64vm/device/uart.h>
-#include <la64vm/device/mc.h>
-#include <la64vm/device/platform.h>
 
 #if defined(__linux__)  || defined(__APPLE__)
 #include <la64vm/device/display.h>
@@ -48,7 +46,6 @@ typedef struct la64_machine {
     la64_intc_t *intc;
     la64_timer_t *timer;
     la64_uart_t *uart;
-    la64_platform_t *platform;
 #if defined(__linux__)  || defined(__APPLE__)
     la64_display_t *display;
 #endif /* __linux__ */
@@ -57,4 +54,4 @@ typedef struct la64_machine {
 la64_machine_t *la64_machine_alloc(uint64_t memory_size);
 void la64_machine_dealloc(la64_machine_t *machine);
 
-#endif /* LA64_MACHINE_H */
+#endif /* LA64VM_MACHINE_H */

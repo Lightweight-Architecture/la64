@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef LA64_DEVICE_INTERRUPT_H
-#define LA64_DEVICE_INTERRUPT_H
+#ifndef LA64VM_DEVICE_INTERRUPT_H
+#define LA64VM_DEVICE_INTERRUPT_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -53,6 +53,7 @@
 #define LA64_INTC_CTRL_NESTING  (1 << 1)
 
 typedef struct la64_core la64_core_t;
+typedef struct la64_machine la64_machine_t;
 
 typedef struct la64_intc {
     uint64_t pending;
@@ -60,18 +61,16 @@ typedef struct la64_intc {
     uint64_t ctrl;
     uint64_t vector_base;
     int64_t  current_irq;
-    la64_core_t *core;
 } la64_intc_t;
 
-la64_intc_t *la64_intc_alloc(la64_core_t *core);
+la64_intc_t *la64_intc_alloc(void);
 void la64_intc_dealloc(la64_intc_t *intc);
 
-void la64_raise_interrupt(la64_core_t *core, int irq_line);
-void la64_clear_interrupt(la64_core_t *core, int irq_line);
-bool la64_intc_check(la64_core_t *core);
-bool la64_intc_pending(la64_intc_t *intc);
+void la64_raise_interrupt(la64_machine_t *machine, int irq_line);
+void la64_clear_interrupt(la64_machine_t *machine, int irq_line);
+bool la64_serve_interrupt_if_needed(la64_core_t *core);
 
 uint64_t la64_intc_read(la64_core_t *core, void *device, uint64_t offset, int size);
 void la64_intc_write(la64_core_t *core, void *device, uint64_t offset, uint64_t value, int size);
 
-#endif /* LA64_DEVICE_INTERRUPT_H */
+#endif /* LA64VM_DEVICE_INTERRUPT_H */

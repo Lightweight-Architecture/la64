@@ -26,6 +26,8 @@
 #include <la64vm/machine.h>
 
 #include <la64vm/device/rtc.h>
+#include <la64vm/device/platform.h>
+#include <la64vm/device/mc.h>
 
 la64_machine_t *la64_machine_alloc(uint64_t memory_size)
 {
@@ -70,7 +72,7 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
     machine->core->machine = machine;
 
     /* allocate interrupt controller */
-    machine->intc = la64_intc_alloc(machine->core);
+    machine->intc = la64_intc_alloc();
 
     /* null pointer check */
     if(machine->intc == NULL)
@@ -125,17 +127,10 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
         goto out_release_uart;
     }
 
-    /* allocate platform */
-    machine->platform = la64_platform_alloc(machine->core);
-
-    if(machine->platform == NULL)
+    /* register platform */
+    if(!la64_mmio_register(machine->mmio_bus, LA64_PLATFORM_BASE, LA64_PLATFORM_SIZE, NULL, la64_platform_read, la64_platform_write, "platform"))
     {
         goto out_release_uart;
-    }
-
-    if(!la64_mmio_register(machine->mmio_bus, LA64_PLATFORM_BASE, LA64_PLATFORM_SIZE, machine->platform, la64_platform_read, la64_platform_write, "platform"))
-    {
-        goto out_release_platform;
     }
 
 #if defined(__linux__) || defined(__APPLE__)
@@ -143,12 +138,12 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
 
     if(machine->display == NULL)
     {
-        goto out_release_display;
+        goto out_release_uart;
     }
 
     if(!la64_mmio_register(machine->mmio_bus, LA64_FB_BASE, LA64_FB_SIZE, machine->display, la64_fb_read, la64_fb_write, "fb"))
     {
-        goto out_release_platform;
+        goto out_release_display;
     }
 #endif /* __linux__ */
 
@@ -159,8 +154,6 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
 out_release_display:
     la64_display_dealloc(machine->display);
 #endif /* __linux__ */
-out_release_platform:
-    la64_platform_dealloc(machine->platform);
 out_release_uart:
     la64_uart_dealloc(machine->uart);
 out_release_timer:
@@ -187,12 +180,6 @@ void la64_machine_dealloc(la64_machine_t *machine)
         la64_display_dealloc(machine->display);
     }
 #endif /* __linux__ */
-
-    /* release platform */
-    if(machine->platform)
-    {
-        la64_platform_dealloc(machine->platform);
-    }
 
     /* release uart */
     if(machine->uart)

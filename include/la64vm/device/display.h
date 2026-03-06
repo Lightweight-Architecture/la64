@@ -22,16 +22,21 @@
  * SOFTWARE.
  */
 
+#ifndef LA64VM_DEVICE_DISPLAY_H
+#define LA64VM_DEVICE_DISPLAY_H
+
+/* the apple and linux part yayy */
 #if defined(__linux__) || defined(__APPLE__)
 
-#ifndef LA64_DEVICE_DISPLAY_H
-#define LA64_DEVICE_DISPLAY_H
-
+/* the size of the screen/framebuffer */
 #define LA64_FB_WIDTH   256
 #define LA64_FB_HEIGHT  256
-#define LA64_FB_TICK_HZ 64.0
-#define LA64_FB_TICK_DT 1.0 / TICK_HZ
 
+/* the freequency of the framebuffer */
+#define LA64_FB_TICK_HZ 64.0
+#define LA64_FB_TICK_DT (1.0 / LA64_FB_TICK_HZ)
+
+/* registers of the framebuffer MMIO device */
 #define LA64_FB_REG_ENABLED 0x00
 #define LA64_FB_PALLETE     0x01
 #define LA64_FB_FRAMEBUFFER 0x301
@@ -39,14 +44,8 @@
 #define LA64_FB_BASE        0x1FE00700
 #define LA64_FB_SIZE        LA64_FB_FRAMEBUFFER + (LA64_FB_WIDTH * LA64_FB_HEIGHT)
 
-#include <stdatomic.h>
 #include <stdint.h>
 #include <pthread.h>
-#if defined(__APPLE__) && defined(__OBJC__)
-#import <Cocoa/Cocoa.h>
-#import <OpenGL/gl3.h>
-#import <OpenGL/OpenGL.h>
-#endif /* __APPLE__ */
 
 typedef struct la64_core la64_core_t;
 
@@ -57,7 +56,22 @@ typedef struct {
     pthread_t pthread;
 } la64_display_t;
 
+la64_display_t *la64_display_alloc(void);
+void la64_display_dealloc(la64_display_t *display);
+
+void *display_start(void *arg);
+
+uint64_t la64_fb_read(la64_core_t *core, void *device, uint64_t offset, int size);
+void la64_fb_write(la64_core_t *core, void *device, uint64_t offset, uint64_t value, int size);
+
+#endif /* __linux__ | __APPLE__ */
+
+/* the apple bozo only part of this header */
 #if defined(__APPLE__) && defined(__OBJC__)
+
+#import <Cocoa/Cocoa.h>
+#import <OpenGL/gl3.h>
+#import <OpenGL/OpenGL.h>
 
 @interface LA64GLView : NSOpenGLView
 {
@@ -76,14 +90,4 @@ typedef struct {
 
 #endif /* __APPLE__ */
 
-la64_display_t *la64_display_alloc(void);
-void la64_display_dealloc(la64_display_t *display);
-
-void *display_start(void *arg);
-
-uint64_t la64_fb_read(la64_core_t *core, void *device, uint64_t offset, int size);
-void la64_fb_write(la64_core_t *core, void *device, uint64_t offset, uint64_t value, int size);
-
-#endif /* LA64_DEVICE_DISPLAY_H */
-
-#endif /* __linux__ */
+#endif /* LA64VM_DEVICE_DISPLAY_H */

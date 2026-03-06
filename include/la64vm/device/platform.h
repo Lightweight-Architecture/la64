@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef LA64_DEVICE_PLATFORM_H
-#define LA64_DEVICE_PLATFORM_H
+#ifndef LA64VM_DEVICE_PLATFORM_H
+#define LA64VM_DEVICE_PLATFORM_H
 
 #include <stdint.h>
 
@@ -34,15 +34,7 @@
 
 typedef struct la64_core la64_core_t;
 
-typedef struct {
-    la64_core_t *core;
-    uint8_t on;
-} la64_platform_t;
-
-la64_platform_t *la64_platform_alloc(la64_core_t *core);
-void la64_platform_dealloc(la64_platform_t *p);
-
 uint64_t la64_platform_read(la64_core_t *core, void *device, uint64_t offset, int size);
 void la64_platform_write(la64_core_t *core, void *device, uint64_t offset, uint64_t value, int size);
 
-#endif /* LA64_DEVICE_PLATFORM_H */
+#endif /* LA64VM_DEVICE_PLATFORM_H */

@@ -32,10 +32,10 @@
 #include <la64vm/memory.h>
 #include <la64vm/instruction/ctrl.h>
 
-la64_intc_t *la64_intc_alloc(la64_core_t *core)
+la64_intc_t *la64_intc_alloc(void)
 {
     /* allocate interrupt controller */
-    la64_intc_t *intc = calloc(1, sizeof(la64_intc_t));
+    la64_intc_t *intc = malloc(sizeof(la64_intc_t));
 
     /* null pointer check */
     if(intc == NULL)
@@ -44,7 +44,6 @@ la64_intc_t *la64_intc_alloc(la64_core_t *core)
     }
 
     /* setup interrupt controller */
-    intc->core = core;
     intc->current_irq = -1;
     intc->enabled = 0;
     intc->ctrl = 0;
@@ -58,24 +57,22 @@ void la64_intc_dealloc(la64_intc_t *intc)
     free(intc);
 }
 
-void la64_raise_interrupt(la64_core_t *core,
+void la64_raise_interrupt(la64_machine_t *machine,
                           int irq_line)
 {
     /* sanity checks */
-    if(core == NULL ||
-       core->machine == NULL ||
-       core->machine->intc == NULL ||
-       irq_line < 0 ||
+    if(irq_line < 0 ||
        irq_line > LA64_IRQ_MAX)
     {
         return;
     }
     
     /* setting pending bit for intc */
-    core->machine->intc->pending |= (1ULL << irq_line);
+    machine->intc->pending |= (1ULL << irq_line);
 }
 
-void la64_clear_interrupt(la64_core_t *core, int irq_line)
+void la64_clear_interrupt(la64_machine_t *machine,
+                          int irq_line)
 {
     /* sanity checks */
     if(irq_line < 0 ||
@@ -85,7 +82,7 @@ void la64_clear_interrupt(la64_core_t *core, int irq_line)
     }
     
     /* clear pending bit */
-    core->machine->intc->pending &= ~(1ULL << irq_line);
+    machine->intc->pending &= ~(1ULL << irq_line);
 }
 
 static int find_pending_irq(la64_intc_t *intc)
@@ -111,7 +108,7 @@ static int find_pending_irq(la64_intc_t *intc)
     return -1;
 }
 
-bool la64_intc_check(la64_core_t *core)
+bool la64_serve_interrupt_if_needed(la64_core_t *core)
 {    
     /* check if interrupts are globally enabled */
     if(!(core->machine->intc->ctrl & LA64_INTC_CTRL_ENABLE))
@@ -186,24 +183,6 @@ bool la64_intc_check(la64_core_t *core)
     core->in_interrupt = true;
     
     return true;
-}
-
-bool la64_intc_pending(la64_intc_t *intc)
-{
-    /* check if interrupts are globally enabled */
-    if(!(intc->ctrl & LA64_INTC_CTRL_ENABLE))
-    {
-        return false;
-    }
-    
-    /* check if were already servicing (and nesting disabled) */
-    if(intc->current_irq >= 0 && !(intc->ctrl & LA64_INTC_CTRL_NESTING))
-    {
-        return false;
-    }
-    
-    /* check for any pending and enabled interrupt */
-    return (intc->pending & intc->enabled) != 0;
 }
 
 uint64_t la64_intc_read(la64_core_t *core, void *device, uint64_t offset, int size)

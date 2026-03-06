@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef LA64_DEVICE_TIMER_H
-#define LA64_DEVICE_TIMER_H
+#ifndef LA64VM_DEVICE_TIMER_H
+#define LA64VM_DEVICE_TIMER_H
 
 #include <stdint.h>
 #include <la64vm/core.h>
@@ -70,4 +70,4 @@ uint64_t la64_get_host_cycles(void);
 uint64_t la64_timer_read(la64_core_t *core, void *device, uint64_t offset, int size);
 void la64_timer_write(la64_core_t *core, void *device, uint64_t offset, uint64_t value, int size);
 
-#endif /* LA64_DEVICE_TIMER_H */
+#endif /* LA64VM_DEVICE_TIMER_H */

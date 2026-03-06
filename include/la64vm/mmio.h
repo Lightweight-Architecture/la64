@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef LA64_MMIO_H
-#define LA64_MMIO_H
+#ifndef LA64VM_MMIO_H
+#define LA64VM_MMIO_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -58,4 +58,4 @@ void la64_mmio_dealloc(la64_mmio_bus_t *bus);
 bool la64_mmio_register(la64_mmio_bus_t *bus, uint64_t base, uint64_t size, void *device, mmio_read_fn read, mmio_write_fn write, const char *name);
 la64_mmio_region_t *la64_mmio_find(la64_mmio_bus_t *bus, uint64_t addr);
 
-#endif /* LA64_MMIO_H */
+#endif /* LA64VM_MMIO_H */

@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef LA64_INSTRUCTION_ALU_H
-#define LA64_INSTRUCTION_ALU_H
+#ifndef LA64VM_INSTRUCTION_ALU_H
+#define LA64VM_INSTRUCTION_ALU_H
 
 #include <la64vm/core.h>
 
@@ -50,4 +50,4 @@ void la64_op_bswapw(la64_core_t *core);
 void la64_op_bswapd(la64_core_t *core);
 void la64_op_bswapq(la64_core_t *core);
 
-#endif /* LA64_INSTRUCTION_ALU_H */
+#endif /* LA64VM_INSTRUCTION_ALU_H */

@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef LA64_DEVICE_MC_H
-#define LA64_DEVICE_MC_H
+#ifndef LA64VM_DEVICE_MC_H
+#define LA64VM_DEVICE_MC_H
 
 #include <stdint.h>
 
@@ -34,4 +34,4 @@ typedef struct la64_core la64_core_t;
 
 uint64_t la64_mc_read(la64_core_t *core, void *device, uint64_t offset, int size);
 
-#endif /* LA64_DEVICE_MC_H */
+#endif /* LA64VM_DEVICE_MC_H */

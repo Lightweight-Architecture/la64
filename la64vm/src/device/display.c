@@ -39,73 +39,6 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-la64_display_t *la64_display_alloc(void)
-{
-    la64_display_t *display = calloc(1, sizeof(la64_display_t));
-
-    /* null pointer check */
-    if(display == NULL)
-    {
-        return NULL;
-    }
-
-    /* allocate palette */
-    display->palette = calloc(3, 256);
-
-    /* null pointer check */
-    if(display->palette == NULL)
-    {
-        free(display);
-        return NULL;
-    }
-
-    /* setting up by default with grayscale */
-    for (int i = 0; i < 256; i++)
-    {
-        uint8_t gray = (uint8_t)i;
-
-        display->palette[i*3 + 0] = gray;
-        display->palette[i*3 + 1] = gray;
-        display->palette[i*3 + 2] = gray;
-    }
-
-    display->fb = calloc(1, LA64_FB_SIZE);
-
-    /* null pointer check */
-    if(display->fb == NULL)
-    {
-        free(display->palette);
-        free(display);
-        return NULL;
-    }
-
-    return display;
-}
-
-void la64_display_dealloc(la64_display_t *display)
-{
-    /* null pointer check */
-    if(display == NULL)
-    {
-        return;
-    }
-
-    if(display->enabled)
-    {
-        pthread_cancel(display->pthread);
-    }
-
-    if(display->palette != NULL)
-    {
-        free(display->palette);
-    }
-
-    if(display->fb != NULL)
-    {
-        free(display->fb);
-    }
-}
-
 static void die(const char* msg)
 {
     fprintf(stderr, "Error: %s\n", msg);
@@ -317,6 +250,75 @@ void *display_start(void *arg)
 }
 
 #endif /* __linux__ */
+
+extern void *display_start(void *arg);
+
+la64_display_t *la64_display_alloc(void)
+{
+    la64_display_t *display = malloc(sizeof(la64_display_t));
+
+    /* null pointer check */
+    if(display == NULL)
+    {
+        return NULL;
+    }
+
+    /* allocate palette */
+    display->palette = calloc(3, 256);
+
+    /* null pointer check */
+    if(display->palette == NULL)
+    {
+        free(display);
+        return NULL;
+    }
+
+    /* setting up by default with grayscale */
+    for (int i = 0; i < 256; i++)
+    {
+        uint8_t gray = (uint8_t)i;
+
+        display->palette[i*3 + 0] = gray;
+        display->palette[i*3 + 1] = gray;
+        display->palette[i*3 + 2] = gray;
+    }
+
+    display->fb = calloc(1, LA64_FB_SIZE);
+
+    /* null pointer check */
+    if(display->fb == NULL)
+    {
+        free(display->palette);
+        free(display);
+        return NULL;
+    }
+
+    return display;
+}
+
+void la64_display_dealloc(la64_display_t *display)
+{
+    /* null pointer check */
+    if(display == NULL)
+    {
+        return;
+    }
+
+    if(display->enabled)
+    {
+        pthread_cancel(display->pthread);
+    }
+
+    if(display->palette != NULL)
+    {
+        free(display->palette);
+    }
+
+    if(display->fb != NULL)
+    {
+        free(display->fb);
+    }
+}
 
 uint64_t la64_fb_read(la64_core_t *core,
                       void *device,

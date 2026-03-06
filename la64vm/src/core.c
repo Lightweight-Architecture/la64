@@ -293,7 +293,7 @@ static void *la64_core_execute_thread(void *arg)
         {
 exception_shortcut:
             core->halted = true;
-            la64_raise_interrupt(core, LA64_IRQ_EXCEPTION);
+            la64_raise_interrupt(core->machine, LA64_IRQ_EXCEPTION);
         }
 
         /* checking if core is halted, if so simply skip execution */
@@ -342,14 +342,10 @@ exception_shortcut:
         /* interrupt controller checking routine starts here */
 skip_execution:
 
-        /* check and handle pending interrupts */
-        if(core->machine && core->machine->intc && la64_intc_pending(core->machine->intc))
-        {
-            la64_intc_check(core);
-        }
+        /* serve interrupt for the interrupt controller */
+        la64_serve_interrupt_if_needed(core);
 
         /* tick the timer always */
-        if(core->machine && core->machine->timer)
     tick_timer:
         {
             extern uint64_t la64_get_host_cycles(void);

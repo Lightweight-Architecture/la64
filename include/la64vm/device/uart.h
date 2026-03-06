@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef LA64_DEVICE_UART_H
-#define LA64_DEVICE_UART_H
+#ifndef LA64VM_DEVICE_UART_H
+#define LA64VM_DEVICE_UART_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -73,4 +73,4 @@ void la64_uart_stop(la64_uart_t *u);
 uint64_t la64_uart_read(la64_core_t *core, void *device, uint64_t offset, int size);
 void la64_uart_write(la64_core_t *core, void *device, uint64_t offset, uint64_t value, int size);
 
-#endif /* LA64_DEVICE_UART_H */
+#endif /* LA64VM_DEVICE_UART_H */

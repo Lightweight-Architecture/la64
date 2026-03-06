@@ -32,46 +32,20 @@
 #include <CoreFoundation/CFRunLoop.h>
 #endif /* __APPLE__ */
 
-la64_platform_t *la64_platform_alloc(la64_core_t *core)
-{
-    la64_platform_t *p = calloc(1, sizeof(la64_platform_t));
-    
-    if(p == NULL)
-    {
-        return NULL;
-    }
-
-    p->core = core;
-    p->on = true;
-
-    return p;
-}
-
-void la64_platform_dealloc(la64_platform_t *p)
-{
-    free(p);
-}
-
 uint64_t la64_platform_read(la64_core_t *core, void *device, uint64_t offset, int size)
 {
-    la64_platform_t *p = (la64_platform_t*)device;
-
-    return p->on;
+    return 1;
 }
 
 void la64_platform_write(la64_core_t *core, void *device, uint64_t offset, uint64_t value, int size)
 {
-    la64_platform_t *p = (la64_platform_t*)device;
-
-    p->on = value;
-
-    if(!p->on)
+    if(value == 0)
     {
         #if defined(__APPLE__)
         CFRunLoopStop(CFRunLoopGetMain());
         #endif /* __APPLE__ */
         
         /* to be fully implemented */
-        la64_core_terminate(p->core);
+        la64_core_terminate(core->machine->core);
     }
 }

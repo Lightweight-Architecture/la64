@@ -22,12 +22,12 @@
  * SOFTWARE.
  */
 
-#ifndef LA64_INSTRUCTION_CORE_H
-#define LA64_INSTRUCTION_CORE_H
+#ifndef LA64VM_INSTRUCTION_CORE_H
+#define LA64VM_INSTRUCTION_CORE_H
 
 #include <la64vm/core.h>
 
 void la64_op_hlt(la64_core_t *core);
 void la64_op_nop(la64_core_t *core);
 
-#endif /* LA64_INSTRUCTION_CORE_H */
+#endif /* LA64VM_INSTRUCTION_CORE_H */
