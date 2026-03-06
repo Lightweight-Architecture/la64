@@ -34,11 +34,6 @@
 
 la64_platform_t *la64_platform_alloc(la64_core_t *core)
 {
-    if(core == NULL)
-    {
-        return NULL;
-    }
-
     la64_platform_t *p = calloc(1, sizeof(la64_platform_t));
     
     if(p == NULL)
@@ -54,21 +49,11 @@ la64_platform_t *la64_platform_alloc(la64_core_t *core)
 
 void la64_platform_dealloc(la64_platform_t *p)
 {
-    if(p == NULL)
-    {
-        return;
-    }
-
     free(p);
 }
 
 uint64_t la64_platform_read(la64_core_t *core, void *device, uint64_t offset, int size)
 {
-    if(device == NULL)
-    {
-        return 0;
-    }
-
     la64_platform_t *p = (la64_platform_t*)device;
 
     return p->on;
@@ -76,11 +61,6 @@ uint64_t la64_platform_read(la64_core_t *core, void *device, uint64_t offset, in
 
 void la64_platform_write(la64_core_t *core, void *device, uint64_t offset, uint64_t value, int size)
 {
-    if(device == NULL)
-    {
-        return;
-    }
-
     la64_platform_t *p = (la64_platform_t*)device;
 
     p->on = value;

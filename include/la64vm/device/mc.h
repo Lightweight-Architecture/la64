@@ -33,6 +33,5 @@
 typedef struct la64_core la64_core_t;
 
 uint64_t la64_mc_read(la64_core_t *core, void *device, uint64_t offset, int size);
-void la64_mc_write(la64_core_t *core, void *device, uint64_t offset, uint64_t value, int size);
 
 #endif /* LA64_DEVICE_MC_H */

@@ -115,12 +115,12 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
     }
 
     /* register rtc */
-    if(!la64_mmio_register(machine->mmio_bus, LA64_RTC_BASE, LA64_RTC_SIZE, NULL, la64_rtc_read, la64_rtc_write, "rtc"))
+    if(!la64_mmio_register(machine->mmio_bus, LA64_RTC_BASE, LA64_RTC_SIZE, NULL, la64_rtc_read, NULL, "rtc"))
     {
         goto out_release_uart;
     }
 
-    if(!la64_mmio_register(machine->mmio_bus, LA64_MC_BASE, LA64_MC_SIZE, NULL, la64_mc_read, la64_mc_write, "mc"))
+    if(!la64_mmio_register(machine->mmio_bus, LA64_MC_BASE, LA64_MC_SIZE, NULL, la64_mc_read, NULL, "mc"))
     {
         goto out_release_uart;
     }
@@ -180,12 +180,6 @@ out_release_machine:
 
 void la64_machine_dealloc(la64_machine_t *machine)
 {
-    /* null pointer check */
-    if(machine == NULL)
-    {
-        return;
-    }
-
 #if defined(__linux__)  || defined(__APPLE__)
     /* release display */
     if(machine->display)

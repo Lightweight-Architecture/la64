@@ -42,6 +42,5 @@
 typedef struct la64_core la64_core_t;
 
 uint64_t la64_rtc_read(la64_core_t *core, void *device, uint64_t offset, int size);
-void la64_rtc_write(la64_core_t *core, void *device, uint64_t offset, uint64_t value, int size);
 
 #endif /* LA64_DEVICE_RTC_H */

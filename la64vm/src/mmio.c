@@ -24,6 +24,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 #include <la64vm/mmio.h>
 
 la64_mmio_bus_t *la64_mmio_alloc(void)
@@ -34,12 +35,6 @@ la64_mmio_bus_t *la64_mmio_alloc(void)
 
 void la64_mmio_dealloc(la64_mmio_bus_t *bus)
 {
-    /* null pointer check */
-    if(bus == NULL)
-    {
-        return;
-    }
-
     free(bus);
 }
 
@@ -51,12 +46,7 @@ bool la64_mmio_register(la64_mmio_bus_t *bus,
                         mmio_write_fn write,
                         const char *name)
 {
-    /* sanity check */
-    if(bus == NULL ||
-       bus->region_count >= MAX_MMIO_REGIONS)
-    {
-        return false;
-    }
+    assert(bus->region_count < MAX_MMIO_REGIONS);
 
     /* overlap check */
     for(int i = 0; i < bus->region_count; i++)
@@ -97,8 +87,7 @@ la64_mmio_region_t *la64_mmio_find(la64_mmio_bus_t *bus,
                                    uint64_t addr)
 {
     /* sanity check */
-    if(bus == NULL ||
-       addr < bus->start_addr ||
+    if(addr < bus->start_addr ||
        addr > bus->end_addr)
     {
         return NULL;

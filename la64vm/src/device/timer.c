@@ -118,12 +118,6 @@ la64_timer_t *la64_timer_alloc(la64_core_t *core,
     /* allocate timer */
     la64_timer_t *timer = calloc(1, sizeof(la64_timer_t));
 
-    /* null pointer check */
-    if(timer == NULL)
-    {
-        return NULL;
-    }
-
     /* setting up timer */
     timer->core = core;
     timer->irq_line = irq_line;
@@ -140,21 +134,12 @@ la64_timer_t *la64_timer_alloc(la64_core_t *core,
 
 void la64_timer_dealloc(la64_timer_t *timer)
 {
-    if(timer)
-    {
-        free(timer);
-    }
+    free(timer);
 }
 
 void la64_timer_tick(la64_timer_t *timer,
                      uint64_t host_cycles)
 {
-    /* null pointer check */
-    if(timer == NULL)
-    {
-        return;
-    }
-    
     /* checking if timer is not enabled */
     if(!(timer->ctrl & TIMER_CTRL_ENABLE))
     {
@@ -213,12 +198,6 @@ uint64_t la64_timer_read(la64_core_t *core,
                          uint64_t offset,
                          int size)
 {
-    /* null pointer check */
-    if(device == NULL)
-    {
-        return 0;
-    }
-
     /* getting timer */
     la64_timer_t *timer = (la64_timer_t *)device;
 
@@ -246,12 +225,6 @@ void la64_timer_write(la64_core_t *core,
                       uint64_t value,
                       int size)
 {
-    /* null pointer check */
-    if(device == NULL)
-    {
-        return;
-    }
-    
     /* getting timer */
     la64_timer_t *timer = (la64_timer_t *)device;
 

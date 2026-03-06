@@ -43,6 +43,12 @@ int main(int argc, char *argv[])
     /* creating new la16 virtual machine */
     la64_machine_t *machine = la64_machine_alloc(0x20000000);
 
+    if(machine == NULL)
+    {
+        fprintf(stderr, "[!] failed to allocated machine\n");
+        return 1;
+    }
+
     /* load boot image */
     if(!la64_memory_load_image(machine->memory, argv[1]))
     {

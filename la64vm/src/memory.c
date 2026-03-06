@@ -34,6 +34,7 @@
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <assert.h>
 
 la64_memory_t *la64_memory_alloc(uint64_t size)
 {
@@ -65,12 +66,6 @@ la64_memory_t *la64_memory_alloc(uint64_t size)
 
 void la64_memory_dealloc(la64_memory_t *memory)
 {
-    /* null pointer check */
-    if(memory == NULL)
-    {
-        return;
-    }
-
     /* release the memory in case that its allocated */
     if(memory->memory != MAP_FAILED ||
        memory->memory != NULL)
@@ -128,19 +123,9 @@ void *la64_memory_access(la64_core_t *core,
                          uint64_t addr,
                          size_t size)
 {
-    /* this is where MMU access happens */
+    assert(size != 0);
 
-
-    /* sanity check */
-    if(core == NULL ||
-       core->machine == NULL ||
-       core->machine->memory == NULL ||
-       size == 0)
-    {
-        return NULL;
-    }
-
-    /* get end */
+    /* get end of access address  */
     uint64_t addr_end = addr + size;
 
     /* wrap around check */
@@ -158,12 +143,6 @@ bool la64_memory_read(la64_core_t *core,
                       size_t size,
                       uint64_t *value)
 {
-    /* null pointer check */
-    if(core == NULL || value == NULL)
-    {
-        return false;
-    }
-
     if(core->rl[LA64_REGISTER_CR0] > LA64_ELEVATION_USER)
     {
         /* finding mmio device */
@@ -173,8 +152,12 @@ bool la64_memory_read(la64_core_t *core,
         if(mmio != NULL)
         {
             /* getting value of MMIO device */
-            *value = mmio->read(core, mmio->device, addr - mmio->base_addr, size);
-            return true;
+            if(mmio->read != NULL)
+            {
+                *value = mmio->read(core, mmio->device, addr - mmio->base_addr, size);
+                return true;
+            }
+            return false;
         }
     }
 
@@ -212,12 +195,6 @@ bool la64_memory_write(la64_core_t *core,
                        uint64_t value,
                        size_t size)
 {
-    /* null pointer check */
-    if(core == NULL)
-    {
-        return false;
-    }
-
     if(core->rl[LA64_REGISTER_CR0] > LA64_ELEVATION_USER)
     {
         /* trying to find mmio device */
@@ -227,8 +204,12 @@ bool la64_memory_write(la64_core_t *core,
         if(mmio != NULL)
         {
             /* performing mmio write */
-            mmio->write(core, mmio->device, addr - mmio->base_addr, value, size);
-            return true;
+            if(mmio->write != NULL)
+            {
+                mmio->write(core, mmio->device, addr - mmio->base_addr, value, size);
+                return true;
+            }
+            return false;
         }
     }
 

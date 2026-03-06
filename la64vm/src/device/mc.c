@@ -36,13 +36,3 @@ uint64_t la64_mc_read(la64_core_t *core,
     /* returning memory size */
     return core->machine->memory->memory_size;
 }
-
-void la64_mc_write(la64_core_t *core,
-                   void *device,
-                   uint64_t offset,
-                   uint64_t value,
-                   int size)
-{
-    /* ro device */
-    return;
-}

@@ -55,12 +55,6 @@ la64_intc_t *la64_intc_alloc(la64_core_t *core)
 
 void la64_intc_dealloc(la64_intc_t *intc)
 {
-    /* null pointer check */
-    if(intc == NULL)
-    {
-        return;
-    }
-
     free(intc);
 }
 
@@ -84,10 +78,7 @@ void la64_raise_interrupt(la64_core_t *core,
 void la64_clear_interrupt(la64_core_t *core, int irq_line)
 {
     /* sanity checks */
-    if(core == NULL ||
-       core->machine == NULL ||
-       core->machine->intc == NULL ||
-       irq_line < 0 ||
+    if(irq_line < 0 ||
        irq_line > LA64_IRQ_MAX)
     {
         return;
@@ -121,15 +112,7 @@ static int find_pending_irq(la64_intc_t *intc)
 }
 
 bool la64_intc_check(la64_core_t *core)
-{
-    /* sanity checks */
-    if(core == NULL ||
-       core->machine == NULL ||
-       core->machine->intc == NULL)
-    {
-        return false;
-    }
-    
+{    
     /* check if interrupts are globally enabled */
     if(!(core->machine->intc->ctrl & LA64_INTC_CTRL_ENABLE))
     {
@@ -207,11 +190,6 @@ bool la64_intc_check(la64_core_t *core)
 
 bool la64_intc_pending(la64_intc_t *intc)
 {
-    if(intc == NULL)
-    {
-        return false;
-    }
-    
     /* check if interrupts are globally enabled */
     if(!(intc->ctrl & LA64_INTC_CTRL_ENABLE))
     {
@@ -232,12 +210,6 @@ uint64_t la64_intc_read(la64_core_t *core, void *device, uint64_t offset, int si
 {
     la64_intc_t *intc = (la64_intc_t *)device;
 
-    /* null pointer check */
-    if(intc == NULL)
-    {
-        return 0;
-    }
-    
     switch(offset)
     {
         case LA64_INTC_REG_PENDING:
@@ -258,12 +230,6 @@ uint64_t la64_intc_read(la64_core_t *core, void *device, uint64_t offset, int si
 void la64_intc_write(la64_core_t *core, void *device, uint64_t offset, uint64_t value, int size)
 {
     la64_intc_t *intc = (la64_intc_t *)device;
-
-    /* null pointer check */
-    if(intc == NULL)
-    {
-        return;
-    }
     
     switch (offset) {
         case LA64_INTC_REG_PENDING:

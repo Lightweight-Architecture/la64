@@ -58,15 +58,3 @@ uint64_t la64_rtc_read(la64_core_t *core,
             return 0;
     }
 }
-
-void la64_rtc_write(la64_core_t *core, 
-                    void *device,
-                    uint64_t offset,
-                    uint64_t value,
-                    int size)
-{
-    (void)device;
-    (void)offset;
-    (void)value;
-    (void)size;
-}
