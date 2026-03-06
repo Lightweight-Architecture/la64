@@ -39,7 +39,6 @@ typedef struct {
     void *device;
     mmio_read_fn read;
     mmio_write_fn write;
-    const char *name;
 } la64_mmio_region_t;
 
 #define MAX_MMIO_REGIONS 32
@@ -55,7 +54,7 @@ typedef struct {
 la64_mmio_bus_t *la64_mmio_alloc(void);
 void la64_mmio_dealloc(la64_mmio_bus_t *bus);
 
-bool la64_mmio_register(la64_mmio_bus_t *bus, uint64_t base, uint64_t size, void *device, mmio_read_fn read, mmio_write_fn write, const char *name);
+bool la64_mmio_register(la64_mmio_bus_t *bus, uint64_t base, uint64_t size, void *device, mmio_read_fn read, mmio_write_fn write);
 la64_mmio_region_t *la64_mmio_find(la64_mmio_bus_t *bus, uint64_t addr);
 
 #endif /* LA64VM_MMIO_H */

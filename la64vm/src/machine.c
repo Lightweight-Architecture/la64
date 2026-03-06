@@ -81,7 +81,7 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
     }
 
     /* register interrupt controller MMIO */
-    if(!la64_mmio_register(machine->mmio_bus, LA64_INTC_BASE, LA64_INTC_SIZE, machine->intc, la64_intc_read, la64_intc_write, "intc"))
+    if(!la64_mmio_register(machine->mmio_bus, LA64_INTC_BASE, LA64_INTC_SIZE, machine->intc, la64_intc_read, la64_intc_write))
     {
         goto out_release_intc;
     }
@@ -96,7 +96,7 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
     }
 
     /* register timer MMIO */
-    if(!la64_mmio_register(machine->mmio_bus, LA64_TIMER_BASE, LA64_TIMER_SIZE, machine->timer, la64_timer_read, la64_timer_write, "timer"))
+    if(!la64_mmio_register(machine->mmio_bus, LA64_TIMER_BASE, LA64_TIMER_SIZE, machine->timer, la64_timer_read, la64_timer_write))
     {
         goto out_release_timer;
     }
@@ -109,24 +109,24 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
         goto out_release_timer;
     }
 
-    if(!la64_mmio_register(machine->mmio_bus, LA64_UART_BASE, LA64_UART_SIZE, machine->uart, la64_uart_read, la64_uart_write, "uart"))
+    if(!la64_mmio_register(machine->mmio_bus, LA64_UART_BASE, LA64_UART_SIZE, machine->uart, la64_uart_read, la64_uart_write))
     {
         goto out_release_uart;
     }
 
     /* register rtc */
-    if(!la64_mmio_register(machine->mmio_bus, LA64_RTC_BASE, LA64_RTC_SIZE, NULL, la64_rtc_read, NULL, "rtc"))
+    if(!la64_mmio_register(machine->mmio_bus, LA64_RTC_BASE, LA64_RTC_SIZE, NULL, la64_rtc_read, NULL))
     {
         goto out_release_uart;
     }
 
-    if(!la64_mmio_register(machine->mmio_bus, LA64_MC_BASE, LA64_MC_SIZE, NULL, la64_mc_read, NULL, "mc"))
+    if(!la64_mmio_register(machine->mmio_bus, LA64_MC_BASE, LA64_MC_SIZE, NULL, la64_mc_read, NULL))
     {
         goto out_release_uart;
     }
 
     /* register platform */
-    if(!la64_mmio_register(machine->mmio_bus, LA64_PLATFORM_BASE, LA64_PLATFORM_SIZE, NULL, la64_platform_read, la64_platform_write, "platform"))
+    if(!la64_mmio_register(machine->mmio_bus, LA64_PLATFORM_BASE, LA64_PLATFORM_SIZE, NULL, la64_platform_read, la64_platform_write))
     {
         goto out_release_uart;
     }
@@ -139,7 +139,7 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
         goto out_release_uart;
     }
 
-    if(!la64_mmio_register(machine->mmio_bus, LA64_FB_BASE, LA64_FB_SIZE, machine->display, la64_fb_read, la64_fb_write, "fb"))
+    if(!la64_mmio_register(machine->mmio_bus, LA64_FB_BASE, LA64_FB_SIZE, machine->display, la64_fb_read, la64_fb_write))
     {
         goto out_release_display;
     }

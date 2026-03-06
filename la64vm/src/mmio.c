@@ -43,8 +43,7 @@ bool la64_mmio_register(la64_mmio_bus_t *bus,
                         uint64_t size,
                         void *device,
                         mmio_read_fn read,
-                        mmio_write_fn write,
-                        const char *name)
+                        mmio_write_fn write)
 {
     assert(bus->region_count < MAX_MMIO_REGIONS);
 
@@ -66,7 +65,6 @@ bool la64_mmio_register(la64_mmio_bus_t *bus,
     region->device = device;
     region->read = read;
     region->write = write;
-    region->name = name;
 
     /* check and set addresses */
     if(bus->start_addr > base)
