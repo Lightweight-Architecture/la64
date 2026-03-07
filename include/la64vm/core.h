@@ -185,7 +185,7 @@
 #define LA64_REGISTER_CR1   0b10111 /* CRKSP:   kernel stack pointer (the stack pointer the interrupt controller will use when receiving interrupt) */
 #define LA64_REGISTER_CR2   0b11000 /* CREXC:   exception register (first 3bits for the exception) */
 #define LA64_REGISTER_CR3   0b11001 /* CRVEC:   cpu vector table */
-#define LA64_REGISTER_CR4   0b11010
+#define LA64_REGISTER_CR4   0b11010 /* CRPTB:   page table pointer (first 8bits are the flags and the rest is the physical address where the page table is) */
 #define LA64_REGISTER_CR5   0b11011
 #define LA64_REGISTER_CR6   0b11100
 #define LA64_REGISTER_CR7   0b11101
