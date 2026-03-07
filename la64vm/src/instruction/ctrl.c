@@ -28,7 +28,7 @@
 #include <la64vm/memory.h>
 #include <stdio.h>
 
-void la64_op_jmp(la64_core_t *core)
+void la64_op_b(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 1);
     core->op.ilen = 0;
@@ -45,67 +45,67 @@ void la64_op_cmp(la64_core_t *core)
     core->rl[LA64_REGISTER_CF] = (a == b) * LA64_CMP_Z | (a <  b) * LA64_CMP_L | (a >  b) * LA64_CMP_G;
 }
 
-void la64_op_je(la64_core_t *core)
+void la64_op_be(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 1);
     
     if(core->rl[LA64_REGISTER_CF] & LA64_CMP_Z)
     {
-        la64_op_jmp(core);
+        la64_op_b(core);
     }
 }
 
-void la64_op_jne(la64_core_t *core)
+void la64_op_bne(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 1);
     
     if(!(core->rl[LA64_REGISTER_CF] & LA64_CMP_Z))
     {
-        la64_op_jmp(core);
+        la64_op_b(core);
     }
 }
 
-void la64_op_jlt(la64_core_t *core)
+void la64_op_blt(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 1);
     
     if(core->rl[LA64_REGISTER_CF] & LA64_CMP_L)
     {
-        la64_op_jmp(core);
+        la64_op_b(core);
     }
 }
 
-void la64_op_jgt(la64_core_t *core)
+void la64_op_bgt(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 1);
     
     if(core->rl[LA64_REGISTER_CF] & LA64_CMP_G)
     {
-        la64_op_jmp(core);
+        la64_op_b(core);
     }
 }
 
-void la64_op_jle(la64_core_t *core)
+void la64_op_ble(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 1);
     
     if(core->rl[LA64_REGISTER_CF] & LA64_CMP_L || core->rl[LA64_REGISTER_CF] & LA64_CMP_Z)
     {
-        la64_op_jmp(core);
+        la64_op_b(core);
     }
 }
 
-void la64_op_jge(la64_core_t *core)
+void la64_op_bge(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 1);
     
     if(core->rl[LA64_REGISTER_CF] & LA64_CMP_G || core->rl[LA64_REGISTER_CF] & LA64_CMP_Z)
     {
-        la64_op_jmp(core);
+        la64_op_b(core);
     }
 }
 
-void la64_op_jz(la64_core_t *core)
+void la64_op_bz(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 2);
     
@@ -116,7 +116,7 @@ void la64_op_jz(la64_core_t *core)
     }
 }
 
-void la64_op_jnz(la64_core_t *core)
+void la64_op_bnz(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 2);
     

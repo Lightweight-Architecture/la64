@@ -38,6 +38,7 @@ typedef struct {
     uint8_t minargs;            /* minimum arguments count */
     uint8_t maxargs;            /* maximum arguments count */
     uint32_t argmask;           /* argument mask (0 means it doesnt matter what the operand is, 1 means it must be a register) */
+    const char *dnstr;          /* deprecation string if deprecated */
 } opcode_entry_t;
 
 typedef struct {
@@ -49,8 +50,6 @@ typedef struct {
     bool null;                  /* for null pointer exceptions */
     bool reg_only;              /* if only registers are allowed */
 } opcode_validator_return_t;
-
-extern const opcode_entry_t opcode_table[LA64_OPCODE_MAX + 1];
 
 /* opcode entry gathering */
 const opcode_entry_t *opcode_from_string(const char *name);

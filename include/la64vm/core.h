@@ -76,16 +76,16 @@
 #define LA64_OPCODE_BSWAPQ          0b00100101
 
 /* control flow operations */
-#define LA64_OPCODE_JMP             0b00100110
+#define LA64_OPCODE_B               0b00100110
 #define LA64_OPCODE_CMP             0b00100111
-#define LA64_OPCODE_JE              0b00101000
-#define LA64_OPCODE_JNE             0b00101001
-#define LA64_OPCODE_JLT             0b00101010
-#define LA64_OPCODE_JGT             0b00101011
-#define LA64_OPCODE_JLE             0b00101100
-#define LA64_OPCODE_JGE             0b00101101
-#define LA64_OPCODE_JZ              0b00101110
-#define LA64_OPCODE_JNZ             0b00101111
+#define LA64_OPCODE_BE              0b00101000
+#define LA64_OPCODE_BNE             0b00101001
+#define LA64_OPCODE_BLT             0b00101010
+#define LA64_OPCODE_BGT             0b00101011
+#define LA64_OPCODE_BLE             0b00101100
+#define LA64_OPCODE_BGE             0b00101101
+#define LA64_OPCODE_BZ              0b00101110
+#define LA64_OPCODE_BNZ             0b00101111
 #define LA64_OPCODE_BL              0b00110000
 #define LA64_OPCODE_RET             0b00110001
 #define LA64_OPCODE_IRET            0b00110010

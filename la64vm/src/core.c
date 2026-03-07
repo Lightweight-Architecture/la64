@@ -88,16 +88,16 @@ la64_opfunc_t opfunc_table[] = {
     la64_op_bswapq,
 
     /* control flow operations */
-    la64_op_jmp,
+    la64_op_b,
     la64_op_cmp,
-    la64_op_je,
-    la64_op_jne,
-    la64_op_jlt,
-    la64_op_jgt,
-    la64_op_jle,
-    la64_op_jge,
-    la64_op_jz,
-    la64_op_jnz,
+    la64_op_be,
+    la64_op_bne,
+    la64_op_blt,
+    la64_op_bgt,
+    la64_op_ble,
+    la64_op_bge,
+    la64_op_bz,
+    la64_op_bnz,
     la64_op_bl,
     la64_op_ret,
     la64_op_iret
@@ -158,13 +158,13 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
         case LA64_OPCODE_IRET:
             maxargs = 0;
             break;
-        case LA64_OPCODE_JMP:
-        case LA64_OPCODE_JE:
-        case LA64_OPCODE_JNE:
-        case LA64_OPCODE_JLT:
-        case LA64_OPCODE_JGT:
-        case LA64_OPCODE_JLE:
-        case LA64_OPCODE_JGE:
+        case LA64_OPCODE_B:
+        case LA64_OPCODE_BE:
+        case LA64_OPCODE_BNE:
+        case LA64_OPCODE_BLT:
+        case LA64_OPCODE_BGT:
+        case LA64_OPCODE_BLE:
+        case LA64_OPCODE_BGE:
         case LA64_OPCODE_BSWAPW:
         case LA64_OPCODE_BSWAPD:
         case LA64_OPCODE_BSWAPQ:
@@ -182,8 +182,8 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
         case LA64_OPCODE_STD:
         case LA64_OPCODE_STQ:
         case LA64_OPCODE_CMP:
-        case LA64_OPCODE_JZ:
-        case LA64_OPCODE_JNZ:
+        case LA64_OPCODE_BZ:
+        case LA64_OPCODE_BNZ:
             maxargs = 2;
             break;
         case LA64_OPCODE_ADD:

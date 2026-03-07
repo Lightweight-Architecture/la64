@@ -27,16 +27,16 @@
 
 #include <la64vm/core.h>
 
-void la64_op_jmp(la64_core_t *core);
+void la64_op_b(la64_core_t *core);
 void la64_op_cmp(la64_core_t *core);
-void la64_op_je(la64_core_t *core);
-void la64_op_jne(la64_core_t *core);
-void la64_op_jlt(la64_core_t *core);
-void la64_op_jgt(la64_core_t *core);
-void la64_op_jle(la64_core_t *core);
-void la64_op_jge(la64_core_t *core);
-void la64_op_jz(la64_core_t *core);
-void la64_op_jnz(la64_core_t *core);
+void la64_op_be(la64_core_t *core);
+void la64_op_bne(la64_core_t *core);
+void la64_op_blt(la64_core_t *core);
+void la64_op_bgt(la64_core_t *core);
+void la64_op_ble(la64_core_t *core);
+void la64_op_bge(la64_core_t *core);
+void la64_op_bz(la64_core_t *core);
+void la64_op_bnz(la64_core_t *core);
 
 void la64_push(la64_core_t *core, uint64_t value);
 uint64_t la64_pop(la64_core_t *core);
