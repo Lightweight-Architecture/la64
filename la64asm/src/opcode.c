@@ -26,7 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-const opcode_entry_t opcode_table[LA64_OPCODE_MAX + 1] = {
+const opcode_entry_t opcode_table[] = {
     /* core operations */
     { .name = "hlt",    .opcode = LA64_OPCODE_HLT,      .minargs = 0, .maxargs = 0,  .argmask = 0b00000000000000000000000000000000 },
     { .name = "nop",    .opcode = LA64_OPCODE_NOP,      .minargs = 0, .maxargs = 0,  .argmask = 0b00000000000000000000000000000000 },
@@ -96,7 +96,7 @@ const opcode_entry_t *opcode_from_string(const char *name)
     }
 
     /* iterating through table */
-    for(unsigned char opcode = 0x00; opcode < LA64_OPCODE_MAX + 1; opcode++)
+    for(unsigned char opcode = 0x00; opcode < (sizeof(opcode_table) / sizeof(opcode_table[0])); opcode++)
     {
         /* check if opcode name matches */
         if(strcmp(opcode_table[opcode].name, name) == 0)

@@ -71,7 +71,7 @@ register_entry_t *register_from_string(const char *name)
     }
 
     /* iterating through table */
-    for(unsigned char reg = 0x00; reg < (LA64_REGISTER_MAX + 1); reg++)
+    for(unsigned char reg = 0x00; reg < (sizeof(register_table) / sizeof(register_table[0])); reg++)
     {
         /* check if opcode name matches */
         if(strcmp(register_table[reg].name, name) == 0)
