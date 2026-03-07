@@ -142,7 +142,7 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
 
     /* preparing bitwalker */
     bitwalker_t bw;
-    bitwalker_init_read(&bw, iptr, 32, BW_LITTLE_ENDIAN);
+    bitwalker_init_read(&bw, iptr, 256, BW_LITTLE_ENDIAN);
 
     /* getting opcode */
     core->op.op = (uint8_t)bitwalker_read(&bw, 8);

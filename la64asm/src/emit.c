@@ -35,6 +35,12 @@
 
 #include <lautils/bitwalker.h>
 
+static inline void la64_compiler_emit_opcode(bitwalker_t *bw,
+                                             uint8_t op)
+{
+    bitwalker_write(bw, op, 8);
+}
+
 bool la64_compiler_emit(compiler_line_t *cl)
 {
     /* accessing compiler invocation */
@@ -79,10 +85,10 @@ bool la64_compiler_emit(compiler_line_t *cl)
         }
 
         /* initilizing bitwalker */
-        bitwalker_init(&bw, &(ci->image[ci->image_addr]), 512, BW_LITTLE_ENDIAN);
+        bitwalker_init(&bw, &(ci->image[ci->image_addr]), 256, BW_LITTLE_ENDIAN);
 
         /* setting opcode from entry */
-        bitwalker_write(&bw, opce->opcode, 8);
+        la64_compiler_emit_opcode(&bw, opce->opcode);
     }
 
     /* parse parameters */
