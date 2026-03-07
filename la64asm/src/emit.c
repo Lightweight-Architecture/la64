@@ -37,15 +37,15 @@
 #include <lautils/bitwalker.h>
 
 /* opcode emit */
-static inline void la64_compiler_emit_opcode(bitwalker_t *bw,
-                                             uint8_t op)
+void la64_compiler_emit_opcode(bitwalker_t *bw,
+                               uint8_t op)
 {
     bitwalker_write(bw, op, 8);
 }
 
 /* register emit */
-static inline void la64_compiler_emit_reg(bitwalker_t *bw,
-                                          uint8_t reg)
+void la64_compiler_emit_reg(bitwalker_t *bw,
+                            uint8_t reg)
 {
     assert(reg < LA64_REGISTER_MAX);
 
@@ -54,36 +54,36 @@ static inline void la64_compiler_emit_reg(bitwalker_t *bw,
 }
 
 /* intermediate emit */
-static inline void la64_compiler_emit_imm8(bitwalker_t *bw,
-                                           uint8_t imm)
+void la64_compiler_emit_imm8(bitwalker_t *bw,
+                             uint8_t imm)
 {
     bitwalker_write(bw, LA64_PARAMETER_CODING_IMM8, 3);
     bitwalker_write(bw, imm, 8);
 }
 
-static inline void la64_compiler_emit_imm16(bitwalker_t *bw,
-                                            uint16_t imm)
+void la64_compiler_emit_imm16(bitwalker_t *bw,
+                              uint16_t imm)
 {
     bitwalker_write(bw, LA64_PARAMETER_CODING_IMM16, 3);
     bitwalker_write(bw, imm, 16);
 }
 
-static inline void la64_compiler_emit_imm32(bitwalker_t *bw,
-                                            uint32_t imm)
+void la64_compiler_emit_imm32(bitwalker_t *bw,
+                              uint32_t imm)
 {
     bitwalker_write(bw, LA64_PARAMETER_CODING_IMM32, 3);
     bitwalker_write(bw, imm, 32);
 }
 
-static inline void la64_compiler_emit_imm64(bitwalker_t *bw,
-                                            uint64_t imm)
+void la64_compiler_emit_imm64(bitwalker_t *bw,
+                              uint64_t imm)
 {
     bitwalker_write(bw, LA64_PARAMETER_CODING_IMM64, 3);
     bitwalker_write(bw, imm, 64);
 }
 
-static inline void la64_compiler_emit_imm(bitwalker_t *bw,
-                                          uint64_t imm)
+void la64_compiler_emit_imm(bitwalker_t *bw,
+                            uint64_t imm)
 {
     if(imm <= 0xFF)
     {
@@ -104,7 +104,7 @@ static inline void la64_compiler_emit_imm(bitwalker_t *bw,
 }
 
 /* end emitter */
-static inline void la64_compiler_emit_end(bitwalker_t *bw)
+void la64_compiler_emit_end(bitwalker_t *bw)
 {
     bitwalker_write(bw, LA64_PARAMETER_CODING_INSTR_END, 3);
 }
@@ -116,10 +116,12 @@ bool la64_compiler_emit(compiler_line_t *cl)
     if(cl->token_cnt <= 0)
     {
         diag_error(&(cl->token[0]), "insufficient operands\n");
+        return false;
     }
     else if(cl->token_cnt > 32)
     {
         diag_error(&(cl->token[0]), "holy smokes, why soo many operands, maximum is 32 operands in 64bit lightweight architecture\n");
+        return false;
     }
 
     /* getting opcode entry if it exists */
@@ -128,6 +130,7 @@ bool la64_compiler_emit(compiler_line_t *cl)
     if(opce == NULL)
     {
         diag_error(&(cl->token[0]), "illegal opcode \"%s\"\n", cl->token[0].str);
+        return false;
     }
 
     /* checking for deprecation */
@@ -140,10 +143,12 @@ bool la64_compiler_emit(compiler_line_t *cl)
     if((cl->token_cnt - 1) > opce->maxargs)
     {
         diag_error(&(cl->token[cl->token_cnt - 1]), "too many operands for opcode \"%s\", expected %d operands, but got %d operands\n", opce->name, opce->maxargs, cl->token_cnt - 1);
+        return false;
     }
     else if((cl->token_cnt - 1) < opce->minargs)
     {
         diag_error(&(cl->token[cl->token_cnt - 1]), "too few operands for opcode \"%s\", expected %d operands, but got %d operands\n", opce->name, opce->minargs, cl->token_cnt - 1);
+        return false;
     }
 
     /* initilizing bitwalker */
@@ -172,6 +177,7 @@ bool la64_compiler_emit(compiler_line_t *cl)
         if(reg_only)
         {
             diag_error(&(cl->token[i]), "expected register, got intermediate or label \"%s\"\n", cl->token[i].str);
+            return false;
         }
 
         /* parsing value */
@@ -223,10 +229,10 @@ bool la64_compiler_emit(compiler_line_t *cl)
 
     cl->ci->image_addr += bitwalker_bytes_used(&bw);
 
-    return 0;
+    return true;
 }
 
-void la64_compiler_emit_all(compiler_invocation_t *ci)
+bool la64_compiler_emit_all(compiler_invocation_t *ci)
 {
     /* iterate through each token */
     for(uint64_t i = 0; i < ci->line_cnt; i++)
@@ -240,7 +246,10 @@ void la64_compiler_emit_all(compiler_invocation_t *ci)
         }
         else if(ci->line[i].type == COMPILER_LINE_TYPE_ASM)
         {
-            la64_compiler_emit(&(ci->line[i]));
+            if(!la64_compiler_emit(&(ci->line[i])))
+            {
+                return false;
+            }
         }
     }
 
@@ -269,6 +278,9 @@ void la64_compiler_emit_all(compiler_invocation_t *ci)
         else
         {
             diag_error(ci->rtlb[i].ctlink, "label \"%s\" not found\n", ci->rtlb[i].name);
+            return false;
         }
     }
+
+    return true;
 }

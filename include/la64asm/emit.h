@@ -31,7 +31,24 @@
 #include <la64asm/label.h>
 #include <stdbool.h>
 
+/* opcode emit */
+void la64_compiler_emit_opcode(bitwalker_t *bw, uint8_t op);
+
+/* register emit */
+void la64_compiler_emit_reg(bitwalker_t *bw, uint8_t reg);
+
+/* intermediate emit */
+void la64_compiler_emit_imm8(bitwalker_t *bw, uint8_t imm);
+void la64_compiler_emit_imm16(bitwalker_t *bw, uint16_t imm);
+void la64_compiler_emit_imm32(bitwalker_t *bw, uint32_t imm);
+void la64_compiler_emit_imm64(bitwalker_t *bw, uint64_t imm);
+void la64_compiler_emit_imm(bitwalker_t *bw, uint64_t imm);
+
+/* end emitter */
+void la64_compiler_emit_end(bitwalker_t *bw);
+
+/* automised code emitting */
 bool la64_compiler_emit(compiler_line_t *cl);
-void la64_compiler_emit_all(compiler_invocation_t *ci);
+bool la64_compiler_emit_all(compiler_invocation_t *ci);
 
 #endif /* LA16_EMIT_H */
