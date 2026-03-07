@@ -25,6 +25,7 @@
 #include <la64vm/mmu.h>
 #include <la64vm/core.h>
 #include <la64vm/machine.h>
+#include <stdio.h>
 
 static bool la64_mmu_access_ctable(la64_core_t *core,
                                    uint64_t ptbase,
@@ -123,7 +124,8 @@ bool la64_mmu_access(la64_core_t *core,
     /* gather its flag and check if paging is enabled */
     la64_mmu_flag_t l5_flag = l5_entry & LA64_MMU_MASK_FLAGS;
 
-    if(!(l5_flag & LA64_MMU_PT_PRESENT))
+    if(!(l5_flag & LA64_MMU_PT_PRESENT) ||
+       core->in_interrupt)
     {
         /* incase paging is disabled virtual addresses are physical ones */
         *paddr = vaddr;

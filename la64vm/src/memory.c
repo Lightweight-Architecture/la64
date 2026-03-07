@@ -26,6 +26,7 @@
 #include <la64vm/core.h>
 #include <la64vm/machine.h>
 #include <la64vm/mmio.h>
+#include <la64vm/mmu.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -143,22 +144,24 @@ bool la64_memory_read(la64_core_t *core,
                       size_t size,
                       uint64_t *value)
 {
-    if(core->rl[LA64_REGISTER_CR0] > LA64_ELEVATION_USER)
+    if(!la64_mmu_access(core, addr, LA64_MMU_ACC_READ, &addr))
     {
-        /* finding mmio device */
-        la64_mmio_region_t *mmio = la64_mmio_find(core->machine->mmio_bus, addr);
+        return false;
+    }
 
-        /* checking if address was indeed assigned to a MMIO device */
-        if(mmio != NULL)
+    /* finding mmio device */
+    la64_mmio_region_t *mmio = la64_mmio_find(core->machine->mmio_bus, addr);
+
+    /* checking if address was indeed assigned to a MMIO device */
+    if(mmio != NULL)
+    {
+        /* getting value of MMIO device */
+        if(mmio->read != NULL)
         {
-            /* getting value of MMIO device */
-            if(mmio->read != NULL)
-            {
-                *value = mmio->read(core, mmio->device, addr - mmio->base_addr, size);
-                return true;
-            }
-            return false;
+            *value = mmio->read(core, mmio->device, addr - mmio->base_addr, size);
+            return true;
         }
+        return false;
     }
 
     /* accessing memory TODO: implement page tables */
@@ -195,22 +198,24 @@ bool la64_memory_write(la64_core_t *core,
                        uint64_t value,
                        size_t size)
 {
-    if(core->rl[LA64_REGISTER_CR0] > LA64_ELEVATION_USER)
+    if(!la64_mmu_access(core, addr, LA64_MMU_ACC_WRITE, &addr))
     {
-        /* trying to find mmio device */
-        la64_mmio_region_t *mmio = la64_mmio_find(core->machine->mmio_bus, addr);
+        return false;
+    }
 
-        /* null pointer checking potential mmio device */
-        if(mmio != NULL)
+    /* trying to find mmio device */
+    la64_mmio_region_t *mmio = la64_mmio_find(core->machine->mmio_bus, addr);
+
+    /* null pointer checking potential mmio device */
+    if(mmio != NULL)
+    {
+        /* performing mmio write */
+        if(mmio->write != NULL)
         {
-            /* performing mmio write */
-            if(mmio->write != NULL)
-            {
-                mmio->write(core, mmio->device, addr - mmio->base_addr, value, size);
-                return true;
-            }
-            return false;
+            mmio->write(core, mmio->device, addr - mmio->base_addr, value, size);
+            return true;
         }
+        return false;
     }
 
     /* accessing memory TODO: implement page tables */
