@@ -37,10 +37,10 @@ const opcode_entry_t opcode_table[] = {
     { .name = "swpz",   .opcode = LA64_OPCODE_SWPZ,     .minargs = 2, .maxargs = 2,  .argmask = 0b11000000000000000000000000000000, .dnstr = NULL },
     { .name = "push",   .opcode = LA64_OPCODE_PUSH,     .minargs = 1, .maxargs = 32, .argmask = 0b00000000000000000000000000000000, .dnstr = NULL },
     { .name = "pop",    .opcode = LA64_OPCODE_POP,      .minargs = 1, .maxargs = 32, .argmask = 0b11111111111111111111111111111111, .dnstr = NULL },
-    { .name = "ldb",    .opcode = LA64_OPCODE_LDB,      .minargs = 2, .maxargs = 2,  .argmask = 0b00000000000000000000000000000000, .dnstr = NULL },
-    { .name = "ldw",    .opcode = LA64_OPCODE_LDW,      .minargs = 2, .maxargs = 2,  .argmask = 0b00000000000000000000000000000000, .dnstr = NULL },
-    { .name = "ldd",    .opcode = LA64_OPCODE_LDD,      .minargs = 2, .maxargs = 2,  .argmask = 0b00000000000000000000000000000000, .dnstr = NULL },
-    { .name = "ldq",    .opcode = LA64_OPCODE_LDQ,      .minargs = 2, .maxargs = 2,  .argmask = 0b00000000000000000000000000000000, .dnstr = NULL },
+    { .name = "ldb",    .opcode = LA64_OPCODE_LDB,      .minargs = 2, .maxargs = 2,  .argmask = 0b10000000000000000000000000000000, .dnstr = NULL },
+    { .name = "ldw",    .opcode = LA64_OPCODE_LDW,      .minargs = 2, .maxargs = 2,  .argmask = 0b10000000000000000000000000000000, .dnstr = NULL },
+    { .name = "ldd",    .opcode = LA64_OPCODE_LDD,      .minargs = 2, .maxargs = 2,  .argmask = 0b10000000000000000000000000000000, .dnstr = NULL },
+    { .name = "ldq",    .opcode = LA64_OPCODE_LDQ,      .minargs = 2, .maxargs = 2,  .argmask = 0b10000000000000000000000000000000, .dnstr = NULL },
     { .name = "stb",    .opcode = LA64_OPCODE_STB,      .minargs = 2, .maxargs = 2,  .argmask = 0b00000000000000000000000000000000, .dnstr = NULL },
     { .name = "stw",    .opcode = LA64_OPCODE_STW,      .minargs = 2, .maxargs = 2,  .argmask = 0b00000000000000000000000000000000, .dnstr = NULL },
     { .name = "std",    .opcode = LA64_OPCODE_STD,      .minargs = 2, .maxargs = 2,  .argmask = 0b00000000000000000000000000000000, .dnstr = NULL },
@@ -87,15 +87,15 @@ const opcode_entry_t opcode_table[] = {
     { .name = "iret",    .opcode = LA64_OPCODE_IRET,    .minargs = 0, .maxargs = 0,  .argmask = 0b00000000000000000000000000000000, .dnstr = NULL },
 
     /* compatibility stubs for older code */
-    { .name = "jmp",    .opcode = LA64_OPCODE_B,        .minargs = 1, .maxargs = 1,  .argmask = 0b00000000000000000000000000000000, .dnstr = "do use \"b\" instead" },
-    { .name = "je",     .opcode = LA64_OPCODE_BE,       .minargs = 1, .maxargs = 1,  .argmask = 0b00000000000000000000000000000000, .dnstr = "do use \"be\" instead" },
-    { .name = "jne",    .opcode = LA64_OPCODE_BNE,      .minargs = 1, .maxargs = 1,  .argmask = 0b00000000000000000000000000000000, .dnstr = "do use \"bne\" instead" },
-    { .name = "jlt",    .opcode = LA64_OPCODE_BLT,      .minargs = 1, .maxargs = 1,  .argmask = 0b00000000000000000000000000000000, .dnstr = "do use \"blt\" instead" },
-    { .name = "jgt",    .opcode = LA64_OPCODE_BGT,      .minargs = 1, .maxargs = 1,  .argmask = 0b00000000000000000000000000000000, .dnstr = "do use \"bgt\" instead" },
-    { .name = "jle",    .opcode = LA64_OPCODE_BLE,      .minargs = 1, .maxargs = 1,  .argmask = 0b00000000000000000000000000000000, .dnstr = "do use \"ble\" instead" },
-    { .name = "jge",    .opcode = LA64_OPCODE_BGE,      .minargs = 1, .maxargs = 1,  .argmask = 0b00000000000000000000000000000000, .dnstr = "do use \"bge\" instead" },
-    { .name = "jz",     .opcode = LA64_OPCODE_BZ,       .minargs = 2, .maxargs = 2,  .argmask = 0b00000000000000000000000000000000, .dnstr = "do use \"bz\" instead" },
-    { .name = "jnz",    .opcode = LA64_OPCODE_BNZ,      .minargs = 2, .maxargs = 2,  .argmask = 0b00000000000000000000000000000000, .dnstr = "do use \"bnz\" instead" }
+    { .name = "jmp",    .opcode = LA64_OPCODE_B,        .minargs = 1, .maxargs = 1,  .argmask = 0b00000000000000000000000000000000, .dnstr = "use \"b\" instead" },
+    { .name = "je",     .opcode = LA64_OPCODE_BE,       .minargs = 1, .maxargs = 1,  .argmask = 0b00000000000000000000000000000000, .dnstr = "use \"be\" instead" },
+    { .name = "jne",    .opcode = LA64_OPCODE_BNE,      .minargs = 1, .maxargs = 1,  .argmask = 0b00000000000000000000000000000000, .dnstr = "use \"bne\" instead" },
+    { .name = "jlt",    .opcode = LA64_OPCODE_BLT,      .minargs = 1, .maxargs = 1,  .argmask = 0b00000000000000000000000000000000, .dnstr = "use \"blt\" instead" },
+    { .name = "jgt",    .opcode = LA64_OPCODE_BGT,      .minargs = 1, .maxargs = 1,  .argmask = 0b00000000000000000000000000000000, .dnstr = "use \"bgt\" instead" },
+    { .name = "jle",    .opcode = LA64_OPCODE_BLE,      .minargs = 1, .maxargs = 1,  .argmask = 0b00000000000000000000000000000000, .dnstr = "use \"ble\" instead" },
+    { .name = "jge",    .opcode = LA64_OPCODE_BGE,      .minargs = 1, .maxargs = 1,  .argmask = 0b00000000000000000000000000000000, .dnstr = "use \"bge\" instead" },
+    { .name = "jz",     .opcode = LA64_OPCODE_BZ,       .minargs = 2, .maxargs = 2,  .argmask = 0b00000000000000000000000000000000, .dnstr = "use \"bz\" instead" },
+    { .name = "jnz",    .opcode = LA64_OPCODE_BNZ,      .minargs = 2, .maxargs = 2,  .argmask = 0b00000000000000000000000000000000, .dnstr = "use \"bnz\" instead" }
 };
 
 const opcode_entry_t *opcode_from_string(const char *name)
