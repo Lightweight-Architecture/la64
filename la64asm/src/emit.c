@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <assert.h>
 #include <lautils/parser.h>
 #include <la64asm/opcode.h>
 #include <la64asm/register.h>
@@ -35,17 +36,82 @@
 
 #include <lautils/bitwalker.h>
 
+/* opcode emit */
 static inline void la64_compiler_emit_opcode(bitwalker_t *bw,
                                              uint8_t op)
 {
     bitwalker_write(bw, op, 8);
 }
 
+/* register emit */
+static inline void la64_compiler_emit_reg(bitwalker_t *bw,
+                                          uint8_t reg)
+{
+    assert(reg < LA64_REGISTER_MAX);
+
+    bitwalker_write(bw, LA64_PARAMETER_CODING_REG, 3);
+    bitwalker_write(bw, reg, 5);
+}
+
+/* intermediate emit */
+static inline void la64_compiler_emit_imm8(bitwalker_t *bw,
+                                           uint8_t imm)
+{
+    bitwalker_write(bw, LA64_PARAMETER_CODING_IMM8, 3);
+    bitwalker_write(bw, imm, 8);
+}
+
+static inline void la64_compiler_emit_imm16(bitwalker_t *bw,
+                                            uint16_t imm)
+{
+    bitwalker_write(bw, LA64_PARAMETER_CODING_IMM16, 3);
+    bitwalker_write(bw, imm, 16);
+}
+
+static inline void la64_compiler_emit_imm32(bitwalker_t *bw,
+                                            uint32_t imm)
+{
+    bitwalker_write(bw, LA64_PARAMETER_CODING_IMM32, 3);
+    bitwalker_write(bw, imm, 32);
+}
+
+static inline void la64_compiler_emit_imm64(bitwalker_t *bw,
+                                            uint64_t imm)
+{
+    bitwalker_write(bw, LA64_PARAMETER_CODING_IMM64, 3);
+    bitwalker_write(bw, imm, 64);
+}
+
+static inline void la64_compiler_emit_imm(bitwalker_t *bw,
+                                          uint64_t imm)
+{
+    if(imm <= 0xFF)
+    {
+        la64_compiler_emit_imm8(bw, (uint8_t)imm);
+    }
+    else if(imm <= 0xFFFF)
+    {
+        la64_compiler_emit_imm16(bw, (uint16_t)imm);
+    }
+    else if(imm <= 0xFFFFFFFF)
+    {
+        la64_compiler_emit_imm32(bw, (uint32_t)imm);
+    }
+    else if(imm <= 0xFFFFFFFFFFFFFFFF)
+    {
+        la64_compiler_emit_imm64(bw, (uint64_t)imm);
+    }
+}
+
+/* end emitter */
+static inline void la64_compiler_emit_end(bitwalker_t *bw)
+{
+    bitwalker_write(bw, LA64_PARAMETER_CODING_INSTR_END, 3);
+}
+
+/* automised code emitting */
 bool la64_compiler_emit(compiler_line_t *cl)
 {
-    /* accessing compiler invocation */
-    compiler_invocation_t *ci = cl->ci;
-
     /* parameter count check */
     if(cl->token_cnt <= 0)
     {
@@ -56,9 +122,6 @@ bool la64_compiler_emit(compiler_line_t *cl)
         diag_error(&(cl->token[0]), "holy smokes, why soo many operands, maximum is 32 operands in 64bit lightweight architecture\n");
     }
 
-    /* initilize bitwalker */
-    bitwalker_t bw;
-
     /* getting opcode entry if it exists */
     const opcode_entry_t *opce = opcode_from_string(cl->token[0].str);
 
@@ -66,30 +129,29 @@ bool la64_compiler_emit(compiler_line_t *cl)
     {
         diag_error(&(cl->token[0]), "illegal opcode \"%s\"\n", cl->token[0].str);
     }
-    else
+
+    /* checking for deprecation */
+    if(opce->dnstr != NULL)
     {
-        /* checking for deprecation */
-        if(opce->dnstr != NULL)
-        {
-            diag_warn(&(cl->token[cl->token_cnt - 1]), "opcode \"%s\" is deprecated: %s\n", opce->name, opce->dnstr);
-        }
-
-        /* checking argument count */
-        if((cl->token_cnt - 1) > opce->maxargs)
-        {
-            diag_error(&(cl->token[cl->token_cnt - 1]), "too many operands for opcode \"%s\", expected %d operands, but got %d operands\n", opce->name, opce->maxargs, cl->token_cnt - 1);
-        }
-        else if((cl->token_cnt - 1) < opce->minargs)
-        {
-            diag_error(&(cl->token[cl->token_cnt - 1]), "too few operands for opcode \"%s\", expected %d operands, but got %d operands\n", opce->name, opce->minargs, cl->token_cnt - 1);
-        }
-
-        /* initilizing bitwalker */
-        bitwalker_init(&bw, &(ci->image[ci->image_addr]), 256, BW_LITTLE_ENDIAN);
-
-        /* setting opcode from entry */
-        la64_compiler_emit_opcode(&bw, opce->opcode);
+        diag_warn(&(cl->token[cl->token_cnt - 1]), "opcode \"%s\" is deprecated: %s\n", opce->name, opce->dnstr);
     }
+
+    /* checking argument count */
+    if((cl->token_cnt - 1) > opce->maxargs)
+    {
+        diag_error(&(cl->token[cl->token_cnt - 1]), "too many operands for opcode \"%s\", expected %d operands, but got %d operands\n", opce->name, opce->maxargs, cl->token_cnt - 1);
+    }
+    else if((cl->token_cnt - 1) < opce->minargs)
+    {
+        diag_error(&(cl->token[cl->token_cnt - 1]), "too few operands for opcode \"%s\", expected %d operands, but got %d operands\n", opce->name, opce->minargs, cl->token_cnt - 1);
+    }
+
+    /* initilizing bitwalker */
+    bitwalker_t bw;
+    bitwalker_init(&bw, &(cl->ci->image[cl->ci->image_addr]), 256, BW_LITTLE_ENDIAN);
+
+    /* setting opcode from entry */
+    la64_compiler_emit_opcode(&bw, opce->opcode);
 
     /* parse parameters */
     for(uint64_t i = 1; i < cl->token_cnt; i++)
@@ -102,8 +164,7 @@ bool la64_compiler_emit(compiler_line_t *cl)
 
         if(reg != NULL)
         {
-            bitwalker_write(&bw, LA64_PARAMETER_CODING_REG, 3);
-            bitwalker_write(&bw, reg->reg, 5);
+            la64_compiler_emit_reg(&bw, reg->reg);
             continue;
         }
 
@@ -116,65 +177,51 @@ bool la64_compiler_emit(compiler_line_t *cl)
         /* parsing value */
         parser_return_t pr = parse_value_from_string(cl->token[i].str);
 
-        /* checking for intermediates */
-        if(pr.type != laParserValueTypeString)
+        if(pr.type == laParserValueTypeString)
         {
-            /* now we gonna have to check how large this is ;w; */
-            if(pr.value <= 0xFF)
+            /* its a label */
+            /* set mode to 64bit, because a label is 64bit wide */
+            bitwalker_write(&bw, LA64_PARAMETER_CODING_IMM64, 3);
+
+            /* it must be a label and therefore a entry in the new relocation table ;) */
+            /* checking label type in question */
+            char *label = NULL;
+
+            /* checking for local label */
+            if(cl->token[i].str[0] == '.')
             {
-                bitwalker_write(&bw, LA64_PARAMETER_CODING_IMM8, 3);
-                bitwalker_write(&bw, pr.value, 8);
+                asprintf(&label, "%s%s", cl->ci->label_scope, cl->token[i].str);
             }
-            else if(pr.value <= 0xFFFF)
+            else
             {
-                bitwalker_write(&bw, LA64_PARAMETER_CODING_IMM16, 3);
-                bitwalker_write(&bw, pr.value, 16);
-            }
-            else if(pr.value <= 0xFFFFFFFF)
-            {
-                bitwalker_write(&bw, LA64_PARAMETER_CODING_IMM32, 3);
-                bitwalker_write(&bw, pr.value, 32);
-            }
-            else if(pr.value <= 0xFFFFFFFFFFFFFFFF)
-            {
-                bitwalker_write(&bw, LA64_PARAMETER_CODING_IMM64, 3);
-                bitwalker_write(&bw, pr.value, 64);
+                label = strdup(cl->token[i].str);
             }
 
-            continue;
-        }
+            cl->ci->rtlb[cl->ci->rtlb_cnt].name = label;
+            cl->ci->rtlb[cl->ci->rtlb_cnt].bw = bw;
+            cl->ci->rtlb[cl->ci->rtlb_cnt++].ctlink = &(cl->token[i]);
 
-        /* set mode to 64bit lmfao */
-        bitwalker_write(&bw, LA64_PARAMETER_CODING_IMM64, 3);
-
-        /* it must be a label and therefore a entry in the new relocation table ;) */
-        /* checking label type in question */
-        char *label = NULL;
-
-        /* checking for local label */
-        if(cl->token[i].str[0] == '.')
-        {
-            asprintf(&label, "%s%s", ci->label_scope, cl->token[i].str);
+            /*
+             * skip the 64bit the label occupies
+             * as we added it to the relocation table
+             * already. the relocation table later will
+             * fill this space with the address.
+             */
+            bitwalker_skip(&bw, 64);
         }
         else
         {
-            label = strdup(cl->token[i].str);
+            /* its a intermediate */
+            la64_compiler_emit_imm(&bw, pr.value);
         }
-
-        ci->rtlb[ci->rtlb_cnt].name = label;
-        ci->rtlb[ci->rtlb_cnt].bw = bw;
-        ci->rtlb[ci->rtlb_cnt++].ctlink = &(cl->token[i]);
-
-        /* skip the 64bit for now */
-        bitwalker_skip(&bw, 64);
     }
 
     if(opce->maxargs == 32 || opce->maxargs != (cl->token_cnt - 1))
     {
-        bitwalker_write(&bw, LA64_PARAMETER_CODING_INSTR_END, 3);
+        la64_compiler_emit_end(&bw);
     }
 
-    ci->image_addr += bitwalker_bytes_used(&bw);
+    cl->ci->image_addr += bitwalker_bytes_used(&bw);
 
     return 0;
 }
@@ -197,23 +244,31 @@ void la64_compiler_emit_all(compiler_invocation_t *ci)
         }
     }
 
-    /* append binary end label */
+    /*
+     * appending binary end label, which is a compiler
+     * constant.
+     */
     ci->label[ci->label_cnt].addr = ci->image_addr;
     ci->label[ci->label_cnt++].name = strdup("__la64_exec_img_end");
 
-    /* now handling relocations */
+    /*
+     * the main code emitter appended labels the code
+     * requires to the relocation table, so we have to
+     * look each request up in the label lookup table
+     * and insert each label at the place where a label
+     * shall be.
+     */
     for(uint64_t i = 0; i < ci->rtlb_cnt; i++)
     {
-        /* lookup label */
         uint64_t addr = label_lookup(ci, ci->rtlb[i].name);
 
-        /* sanity checking address */
-        if(addr == COMPILER_LABEL_NOT_FOUND)
+        if(addr != COMPILER_LABEL_NOT_FOUND)
+        {
+            bitwalker_write(&(ci->rtlb[i].bw), addr, 64);
+        }
+        else
         {
             diag_error(ci->rtlb[i].ctlink, "label \"%s\" not found\n", ci->rtlb[i].name);
         }
-
-        /* using da bitwalker to fixup address */
-        bitwalker_write(&(ci->rtlb[i].bw), addr, 64);
     }
 }
