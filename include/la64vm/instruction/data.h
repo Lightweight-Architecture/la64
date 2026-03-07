@@ -27,7 +27,6 @@
 
 #include <la64vm/core.h>
 
-void la64_op_clr(la64_core_t *core);
 void la64_op_mov(la64_core_t *core);
 void la64_op_swp(la64_core_t *core);
 void la64_op_swpz(la64_core_t *core);

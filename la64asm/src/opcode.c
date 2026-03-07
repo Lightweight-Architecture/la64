@@ -32,7 +32,6 @@ const opcode_entry_t opcode_table[LA64_OPCODE_MAX + 1] = {
     { .name = "nop",    .opcode = LA64_OPCODE_NOP,      .minargs = 0, .maxargs = 0,  .argmask = 0b00000000000000000000000000000000 },
 
     /* data operations */
-    { .name = "clr",    .opcode = LA64_OPCODE_CLR,      .minargs = 1, .maxargs = 32, .argmask = 0b11111111111111111111111111111111 },
     { .name = "mov",    .opcode = LA64_OPCODE_MOV,      .minargs = 2, .maxargs = 2,  .argmask = 0b10000000000000000000000000000000 },
     { .name = "swp",    .opcode = LA64_OPCODE_SWP,      .minargs = 2, .maxargs = 2,  .argmask = 0b11000000000000000000000000000000 },
     { .name = "swpz",   .opcode = LA64_OPCODE_SWPZ,     .minargs = 2, .maxargs = 2,  .argmask = 0b11000000000000000000000000000000 },

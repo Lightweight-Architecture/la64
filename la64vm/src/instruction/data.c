@@ -27,16 +27,6 @@
 #include <la64vm/machine.h>
 #include <la64vm/memory.h>
 
-void la64_op_clr(la64_core_t *core)
-{
-    la64_instr_termcond(core->op.param_cnt == 0);
-
-    for(uint8_t i = 0; i < core->op.param_cnt; i++)
-    {
-        (*(core->op.param[i])) = 0;
-    }
-}
-
 void la64_op_mov(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 2);
