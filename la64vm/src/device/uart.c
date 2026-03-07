@@ -238,7 +238,7 @@ void la64_uart_write(la64_core_t *core, void *device, uint64_t offset, uint64_t 
             uart_update_irq(u);
             break;
         case UART_REG_CONTROL:
-            u->control = value;
+            u->control = (uint32_t)value;
             if(value & UART_CTRL_RESET)
             {
                 u->rx_head = u->rx_tail = 0;

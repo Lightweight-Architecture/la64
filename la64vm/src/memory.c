@@ -158,7 +158,7 @@ bool la64_memory_read(la64_core_t *core,
         /* getting value of MMIO device */
         if(mmio->read != NULL)
         {
-            *value = mmio->read(core, mmio->device, addr - mmio->base_addr, size);
+            *value = mmio->read(core, mmio->device, addr - mmio->base_addr, (int)size);
             return true;
         }
         return false;
@@ -212,7 +212,7 @@ bool la64_memory_write(la64_core_t *core,
         /* performing mmio write */
         if(mmio->write != NULL)
         {
-            mmio->write(core, mmio->device, addr - mmio->base_addr, value, size);
+            mmio->write(core, mmio->device, addr - mmio->base_addr, value, (int)size);
             return true;
         }
         return false;
@@ -230,13 +230,13 @@ bool la64_memory_write(la64_core_t *core,
     switch(size)
     {
         case 1:
-            *(uint8_t *)ptr = value;
+            *(uint8_t *)ptr = (uint8_t)value;
             return true;
         case 2:
-            *(uint16_t *)ptr = value;
+            *(uint16_t *)ptr = (uint16_t)value;
             return true;
         case 4:
-            *(uint32_t *)ptr = value;
+            *(uint32_t *)ptr = (uint32_t)value;
             return true;
         case 8:
             *(uint64_t *)ptr = value;
