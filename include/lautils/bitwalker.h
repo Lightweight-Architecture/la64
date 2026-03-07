@@ -44,9 +44,6 @@ typedef struct {
 /* helper */
 
 bw_endian_t bw_host_endian(void);
-uint16_t bw_swap16(uint16_t v);
-uint32_t bw_swap32(uint32_t v);
-uint64_t bw_swap64(uint64_t v);
 uint64_t bw_swap_n(uint64_t v, uint8_t num_bytes);
 
 /* initiliazation */

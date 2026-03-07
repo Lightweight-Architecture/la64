@@ -32,43 +32,18 @@ bw_endian_t bw_host_endian(void)
     return (*((const uint8_t*)&test) == 0x01) ? BW_LITTLE_ENDIAN : BW_BIG_ENDIAN;
 }
 
-uint16_t bw_swap16(uint16_t v)
-{
-    return (v >> 8) | (v << 8);
-}
-
-uint32_t bw_swap32(uint32_t v)
-{
-    return ((v >> 24) & 0x000000FF) |
-           ((v >>  8) & 0x0000FF00) |
-           ((v <<  8) & 0x00FF0000) |
-           ((v << 24) & 0xFF000000);
-}
-
-uint64_t bw_swap64(uint64_t v)
-{
-    return ((v >> 56) & 0x00000000000000FFULL) |
-           ((v >> 40) & 0x000000000000FF00ULL) |
-           ((v >> 24) & 0x0000000000FF0000ULL) |
-           ((v >>  8) & 0x00000000FF000000ULL) |
-           ((v <<  8) & 0x000000FF00000000ULL) |
-           ((v << 24) & 0x0000FF0000000000ULL) |
-           ((v << 40) & 0x00FF000000000000ULL) |
-           ((v << 56) & 0xFF00000000000000ULL);
-}
-
 uint64_t bw_swap_n(uint64_t v,
                    uint8_t num_bytes)
 {
     switch (num_bytes)
     {
-        case 2:  return bw_swap16((uint16_t)v);
+        case 2:  return __builtin_bswap16((uint16_t)v);
         case 3:  return ((v >> 16) & 0xFF) | (v & 0xFF00) | ((v & 0xFF) << 16);
-        case 4:  return bw_swap32((uint32_t)v);
+        case 4:  return __builtin_bswap32((uint32_t)v);
         case 5:
         case 6:
         case 7:
-        case 8:  return bw_swap64(v) >> ((8 - num_bytes) * 8);
+        case 8:  return __builtin_bswap64(v) >> ((8 - num_bytes) * 8);
         default: return v;
     }
 }
