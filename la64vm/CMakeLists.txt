@@ -9,6 +9,7 @@ add_executable(la64vm
     src/machine.c
     src/memory.c
     src/mmio.c
+    src/mmu.c
 
     src/device/timer.c
     src/device/interrupt.c
