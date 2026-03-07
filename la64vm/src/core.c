@@ -73,13 +73,20 @@ la64_opfunc_t opfunc_table[] = {
     la64_op_inc,
     la64_op_dec,
     la64_op_not,
+    la64_op_neg,
     la64_op_and,
     la64_op_or,
     la64_op_xor,
     la64_op_shr,
     la64_op_shl,
+    la64_op_sar,
     la64_op_ror,
     la64_op_rol,
+    la64_op_pdep,
+    la64_op_pext,
+    la64_op_bswapw,
+    la64_op_bswapd,
+    la64_op_bswapq,
 
     /* control flow operations */
     la64_op_jmp,
@@ -94,15 +101,6 @@ la64_opfunc_t opfunc_table[] = {
     la64_op_jnz,
     la64_op_bl,
     la64_op_ret,
-
-    /* alu v2 operations */
-    la64_op_pdep,
-    la64_op_pext,
-    la64_op_bswapw,
-    la64_op_bswapd,
-    la64_op_bswapq,
-
-    /* control flow v2 operations */
     la64_op_iret
 };
 
@@ -161,7 +159,6 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
         case LA64_OPCODE_IRET:
             maxargs = 0;
             break;
-        case LA64_OPCODE_NOT:
         case LA64_OPCODE_JMP:
         case LA64_OPCODE_JE:
         case LA64_OPCODE_JNE:
@@ -201,6 +198,7 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
         case LA64_OPCODE_XOR:
         case LA64_OPCODE_SHR:
         case LA64_OPCODE_SHL:
+        case LA64_OPCODE_SAR:
         case LA64_OPCODE_ROR:
         case LA64_OPCODE_ROL:
         case LA64_OPCODE_PDEP:

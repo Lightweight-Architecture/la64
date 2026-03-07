@@ -147,9 +147,22 @@ void la64_op_dec(la64_core_t *core)
 
 void la64_op_not(la64_core_t *core)
 {
-    la64_instr_termcond(core->op.param_cnt != 1);
+    la64_instr_termcond(core->op.param_cnt == 0);
 
-    *(core->op.param[0]) = ~*(core->op.param[0]); 
+    for(uint8_t i = 0; i < core->op.param_cnt; i++)
+    {
+        *(core->op.param[i]) = ~*(core->op.param[i]);
+    }
+}
+
+void la64_op_neg(la64_core_t *core)
+{
+    la64_instr_termcond(core->op.param_cnt == 0);
+
+    for(uint8_t i = 0; i < core->op.param_cnt; i++)
+    {
+        *(core->op.param[i]) = -*(core->op.param[i]);
+    }
 }
 
 void la64_op_and(la64_core_t *core)
@@ -185,6 +198,13 @@ void la64_op_shl(la64_core_t *core)
     la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
 
     DEFINE_LA64_ARITHMETIC_OP(<<);
+}
+
+void la64_op_sar(la64_core_t *core)
+{
+    la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
+
+    DEFINE_LA64_SIGNED_ARITHMETIC_OP(>>);
 }
 
 void la64_op_ror(la64_core_t *core)

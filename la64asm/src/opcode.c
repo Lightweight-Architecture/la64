@@ -56,14 +56,21 @@ const opcode_entry_t opcode_table[LA64_OPCODE_MAX + 1] = {
     { .name = "mod",    .opcode = LA64_OPCODE_MOD,      .minargs = 2, .maxargs = 3,  .argmask = 0b10000000000000000000000000000000 },
     { .name = "inc",    .opcode = LA64_OPCODE_INC,      .minargs = 1, .maxargs = 32, .argmask = 0b11111111111111111111111111111111 },
     { .name = "dec",    .opcode = LA64_OPCODE_DEC,      .minargs = 1, .maxargs = 32, .argmask = 0b11111111111111111111111111111111 },
-    { .name = "not",    .opcode = LA64_OPCODE_NOT,      .minargs = 1, .maxargs = 1,  .argmask = 0b10000000000000000000000000000000 },
+    { .name = "not",    .opcode = LA64_OPCODE_NOT,      .minargs = 1, .maxargs = 32, .argmask = 0b11111111111111111111111111111111 },
+    { .name = "neg",    .opcode = LA64_OPCODE_NEG,      .minargs = 1, .maxargs = 32, .argmask = 0b11111111111111111111111111111111 },
     { .name = "and",    .opcode = LA64_OPCODE_AND,      .minargs = 2, .maxargs = 3,  .argmask = 0b10000000000000000000000000000000 },
     { .name = "or",     .opcode = LA64_OPCODE_OR,       .minargs = 2, .maxargs = 3,  .argmask = 0b10000000000000000000000000000000 },
     { .name = "xor",    .opcode = LA64_OPCODE_XOR,      .minargs = 2, .maxargs = 3,  .argmask = 0b10000000000000000000000000000000 },
     { .name = "shr",    .opcode = LA64_OPCODE_SHR,      .minargs = 2, .maxargs = 3,  .argmask = 0b10000000000000000000000000000000 },
     { .name = "shl",    .opcode = LA64_OPCODE_SHL,      .minargs = 2, .maxargs = 3,  .argmask = 0b10000000000000000000000000000000 },
+    { .name = "sar",    .opcode = LA64_OPCODE_SAR,      .minargs = 2, .maxargs = 3,  .argmask = 0b10000000000000000000000000000000 },
     { .name = "ror",    .opcode = LA64_OPCODE_ROR,      .minargs = 2, .maxargs = 3,  .argmask = 0b10000000000000000000000000000000 },
     { .name = "rol",    .opcode = LA64_OPCODE_ROL,      .minargs = 2, .maxargs = 3,  .argmask = 0b10000000000000000000000000000000 },
+    { .name = "pdep",   .opcode = LA64_OPCODE_PDEP,     .minargs = 2, .maxargs = 3,  .argmask = 0b10000000000000000000000000000000 },
+    { .name = "pext",   .opcode = LA64_OPCODE_PEXT,     .minargs = 2, .maxargs = 3,  .argmask = 0b10000000000000000000000000000000 },
+    { .name = "bswapw", .opcode = LA64_OPCODE_BSWAPW,   .minargs = 1, .maxargs = 1,  .argmask = 0b10000000000000000000000000000000 },
+    { .name = "bswapd", .opcode = LA64_OPCODE_BSWAPD,   .minargs = 1, .maxargs = 1,  .argmask = 0b10000000000000000000000000000000 },
+    { .name = "bswapq", .opcode = LA64_OPCODE_BSWAPQ,   .minargs = 1, .maxargs = 1,  .argmask = 0b10000000000000000000000000000000 },
 
     /* contol flow operations */
     { .name = "jmp",    .opcode = LA64_OPCODE_JMP,      .minargs = 1, .maxargs = 1,  .argmask = 0b00000000000000000000000000000000 },
@@ -78,15 +85,6 @@ const opcode_entry_t opcode_table[LA64_OPCODE_MAX + 1] = {
     { .name = "jnz",    .opcode = LA64_OPCODE_JNZ,      .minargs = 2, .maxargs = 2,  .argmask = 0b00000000000000000000000000000000 },
     { .name = "bl",     .opcode = LA64_OPCODE_BL,       .minargs = 1, .maxargs = 32, .argmask = 0b00000000000000000000000000000000 },
     { .name = "ret",    .opcode = LA64_OPCODE_RET,      .minargs = 0, .maxargs = 0,  .argmask = 0b00000000000000000000000000000000 },
-
-    /* alu v2 operations */
-    { .name = "pdep",   .opcode = LA64_OPCODE_PDEP,     .minargs = 2, .maxargs = 3,  .argmask = 0b10000000000000000000000000000000 },
-    { .name = "pext",   .opcode = LA64_OPCODE_PEXT,     .minargs = 2, .maxargs = 3,  .argmask = 0b10000000000000000000000000000000 },
-    { .name = "bswapw", .opcode = LA64_OPCODE_BSWAPW,   .minargs = 1, .maxargs = 1,  .argmask = 0b10000000000000000000000000000000 },
-    { .name = "bswapd", .opcode = LA64_OPCODE_BSWAPD,   .minargs = 1, .maxargs = 1,  .argmask = 0b10000000000000000000000000000000 },
-    { .name = "bswapq", .opcode = LA64_OPCODE_BSWAPQ,   .minargs = 1, .maxargs = 1,  .argmask = 0b10000000000000000000000000000000 },
-
-    /* contol flow v2 operations */
     { .name = "iret",    .opcode = LA64_OPCODE_IRET,    .minargs = 0, .maxargs = 0,  .argmask = 0b00000000000000000000000000000000 }
 };
 

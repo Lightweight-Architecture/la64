@@ -61,37 +61,35 @@
 #define LA64_OPCODE_INC             0b00010110
 #define LA64_OPCODE_DEC             0b00010111
 #define LA64_OPCODE_NOT             0b00011000
-#define LA64_OPCODE_AND             0b00011001
-#define LA64_OPCODE_OR              0b00011010
-#define LA64_OPCODE_XOR             0b00011011
-#define LA64_OPCODE_SHR             0b00011100
-#define LA64_OPCODE_SHL             0b00011101
-#define LA64_OPCODE_ROR             0b00011110
-#define LA64_OPCODE_ROL             0b00011111
+#define LA64_OPCODE_NEG             0b00011001
+#define LA64_OPCODE_AND             0b00011010
+#define LA64_OPCODE_OR              0b00011011
+#define LA64_OPCODE_XOR             0b00011100
+#define LA64_OPCODE_SHR             0b00011101
+#define LA64_OPCODE_SHL             0b00011110
+#define LA64_OPCODE_SAR             0b00011111
+#define LA64_OPCODE_ROR             0b00100000
+#define LA64_OPCODE_ROL             0b00100001
+#define LA64_OPCODE_PDEP            0b00100010
+#define LA64_OPCODE_PEXT            0b00100011
+#define LA64_OPCODE_BSWAPW          0b00100100
+#define LA64_OPCODE_BSWAPD          0b00100101
+#define LA64_OPCODE_BSWAPQ          0b00100110
 
 /* control flow operations */
-#define LA64_OPCODE_JMP             0b00100000
-#define LA64_OPCODE_CMP             0b00100001
-#define LA64_OPCODE_JE              0b00100010
-#define LA64_OPCODE_JNE             0b00100011
-#define LA64_OPCODE_JLT             0b00100100
-#define LA64_OPCODE_JGT             0b00100101
-#define LA64_OPCODE_JLE             0b00100110
-#define LA64_OPCODE_JGE             0b00100111
-#define LA64_OPCODE_JZ              0b00101000
-#define LA64_OPCODE_JNZ             0b00101001
-#define LA64_OPCODE_BL              0b00101010
-#define LA64_OPCODE_RET             0b00101011
-
-/* alu v2 operations */
-#define LA64_OPCODE_PDEP            0b00101100
-#define LA64_OPCODE_PEXT            0b00101101
-#define LA64_OPCODE_BSWAPW          0b00101110
-#define LA64_OPCODE_BSWAPD          0b00101111
-#define LA64_OPCODE_BSWAPQ          0b00110000
-
-/* control flow v2 operations */
-#define LA64_OPCODE_IRET            0b00110001
+#define LA64_OPCODE_JMP             0b00100111
+#define LA64_OPCODE_CMP             0b00101000
+#define LA64_OPCODE_JE              0b00101001
+#define LA64_OPCODE_JNE             0b00101010
+#define LA64_OPCODE_JLT             0b00101011
+#define LA64_OPCODE_JGT             0b00101100
+#define LA64_OPCODE_JLE             0b00101101
+#define LA64_OPCODE_JGE             0b00101110
+#define LA64_OPCODE_JZ              0b00101111
+#define LA64_OPCODE_JNZ             0b00110000
+#define LA64_OPCODE_BL              0b00110001
+#define LA64_OPCODE_RET             0b00110010
+#define LA64_OPCODE_IRET            0b00110011
 
 #define LA64_OPCODE_MAX             LA64_OPCODE_IRET
 
