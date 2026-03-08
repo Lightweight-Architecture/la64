@@ -36,7 +36,8 @@ typedef enum {
 
 typedef struct {
     uint8_t    *buffer;
-    size_t      bit_pos;
+    size_t      byte_pos;
+    uint8_t     bit_idx;
     size_t      capacity;
     bw_endian_t endian;
 } bitwalker_t;
@@ -54,7 +55,6 @@ void bitwalker_init_read(bitwalker_t *bw, const uint8_t *buf, size_t len, bw_end
 /* management */
 
 void bitwalker_reset(bitwalker_t *bw);
-size_t bitwalker_tell(const bitwalker_t *bw);
 
 /* read and write */
 
@@ -62,7 +62,6 @@ int bitwalker_write(bitwalker_t *bw, uint64_t value, uint8_t num_bits);
 uint64_t bitwalker_read(bitwalker_t *bw, uint8_t num_bits);
 uint64_t bitwalker_peek(bitwalker_t *bw, uint8_t num_bits);
 void bitwalker_skip(bitwalker_t *bw, size_t num_bits);
-void bitwalker_seek(bitwalker_t *bw, size_t bit_pos);
 size_t bitwalker_bytes_used(const bitwalker_t *bw);
 void bitwalker_align_byte(bitwalker_t *bw);
 

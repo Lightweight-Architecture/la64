@@ -56,7 +56,8 @@ void bitwalker_init(bitwalker_t *bw,
                     bw_endian_t endian)
 {
     bw->buffer   = buf;
-    bw->bit_pos  = 0;
+    bw->byte_pos = 0;
+    bw->bit_idx  = 0;
     bw->capacity = capacity;
     bw->endian   = endian;
     memset(buf, 0, capacity);
@@ -68,7 +69,8 @@ void bitwalker_init_read(bitwalker_t *bw,
                          bw_endian_t endian)
 {
     bw->buffer   = (uint8_t *)buf;
-    bw->bit_pos  = 0;
+    bw->byte_pos = 0;
+    bw->bit_idx  = 0;
     bw->capacity = len;
     bw->endian   = endian;
 }
@@ -77,12 +79,8 @@ void bitwalker_init_read(bitwalker_t *bw,
 
 void bitwalker_reset(bitwalker_t *bw)
 {
-    bw->bit_pos = 0;
-}
-
-size_t bitwalker_tell(const bitwalker_t *bw)
-{
-    return bw->bit_pos;
+    bw->byte_pos = 0;
+    bw->bit_idx = 0;
 }
 
 /* read and write */
@@ -95,7 +93,7 @@ int bitwalker_write(bitwalker_t *bw,
     {
         return -1;
     }
-    else if((bw->bit_pos + num_bits + 7) / 8 > bw->capacity)
+    else if(bw->byte_pos >= bw->capacity)
     {
         return -1;
     }
@@ -116,21 +114,25 @@ int bitwalker_write(bitwalker_t *bw,
         }
     }
 
-    /* pack bits sequentially into buffer */
-    for(uint8_t i = 0; i < num_bits; i++)
-    {
-        uint8_t bit = (value >> i) & 1;
+    uint64_t chunk = 0;
 
-        size_t  byte_idx = bw->bit_pos / 8;
-        uint8_t bit_idx  = bw->bit_pos % 8;
+    /* copy up to 8 bytes from buffer */
+    size_t remain = bw->capacity - bw->byte_pos;
+    size_t n = remain < 8 ? remain : 8;
 
-        if(bit)
-        {
-            bw->buffer[byte_idx] |= (1 << bit_idx);
-        }
-        bw->bit_pos++;
-    }
+    memcpy(&chunk, bw->buffer + bw->byte_pos, n);
 
+    /* shift value into position */
+    chunk |= value << bw->bit_idx;
+
+    /* write back */
+    memcpy(bw->buffer + bw->byte_pos, &chunk, n);
+
+    /* advance cursor */
+    size_t tmp = bw->bit_idx + num_bits;
+    bw->byte_pos += tmp >> 3;
+    bw->bit_idx = tmp & 7;
+    
     return 0;
 }
 
@@ -141,27 +143,29 @@ uint64_t bitwalker_read(bitwalker_t *bw,
     {
         return 0;
     }
-    else if((bw->bit_pos + num_bits + 7) / 8 > bw->capacity)
+    else if(bw->byte_pos >= bw->capacity)
     {
         return 0;
     }
 
-    size_t byte_idx = bw->bit_pos >> 3;
-    uint8_t bit_idx = bw->bit_pos & 7;
-
     uint64_t chunk = 0;
 
     /* copy up to 8 bytes */
-    memcpy(&chunk, bw->buffer + byte_idx, sizeof(uint64_t));
+    size_t remain = bw->capacity - bw->byte_pos;
+    size_t n = remain < 8 ? remain : 8;
+
+    memcpy(&chunk, bw->buffer + bw->byte_pos, n);
 
     /* shift away preceding bits */
-    chunk >>= bit_idx;
+    chunk >>= bw->bit_idx;
 
     uint64_t mask = (num_bits == 64) ? UINT64_MAX : ((1ULL << num_bits) - 1);
 
     uint64_t value = chunk & mask;
 
-    bw->bit_pos += num_bits;
+    bw->bit_idx += num_bits;
+    bw->byte_pos += bw->bit_idx >> 3;
+    bw->bit_idx &= 7;
 
     /* endian fix */
     if(num_bits > 8)
@@ -176,33 +180,24 @@ uint64_t bitwalker_read(bitwalker_t *bw,
     return value;
 }
 
-uint64_t bitwalker_peek(bitwalker_t *bw,
-                        uint8_t num_bits)
-{
-    size_t saved = bw->bit_pos;
-    uint64_t result = bitwalker_read(bw, num_bits);
-    bw->bit_pos = saved;
-    return result;
-}
-
 void bitwalker_skip(bitwalker_t *bw,
                     size_t num_bits)
 {
-    bw->bit_pos += num_bits;
-}
-
-void bitwalker_seek(bitwalker_t *bw,
-                    size_t bit_pos)
-{
-    bw->bit_pos = bit_pos;
+    size_t tmp = bw->bit_idx + num_bits;
+    bw->byte_pos += tmp >> 3;
+    bw->bit_idx = tmp & 7;
 }
 
 size_t bitwalker_bytes_used(const bitwalker_t *bw)
 {
-    return (bw->bit_pos + 7) / 8;
+    return bw->byte_pos + ((bw->bit_idx == 0) ? 0 : 1);
 }
 
 void bitwalker_align_byte(bitwalker_t *bw)
 {
-    bw->bit_pos = (bw->bit_pos + 7) & ~(size_t)7;
+    if(bw->bit_idx != 0)
+    {
+        bw->bit_idx = 0;
+        bw->byte_pos += 1;
+    }
 }
