@@ -33,8 +33,6 @@ void la64_op_mul(la64_core_t *core);
 void la64_op_div(la64_core_t *core);
 void la64_op_idiv(la64_core_t *core);
 void la64_op_mod(la64_core_t *core);
-void la64_op_inc(la64_core_t *core);
-void la64_op_dec(la64_core_t *core);
 void la64_op_not(la64_core_t *core);
 void la64_op_neg(la64_core_t *core);
 void la64_op_and(la64_core_t *core);

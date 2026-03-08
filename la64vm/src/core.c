@@ -69,8 +69,6 @@ la64_opfunc_t opfunc_table[] = {
     la64_op_div,
     la64_op_idiv,
     la64_op_mod,
-    la64_op_inc,
-    la64_op_dec,
     la64_op_not,
     la64_op_neg,
     la64_op_and,

@@ -29,6 +29,7 @@
 #include <la64vm/memory.h>
 #include <la64asm/type.h>
 #include <la64asm/label.h>
+#include <la64asm/opcode.h>
 #include <stdbool.h>
 
 /* opcode emit */
@@ -46,6 +47,12 @@ void la64_compiler_emit_imm(bitwalker_t *bw, uint64_t imm);
 
 /* end emitter */
 void la64_compiler_emit_end(bitwalker_t *bw);
+
+/* instruction emitter */
+bool la64_compiler_emit_instr_inc(const opcode_entry_t *opce, compiler_line_t *cl, bitwalker_t *bw);
+bool la64_compiler_emit_instr_dec(const opcode_entry_t *opce, compiler_line_t *cl, bitwalker_t *bw);
+bool la64_compiler_emit_instr_clr(const opcode_entry_t *opce, compiler_line_t *cl, bitwalker_t *bw);
+bool la64_compiler_emit_instr_default(const opcode_entry_t *opce, compiler_line_t *cl, bitwalker_t *bw);
 
 /* automised code emitting */
 bool la64_compiler_emit(compiler_line_t *cl);

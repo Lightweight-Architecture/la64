@@ -125,26 +125,6 @@ void la64_op_mod(la64_core_t *core)
     DEFINE_LA64_ARITHMETIC_OP_ZERO_BAD(%);
 }
 
-void la64_op_inc(la64_core_t *core)
-{
-    la64_instr_termcond(core->op.param_cnt == 0);
-
-    for(uint8_t i = 0; i < core->op.param_cnt; i++)
-    {
-        (*(core->op.param[i]))++;
-    }
-}
-
-void la64_op_dec(la64_core_t *core)
-{
-    la64_instr_termcond(core->op.param_cnt == 0);
-
-    for(uint8_t i = 0; i < core->op.param_cnt; i++)
-    {
-        (*(core->op.param[i]))--;
-    }
-}
-
 void la64_op_not(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt == 0);

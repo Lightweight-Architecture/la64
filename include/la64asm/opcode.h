@@ -27,18 +27,27 @@
 
 #include <la64vm/core.h>
 
+#include <la64asm/type.h>
+
 #include <lautils/parser.h>
+#include <lautils/bitwalker.h>
 
 #include <stdint.h>
 #include <stdbool.h>
 
-typedef struct {
-    const char *name;           /* name to match with of opcode */
-    uint8_t opcode;             /* opcode in machine code */
-    uint8_t minargs;            /* minimum arguments count */
-    uint8_t maxargs;            /* maximum arguments count */
-    uint32_t argmask;           /* argument mask (0 means it doesnt matter what the operand is, 1 means it must be a register) */
-    const char *dnstr;          /* deprecation string if deprecated */
+typedef struct opcode_entry opcode_entry_t;
+
+/* handler for emitting instruction */
+typedef bool (*instruction_emit_handler)(const opcode_entry_t *opce, compiler_line_t *cl, bitwalker_t *bw);
+
+typedef struct opcode_entry {
+    const char *name;                   /* name to match with of opcode */
+    uint8_t opcode;                     /* opcode in machine code */
+    uint8_t minargs;                    /* minimum arguments count */
+    uint8_t maxargs;                    /* maximum arguments count */
+    uint32_t argmask;                   /* argument mask (0 means it doesnt matter what the operand is, 1 means it must be a register) */
+    const char *dnstr;                  /* deprecation string if deprecated */
+    instruction_emit_handler handler;   /* handler for emitting code */
 } opcode_entry_t;
 
 typedef struct {

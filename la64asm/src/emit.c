@@ -109,6 +109,212 @@ void la64_compiler_emit_end(bitwalker_t *bw)
     bitwalker_write(bw, LA64_PARAMETER_CODING_INSTR_END, 3);
 }
 
+/* instruction emitter */
+bool la64_compiler_emit_instr_inc(opcode_entry_t *opce,
+                                  compiler_line_t *cl,
+                                  bitwalker_t *bw)
+{
+    /*
+     * background is this was a native instruction, but
+     * was removed, because it was redundant, many
+     * la64 programms tho use inc and thats why we create
+     * a emit path for it that emits increment using
+     * the addition opcode, it costs the same, just
+     * 1 byte more for the end marker, plus.. nobody
+     * actually used the multiargument feature of it.
+     */
+    
+    for(uint64_t i = 1; i < cl->token_cnt; i++)
+    {
+        /* increment means each parameter, one opcode */
+        la64_compiler_emit_opcode(bw, LA64_OPCODE_ADD);
+
+        /* it must be a register */
+        register_entry_t *reg = register_from_string(cl->token[i].str);
+
+        if(reg == NULL)
+        {
+            diag_error(&(cl->token[i]), "expected register, got intermediate or label \"%s\"\n", cl->token[i].str);
+            return false;
+        }
+
+        /* emit parameters */
+        la64_compiler_emit_reg(bw, reg->reg);
+        la64_compiler_emit_imm8(bw, 1);
+        la64_compiler_emit_end(bw);
+    }
+
+    /* advancing image address */
+    cl->ci->image_addr += bitwalker_bytes_used(bw);
+
+    return true;
+}
+
+bool la64_compiler_emit_instr_dec(opcode_entry_t *opce,
+                                  compiler_line_t *cl,
+                                  bitwalker_t *bw)
+{
+    /*
+     * background is this was a native instruction, but
+     * was removed, because it was redundant, many
+     * la64 programms tho use dec and thats why we create
+     * a emit path for it that emits decrement using
+     * the subtraction opcode, it costs the same, just
+     * 1 byte more for the end marker, plus.. nobody
+     * actually used the multiargument feature of it.
+     */
+    
+    for(uint64_t i = 1; i < cl->token_cnt; i++)
+    {
+        /* increment means each parameter, one opcode */
+        la64_compiler_emit_opcode(bw, LA64_OPCODE_SUB);
+
+        /* it must be a register */
+        register_entry_t *reg = register_from_string(cl->token[i].str);
+
+        if(reg == NULL)
+        {
+            diag_error(&(cl->token[i]), "expected register, got intermediate or label \"%s\"\n", cl->token[i].str);
+            return false;
+        }
+
+        /* emit parameters */
+        la64_compiler_emit_reg(bw, reg->reg);
+        la64_compiler_emit_imm8(bw, 1);
+        la64_compiler_emit_end(bw);
+    }
+
+    /* advancing image address */
+    cl->ci->image_addr += bitwalker_bytes_used(bw);
+
+    return true;
+}
+
+bool la64_compiler_emit_instr_clr(opcode_entry_t *opce,
+                                  compiler_line_t *cl,
+                                  bitwalker_t *bw)
+{
+    /*
+     * people would argue to emit XOR but XOR 
+     * has a end marker while MOV doesnt, so
+     * using MOV with 0 Is better for code density
+     * than using XOR REG, REG... basically we will
+     * emit...
+     *
+     * MOV REG, 0
+     *
+     * over
+     *
+     * XOR REG, REG, END
+     *
+     */
+    
+    for(uint64_t i = 1; i < cl->token_cnt; i++)
+    {
+        /* increment means each parameter, one opcode */
+        la64_compiler_emit_opcode(bw, LA64_OPCODE_MOV);
+
+        /* it must be a register */
+        register_entry_t *reg = register_from_string(cl->token[i].str);
+
+        if(reg == NULL)
+        {
+            diag_error(&(cl->token[i]), "expected register, got intermediate or label \"%s\"\n", cl->token[i].str);
+            return false;
+        }
+
+        /* emit parameters */
+        la64_compiler_emit_reg(bw, reg->reg);
+        la64_compiler_emit_imm8(bw, 0);
+    }
+
+    /* advancing image address */
+    cl->ci->image_addr += bitwalker_bytes_used(bw);
+
+    return true;
+}
+
+bool la64_compiler_emit_instr_default(const opcode_entry_t *opce,
+                                      compiler_line_t *cl,
+                                      bitwalker_t *bw)
+{
+    /* setting opcode from entry */ 
+    la64_compiler_emit_opcode(bw, opce->opcode);
+
+    /* parse parameters */
+    for(uint64_t i = 1; i < cl->token_cnt; i++)
+    {
+        /* getting rule for current argument */
+        bool reg_only = opcode_arg_accepts_reg_only(opce,  i - 1);
+
+        /* checking for register */
+        register_entry_t *reg = register_from_string(cl->token[i].str);
+
+        if(reg != NULL)
+        {
+            la64_compiler_emit_reg(bw, reg->reg);
+            continue;
+        }
+
+        /* checking if allowed to be something else than a register */
+        if(reg_only)
+        {
+            diag_error(&(cl->token[i]), "expected register, got intermediate or label \"%s\"\n", cl->token[i].str);
+            return false;
+        }
+
+        /* parsing value */
+        parser_return_t pr = parse_value_from_string(cl->token[i].str);
+
+        if(pr.type == laParserValueTypeString)
+        {
+            /* its a label */
+            /* set mode to 64bit, because a label is 64bit wide */
+            bitwalker_write(bw, LA64_PARAMETER_CODING_IMM64, 3);
+
+            /* it must be a label and therefore a entry in the new relocation table ;) */
+            /* checking label type in question */
+            char *label = NULL;
+
+            /* checking for local label */
+            if(cl->token[i].str[0] == '.')
+            {
+                asprintf(&label, "%s%s", cl->ci->label_scope, cl->token[i].str);
+            }
+            else
+            {
+                label = strdup(cl->token[i].str);
+            }
+
+            cl->ci->rtlb[cl->ci->rtlb_cnt].name = label;
+            cl->ci->rtlb[cl->ci->rtlb_cnt].bw = *bw;
+            cl->ci->rtlb[cl->ci->rtlb_cnt++].ctlink = &(cl->token[i]);
+
+            /*
+             * skip the 64bit the label occupies
+             * as we added it to the relocation table
+             * already. the relocation table later will
+             * fill this space with the address.
+             */
+            bitwalker_skip(bw, 64);
+        }
+        else
+        {
+            /* its a intermediate */
+            la64_compiler_emit_imm(bw, pr.value);
+        }
+    }
+
+    if(opce->maxargs == 32 || opce->maxargs != (cl->token_cnt - 1))
+    {
+        la64_compiler_emit_end(bw);
+    }
+
+    cl->ci->image_addr += bitwalker_bytes_used(bw);
+
+    return true;
+}
+
 /* automised code emitting */
 bool la64_compiler_emit(compiler_line_t *cl)
 {
@@ -155,81 +361,10 @@ bool la64_compiler_emit(compiler_line_t *cl)
     bitwalker_t bw;
     bitwalker_init(&bw, &(cl->ci->image[cl->ci->image_addr]), 256, BW_LITTLE_ENDIAN);
 
-    /* setting opcode from entry */
-    la64_compiler_emit_opcode(&bw, opce->opcode);
+    /* check if emitting pseudo instruction */
+    assert(opce->handler != NULL);
 
-    /* parse parameters */
-    for(uint64_t i = 1; i < cl->token_cnt; i++)
-    {
-        /* getting rule for current argument */
-        bool reg_only = opcode_arg_accepts_reg_only(opce,  i - 1);
-
-        /* checking for register */
-        register_entry_t *reg = register_from_string(cl->token[i].str);
-
-        if(reg != NULL)
-        {
-            la64_compiler_emit_reg(&bw, reg->reg);
-            continue;
-        }
-
-        /* checking if allowed to be something else than a register */
-        if(reg_only)
-        {
-            diag_error(&(cl->token[i]), "expected register, got intermediate or label \"%s\"\n", cl->token[i].str);
-            return false;
-        }
-
-        /* parsing value */
-        parser_return_t pr = parse_value_from_string(cl->token[i].str);
-
-        if(pr.type == laParserValueTypeString)
-        {
-            /* its a label */
-            /* set mode to 64bit, because a label is 64bit wide */
-            bitwalker_write(&bw, LA64_PARAMETER_CODING_IMM64, 3);
-
-            /* it must be a label and therefore a entry in the new relocation table ;) */
-            /* checking label type in question */
-            char *label = NULL;
-
-            /* checking for local label */
-            if(cl->token[i].str[0] == '.')
-            {
-                asprintf(&label, "%s%s", cl->ci->label_scope, cl->token[i].str);
-            }
-            else
-            {
-                label = strdup(cl->token[i].str);
-            }
-
-            cl->ci->rtlb[cl->ci->rtlb_cnt].name = label;
-            cl->ci->rtlb[cl->ci->rtlb_cnt].bw = bw;
-            cl->ci->rtlb[cl->ci->rtlb_cnt++].ctlink = &(cl->token[i]);
-
-            /*
-             * skip the 64bit the label occupies
-             * as we added it to the relocation table
-             * already. the relocation table later will
-             * fill this space with the address.
-             */
-            bitwalker_skip(&bw, 64);
-        }
-        else
-        {
-            /* its a intermediate */
-            la64_compiler_emit_imm(&bw, pr.value);
-        }
-    }
-
-    if(opce->maxargs == 32 || opce->maxargs != (cl->token_cnt - 1))
-    {
-        la64_compiler_emit_end(&bw);
-    }
-
-    cl->ci->image_addr += bitwalker_bytes_used(&bw);
-
-    return true;
+    return opce->handler(opce, cl, &bw);
 }
 
 bool la64_compiler_emit_all(compiler_invocation_t *ci)
