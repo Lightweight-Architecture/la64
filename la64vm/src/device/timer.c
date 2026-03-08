@@ -158,7 +158,7 @@ void la64_timer_tick(la64_timer_t *timer,
     }
 
     /*  calculating using virtual frequency the actual timer count */
-    __uint128_t total = (__uint128_t)elapsed_host * LA64_TIMER_FREQ + timer->remainder;
+    __uint128_t total = (__uint128_t)elapsed_host * timer->host_freq + timer->remainder;
     uint64_t virtual_ticks = total / timer->host_freq;
     timer->remainder = total % timer->host_freq;
     
@@ -213,7 +213,7 @@ uint64_t la64_timer_read(la64_core_t *core,
         case TIMER_REG_STATUS:
             return timer->status;
         case TIMER_REG_FREQ:
-            return LA64_TIMER_FREQ;
+            return timer->host_freq;
         default:
             return 0;
     }

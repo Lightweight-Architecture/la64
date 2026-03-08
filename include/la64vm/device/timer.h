@@ -30,7 +30,6 @@
 
 #define LA64_TIMER_BASE     0x1FE00100
 #define LA64_TIMER_SIZE     0x28
-#define LA64_TIMER_FREQ     100000000
 
 #define TIMER_REG_CTRL      0x00
 #define TIMER_REG_COUNT     0x08
