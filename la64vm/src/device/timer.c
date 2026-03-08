@@ -110,7 +110,6 @@ la64_timer_t *la64_timer_alloc(la64_core_t *core)
     
     timer->host_freq = detect_host_freq();
     timer->last_host_cycles = la64_get_host_cycles();
-    timer->remainder = 0;
     
     return timer;
 }
@@ -141,9 +140,7 @@ void la64_timer_tick(la64_timer_t *timer,
     }
 
     /*  calculating using virtual frequency the actual timer count */
-    __uint128_t total = (__uint128_t)elapsed_host * timer->host_freq + timer->remainder;
-    uint64_t virtual_ticks = total / timer->host_freq;
-    timer->remainder = total % timer->host_freq;
+    uint64_t virtual_ticks = elapsed_host;
     
     /* null check */
     if(virtual_ticks == 0)

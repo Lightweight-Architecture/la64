@@ -52,7 +52,6 @@ typedef struct la64_timer {
     
     uint64_t host_freq;
     uint64_t last_host_cycles;
-    uint64_t remainder;
     
     la64_core_t *core;
 } la64_timer_t;
