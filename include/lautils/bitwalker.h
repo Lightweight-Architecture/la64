@@ -64,5 +64,6 @@ uint64_t bitwalker_peek(bitwalker_t *bw, uint8_t num_bits);
 void bitwalker_skip(bitwalker_t *bw, size_t num_bits);
 void bitwalker_seek(bitwalker_t *bw, size_t bit_pos);
 size_t bitwalker_bytes_used(const bitwalker_t *bw);
+void bitwalker_align_byte(bitwalker_t *bw);
 
 #endif /* BITWALKER_H */

@@ -203,3 +203,8 @@ size_t bitwalker_bytes_used(const bitwalker_t *bw)
 {
     return (bw->bit_pos + 7) / 8;
 }
+
+void bitwalker_align_byte(bitwalker_t *bw)
+{
+    bw->bit_pos = (bw->bit_pos + 7) & ~(size_t)7;
+}

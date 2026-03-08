@@ -142,6 +142,7 @@ bool la64_compiler_emit_instr_inc(opcode_entry_t *opce,
         la64_compiler_emit_reg(bw, reg->reg);
         la64_compiler_emit_imm8(bw, 1);
         la64_compiler_emit_end(bw);
+        bitwalker_align_byte(bw);
     }
 
     /* advancing image address */
@@ -182,6 +183,7 @@ bool la64_compiler_emit_instr_dec(opcode_entry_t *opce,
         la64_compiler_emit_reg(bw, reg->reg);
         la64_compiler_emit_imm8(bw, 1);
         la64_compiler_emit_end(bw);
+        bitwalker_align_byte(bw);
     }
 
     /* advancing image address */
@@ -226,6 +228,7 @@ bool la64_compiler_emit_instr_clr(opcode_entry_t *opce,
         /* emit parameters */
         la64_compiler_emit_reg(bw, reg->reg);
         la64_compiler_emit_imm8(bw, 0);
+        bitwalker_align_byte(bw);
     }
 
     /* advancing image address */
