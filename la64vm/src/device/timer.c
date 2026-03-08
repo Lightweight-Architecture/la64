@@ -53,24 +53,7 @@ uint64_t la64_get_host_cycles(void)
 
 static uint64_t detect_host_freq(void)
 {
-#if defined(__aarch64__) && defined(__APPLE__)
-    struct timespec start_ts, end_ts;
-    uint64_t start_cycles, end_cycles;
-
-    clock_gettime(CLOCK_MONOTONIC, &start_ts);
-
-    start_cycles = la64_get_host_cycles();
-
-    usleep(100000);
-
-    clock_gettime(CLOCK_MONOTONIC, &end_ts);
-
-    end_cycles = la64_get_host_cycles();
-
-    uint64_t elapsed_ns = (end_ts.tv_sec - start_ts.tv_sec) * 1000000000ULL + (end_ts.tv_nsec - start_ts.tv_nsec);
-    uint64_t elapsed_cycles = end_cycles - start_cycles;
-    return (elapsed_cycles * 1000000000ULL) / elapsed_ns;
-#elif defined(__aarch64__)
+#if defined(__aarch64__)
     uint64_t freq;
     __asm__ volatile ("mrs %0, cntfrq_el0" : "=r"(freq));
     return freq;
