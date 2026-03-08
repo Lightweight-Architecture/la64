@@ -213,7 +213,7 @@ uint64_t la64_timer_read(la64_core_t *core,
         case TIMER_REG_STATUS:
             return timer->status;
         case TIMER_REG_FREQ:
-            return timer->freq;
+            return LA64_TIMER_FREQ;
         default:
             return 0;
     }

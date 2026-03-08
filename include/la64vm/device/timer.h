@@ -50,7 +50,6 @@ typedef struct la64_timer {
     uint64_t count;
     uint64_t compare;
     uint64_t status;
-    uint64_t freq;
     
     uint64_t host_freq;
     uint64_t last_host_cycles;
