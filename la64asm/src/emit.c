@@ -289,9 +289,27 @@ bool la64_compiler_emit_instr_default(const opcode_entry_t *opce,
                 label = strdup(cl->token[i].str);
             }
 
-            cl->ci->rtlb[cl->ci->rtlb_cnt].name = label;
-            cl->ci->rtlb[cl->ci->rtlb_cnt].bw = *bw;
-            cl->ci->rtlb[cl->ci->rtlb_cnt++].ctlink = &(cl->token[i]);
+            reloc_table_entry_t *rtbe = cl->ci->rtbe;
+            while(rtbe != NULL &&
+                  rtbe->next != NULL)
+            {
+                rtbe = rtbe->next;
+            }
+
+            if(rtbe == NULL)
+            {
+                rtbe = calloc(1, sizeof(reloc_table_entry_t));
+                cl->ci->rtbe = rtbe;
+            }
+            else
+            {
+                rtbe->next = calloc(1, sizeof(reloc_table_entry_t));
+                rtbe = rtbe->next;
+            }
+
+            rtbe->name = label;
+            rtbe->bw = *bw;
+            rtbe->ctlink = &(cl->token[i]);
 
             /*
              * skip the 64bit the label occupies
@@ -405,19 +423,22 @@ bool la64_compiler_emit_all(compiler_invocation_t *ci)
      * and insert each label at the place where a label
      * shall be.
      */
-    for(uint64_t i = 0; i < ci->rtlb_cnt; i++)
+    reloc_table_entry_t *rtbe = ci->rtbe;
+    while(rtbe != NULL)
     {
-        uint64_t addr = label_lookup(ci, ci->rtlb[i].name);
+        uint64_t addr = label_lookup(ci, rtbe->name);
 
         if(addr != COMPILER_LABEL_NOT_FOUND)
         {
-            bitwalker_write(&(ci->rtlb[i].bw), addr, 64);
+            bitwalker_write(&(rtbe->bw), addr, 64);
         }
         else
         {
-            diag_error(ci->rtlb[i].ctlink, "label \"%s\" not found\n", ci->rtlb[i].name);
+            diag_error(rtbe->ctlink, "label \"%s\" not found\n", rtbe->name);
             return false;
         }
+
+        rtbe = rtbe->next;
     }
 
     return true;

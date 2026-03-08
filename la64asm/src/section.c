@@ -99,9 +99,27 @@ void code_token_section(compiler_invocation_t *ci)
                             }
 
                             /* using finally the relocation table to its full extend */
-                            ci->rtlb[ci->rtlb_cnt].name = strdup(ci->line[i].token[a].str);
-                            ci->rtlb[ci->rtlb_cnt].ctlink = &(ci->line[i].token[a]);
-                            bitwalker_init(&(ci->rtlb[ci->rtlb_cnt++].bw), &(ci->image[ci->image_addr]), 8, BW_LITTLE_ENDIAN);
+                            reloc_table_entry_t *rtbe = ci->rtbe;
+                            while(rtbe != NULL &&
+                                  rtbe->next != NULL)
+                            {
+                                rtbe = rtbe->next;
+                            }
+
+                            if(rtbe == NULL)
+                            {
+                                rtbe = calloc(1, sizeof(reloc_table_entry_t));
+                                ci->rtbe = rtbe;
+                            }
+                            else
+                            {
+                                rtbe->next = calloc(1, sizeof(reloc_table_entry_t));
+                                rtbe = rtbe->next;
+                            }
+
+                            rtbe->name = strdup(ci->line[i].token[a].str);
+                            rtbe->ctlink = &(ci->line[i].token[a]);
+                            bitwalker_init(&(rtbe->bw), &(ci->image[ci->image_addr]), 8, BW_LITTLE_ENDIAN);
                             ci->image_addr += 8;
                         }
                         else

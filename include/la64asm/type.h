@@ -70,11 +70,14 @@ typedef struct {
     compiler_token_t *ctlink;               /* link to the originator of the label */
 } compiler_label_t;
 
-typedef struct {
-    char *name;                             /* unknown label looking for address */
+typedef struct reloc_table_entry reloc_table_entry_t;
+
+struct reloc_table_entry {
+    char *name;                             /* resolved label name */
     bitwalker_t bw;                         /* bitwalker state of when it was looked for (always 64bit skipped) */
     compiler_token_t *ctlink;               /* link to the originator of the entry */
-} reloc_table_entry;
+    reloc_table_entry_t *next;              /* pointer to next entry */
+};
 
 typedef struct compiler_invocation {
     compiler_file_t *file;                  /* code files */
@@ -84,8 +87,7 @@ typedef struct compiler_invocation {
     char *label_scope;                      /* current resolved label scope */
     compiler_label_t *label;                /* label array */
     uint64_t label_cnt;                     /* count of labels */
-    reloc_table_entry rtlb[0xFFFFFF];       /* relocation table */
-    uint64_t rtlb_cnt;                      /* count of relocation table entries */
+    reloc_table_entry_t *rtbe;              /* relocation table root entry */
     uint8_t image[0xFFFFFF];                /* replace with better technique that is more incremental */
     uint64_t image_addr;                    /* current address */
 } compiler_invocation_t;
