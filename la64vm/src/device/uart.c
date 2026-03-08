@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include <la64vm/core.h>
+#include <la64vm/machine.h>
 #include <la64vm/device/uart.h>
 #include <la64vm/device/interrupt.h>
 #include <stdlib.h>
@@ -57,11 +57,11 @@ static void uart_update_irq(la64_uart_t *u)
     /* updating interrupt */
     if(level)
     {
-        la64_raise_interrupt(u->core->machine, LA64_IRQ_UART);
+        la64_raise_interrupt(u->machine, LA64_IRQ_UART);
     }
     else
     {
-        la64_clear_interrupt(u->core->machine, LA64_IRQ_UART);
+        la64_clear_interrupt(u->machine, LA64_IRQ_UART);
     }
 }
 
@@ -153,7 +153,7 @@ static inline void la64_uart_stop(la64_uart_t *u)
     uart_restore_mode();
 }
 
-la64_uart_t *la64_uart_alloc(la64_core_t *core)
+la64_uart_t *la64_uart_alloc(la64_machine_t *machine)
 {
     /* allocate uart */
     la64_uart_t *u = malloc(sizeof(la64_uart_t));
@@ -164,8 +164,15 @@ la64_uart_t *la64_uart_alloc(la64_core_t *core)
         return NULL;
     }
 
+    /* registering uart on machine */
+    if(!la64_mmio_register(machine->mmio_bus, LA64_UART_BASE, LA64_UART_SIZE, u, la64_uart_read, la64_uart_write))
+    {
+        free(u);
+        return NULL;
+    }
+
     /* setting up uart */
-    u->core = core;
+    u->machine = machine;
     u->status = UART_STATUS_TX_EMPTY;
     
     pthread_mutex_init(&u->mutex, NULL);

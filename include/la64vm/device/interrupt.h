@@ -63,7 +63,7 @@ typedef struct la64_intc {
     int64_t  current_irq;
 } la64_intc_t;
 
-la64_intc_t *la64_intc_alloc(void);
+la64_intc_t *la64_intc_alloc(la64_machine_t *machine);
 void la64_intc_dealloc(la64_intc_t *intc);
 
 void la64_raise_interrupt(la64_machine_t *machine, int irq_line);

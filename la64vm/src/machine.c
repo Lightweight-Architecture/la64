@@ -33,88 +33,53 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
 {
     /* allocating brand new machine */
     la64_machine_t *machine = calloc(1, sizeof(la64_machine_t));
-
-    /* null pointer check */
     if(machine == NULL)
     {
         return NULL;
     }
 
-    /* allocate memory */
+    /* allocate random access memory */
     machine->memory = la64_memory_alloc(memory_size);
-
-    /* null pointer check */
     if(machine->memory == NULL)
     {
-        /* release machine and return nothing */
         goto out_release_machine;
     }
 
-    /* allocate mmio */
+    /* allocating mmio controller */
     machine->mmio_bus = la64_mmio_alloc();
-
-    /* null pointer check */
     if(machine->mmio_bus == NULL)
     {
-        /* release machine, memory and return nothing */
         goto out_release_memory;
     }
 
-    /* allocate new core */
+    /* allocating main core */
     machine->core = la64_core_alloc();
-
-    /* null pointer check */
     if(machine->core == NULL)
     {
         goto out_release_mmio;
     }
-
     machine->core->machine = machine;
 
-    /* allocate interrupt controller */
-    machine->intc = la64_intc_alloc();
-
-    /* null pointer check */
+    /* allocating devices*/
+    machine->intc = la64_intc_alloc(machine);
     if(machine->intc == NULL)
     {
         goto out_release_core;
     }
 
-    /* register interrupt controller MMIO */
-    if(!la64_mmio_register(machine->mmio_bus, LA64_INTC_BASE, LA64_INTC_SIZE, machine->intc, la64_intc_read, la64_intc_write))
-    {
-        goto out_release_intc;
-    }
-
-    /* allocate timer */
-    machine->timer = la64_timer_alloc(machine->core);
-
-    /* null pointer check */
+    machine->timer = la64_timer_alloc(machine);
     if(machine->timer == NULL)
     {
         goto out_release_intc;
     }
 
-    /* register timer MMIO */
-    if(!la64_mmio_register(machine->mmio_bus, LA64_TIMER_BASE, LA64_TIMER_SIZE, machine->timer, la64_timer_read, la64_timer_write))
-    {
-        goto out_release_timer;
-    }
-
-    /* allocate uart */
-    machine->uart = la64_uart_alloc(machine->core);
-
+    machine->uart = la64_uart_alloc(machine);
     if(machine->uart == NULL)
     {
         goto out_release_timer;
     }
 
-    if(!la64_mmio_register(machine->mmio_bus, LA64_UART_BASE, LA64_UART_SIZE, machine->uart, la64_uart_read, la64_uart_write))
-    {
-        goto out_release_uart;
-    }
-
-    /* register rtc */
+    /* register device less(means without allocation) devices */
     if(!la64_mmio_register(machine->mmio_bus, LA64_RTC_BASE, LA64_RTC_SIZE, NULL, la64_rtc_read, NULL))
     {
         goto out_release_uart;
@@ -125,23 +90,18 @@ la64_machine_t *la64_machine_alloc(uint64_t memory_size)
         goto out_release_uart;
     }
 
-    /* register platform */
     if(!la64_mmio_register(machine->mmio_bus, LA64_PLATFORM_BASE, LA64_PLATFORM_SIZE, NULL, la64_platform_read, la64_platform_write))
     {
         goto out_release_uart;
     }
 
+    /* apple and linux have support for the LA64 LCD display */
 #if defined(__linux__) || defined(__APPLE__)
-    machine->display = la64_display_alloc();
+    machine->display = la64_display_alloc(machine);
 
     if(machine->display == NULL)
     {
         goto out_release_uart;
-    }
-
-    if(!la64_mmio_register(machine->mmio_bus, LA64_FB_BASE, LA64_FB_SIZE, machine->display, la64_fb_read, la64_fb_write))
-    {
-        goto out_release_display;
     }
 #endif /* __linux__ */
 
@@ -171,44 +131,39 @@ out_release_machine:
 
 void la64_machine_dealloc(la64_machine_t *machine)
 {
+    /* release devices */
 #if defined(__linux__)  || defined(__APPLE__)
-    /* release display */
     if(machine->display)
     {
         la64_display_dealloc(machine->display);
     }
 #endif /* __linux__ */
 
-    /* release uart */
     if(machine->uart)
     {
         la64_uart_dealloc(machine->uart);
     }
 
-    /* release timer */
     if(machine->timer)
     {
         la64_timer_dealloc(machine->timer);
     }
 
-    /* release interrupt controller */
     if(machine->intc)
     {
         la64_intc_dealloc(machine->intc);
     }
 
-    /* release cores */
+    /* releasing machine internals */
     la64_core_dealloc(machine->core);
 
-    /* release mmio */
     if(machine->mmio_bus)
     {
         la64_mmio_dealloc(machine->mmio_bus);
     }
 
-    /* release memory */
     la64_memory_dealloc(machine->memory);
 
-    /* release machine */
+    /* release machine it self */
     free(machine);
 }

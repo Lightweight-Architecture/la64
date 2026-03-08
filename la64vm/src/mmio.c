@@ -92,7 +92,7 @@ la64_mmio_region_t *la64_mmio_find(la64_mmio_bus_t *bus,
     }
 
     /* fast path */
-    if (bus->last_region != NULL &&
+    if(bus->last_region != NULL &&
         addr >= bus->last_region->base_addr &&
         addr < bus->last_region->base_addr + bus->last_region->size)
     {

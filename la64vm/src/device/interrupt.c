@@ -32,7 +32,7 @@
 #include <la64vm/memory.h>
 #include <la64vm/instruction/ctrl.h>
 
-la64_intc_t *la64_intc_alloc(void)
+la64_intc_t *la64_intc_alloc(la64_machine_t *machine)
 {
     /* allocate interrupt controller */
     la64_intc_t *intc = malloc(sizeof(la64_intc_t));
@@ -40,6 +40,13 @@ la64_intc_t *la64_intc_alloc(void)
     /* null pointer check */
     if(intc == NULL)
     {
+        return NULL;
+    }
+
+    /* register interrupt controller MMIO */
+    if(!la64_mmio_register(machine->mmio_bus, LA64_INTC_BASE, LA64_INTC_SIZE, intc, la64_intc_read, la64_intc_write))
+    {
+        free(intc);
         return NULL;
     }
 

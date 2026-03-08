@@ -27,6 +27,8 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <la64vm/machine.h>
+
 #include <la64vm/device/timer.h>
 #include <la64vm/device/interrupt.h>
 
@@ -94,7 +96,7 @@ static uint64_t detect_host_freq(void)
 #endif
 }
 
-la64_timer_t *la64_timer_alloc(la64_core_t *core)
+la64_timer_t *la64_timer_alloc(la64_machine_t *machine)
 {
     /* allocate timer */
     la64_timer_t *timer = malloc(sizeof(la64_timer_t));
@@ -104,8 +106,15 @@ la64_timer_t *la64_timer_alloc(la64_core_t *core)
         return NULL;
     }
 
+    /* register timer MMIO */
+    if(!la64_mmio_register(machine->mmio_bus, LA64_TIMER_BASE, LA64_TIMER_SIZE, timer, la64_timer_read, la64_timer_write))
+    {
+        free(timer);
+        return NULL;
+    }
+
     /* setting up timer */
-    timer->core = core;
+    timer->machine = machine;
     timer->compare = UINT64_MAX;
     
     timer->host_freq = detect_host_freq();
@@ -168,7 +177,7 @@ void la64_timer_tick(la64_timer_t *timer,
         
         if(timer->ctrl & TIMER_CTRL_IRQ_EN)
         {
-            la64_raise_interrupt(timer->core->machine, LA64_IRQ_TIMER);
+            la64_raise_interrupt(timer->machine, LA64_IRQ_TIMER);
         }
     }
 }

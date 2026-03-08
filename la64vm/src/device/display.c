@@ -32,6 +32,7 @@
 
 #include <lautils/bitwalker.h>
 
+#include <la64vm/machine.h>
 #include <la64vm/device/display.h>
 
 #if defined(__linux__)
@@ -253,13 +254,19 @@ void *display_start(void *arg)
 
 extern void *display_start(void *arg);
 
-la64_display_t *la64_display_alloc(void)
+la64_display_t *la64_display_alloc(la64_machine_t *machine)
 {
     la64_display_t *display = malloc(sizeof(la64_display_t));
 
     /* null pointer check */
     if(display == NULL)
     {
+        return NULL;
+    }
+
+    if(!la64_mmio_register(machine->mmio_bus, LA64_FB_BASE, LA64_FB_SIZE, display, la64_fb_read, la64_fb_write))
+    {
+        free(display);
         return NULL;
     }
 

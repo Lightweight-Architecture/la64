@@ -42,7 +42,7 @@
 #define TIMER_CTRL_PERIODIC (1 << 2)
 #define TIMER_STATUS_IRQ    (1 << 0)
 
-typedef struct la64_core la64_core_t;
+typedef struct la64_machine la64_machine_t;
 
 typedef struct la64_timer {
     uint64_t ctrl;
@@ -53,10 +53,10 @@ typedef struct la64_timer {
     uint64_t host_freq;
     uint64_t last_host_cycles;
     
-    la64_core_t *core;
+    la64_machine_t *machine;
 } la64_timer_t;
 
-la64_timer_t *la64_timer_alloc(la64_core_t *core);
+la64_timer_t *la64_timer_alloc(la64_machine_t *core);
 void la64_timer_dealloc(la64_timer_t *timer);
 void la64_timer_tick(la64_timer_t *timer, uint64_t host_cycles);
 uint64_t la64_get_host_cycles(void);

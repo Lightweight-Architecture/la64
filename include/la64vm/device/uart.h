@@ -48,7 +48,7 @@
 #define UART_CTRL_TX_IRQ_EN    (1 << 1)
 #define UART_CTRL_RESET        (1 << 2)
 
-typedef struct la64_core la64_core_t;
+typedef struct la64_machine la64_machine_t;
 
 typedef struct {
     uint8_t rx_buf[UART_BUF_SIZE];
@@ -60,10 +60,10 @@ typedef struct {
     pthread_mutex_t mutex;
     atomic_bool running;
 
-    la64_core_t *core;
+    la64_machine_t *machine;
 } la64_uart_t;
 
-la64_uart_t *la64_uart_alloc(la64_core_t *core);
+la64_uart_t *la64_uart_alloc(la64_machine_t *machine);
 void la64_uart_dealloc(la64_uart_t *u);
 
 uint64_t la64_uart_read(la64_core_t *core, void *device, uint64_t offset, int size);

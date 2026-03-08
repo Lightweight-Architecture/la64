@@ -48,6 +48,7 @@
 #include <pthread.h>
 
 typedef struct la64_core la64_core_t;
+typedef struct la64_machine la64_machine_t;
 
 typedef struct {
     uint8_t enabled;
@@ -56,7 +57,7 @@ typedef struct {
     pthread_t pthread;
 } la64_display_t;
 
-la64_display_t *la64_display_alloc(void);
+la64_display_t *la64_display_alloc(la64_machine_t *machine);
 void la64_display_dealloc(la64_display_t *display);
 
 void *display_start(void *arg);
