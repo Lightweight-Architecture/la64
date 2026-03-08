@@ -302,6 +302,13 @@ typedef struct la64_core {
     bool halted;
 
     /*
+     * in-case a interrupt fired before the cpu
+     * intentionally executed hlt then it shall
+     * immediately wake from the halt.
+     */
+    bool unhalted_interrupt;
+
+    /*
      * cpu cant get a second interrupt while handling
      * one, but will be unset when the cpu calls iret.
      */

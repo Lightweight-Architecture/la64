@@ -181,6 +181,12 @@ bool la64_serve_interrupt_if_needed(la64_core_t *core)
     core->rl[LA64_REGISTER_PC] = handler_addr;
     core->op.ilen = 0;
     core->in_interrupt = true;
+
+    /* checking if core is at halt */
+    if(!core->halted)
+    {
+        core->unhalted_interrupt = true;
+    }
     
     return true;
 }

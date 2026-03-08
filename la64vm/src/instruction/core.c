@@ -29,7 +29,14 @@ void la64_op_hlt(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 0);
 
-    core->halted = true;
+    if(!core->unhalted_interrupt)
+    {
+        core->halted = true;
+    }
+    else
+    {
+        core->unhalted_interrupt = false;
+    }
 }
 
 void la64_op_nop(la64_core_t *core)
