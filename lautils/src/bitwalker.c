@@ -146,26 +146,24 @@ uint64_t bitwalker_read(bitwalker_t *bw,
         return 0;
     }
 
-    uint64_t value = 0;
+    size_t byte_idx = bw->bit_pos >> 3;
+    uint8_t bit_idx = bw->bit_pos & 7;
 
-    /* unpack bits sequentially from buffer */
-    for(uint8_t i = 0; i < num_bits; i++)
-    {
-        size_t  byte_idx = bw->bit_pos / 8;
-        uint8_t bit_idx  = bw->bit_pos % 8;
-        uint8_t bit = (bw->buffer[byte_idx] >> bit_idx) & 1;
+    uint64_t chunk = 0;
 
-        if(bit)
-        {
-            value |= (1ULL << i);
-        }
-        bw->bit_pos++;
-    }
+    /* copy up to 8 bytes */
+    memcpy(&chunk, bw->buffer + byte_idx, sizeof(uint64_t));
 
-    /*
-     * for multi-byte values we gonna have to convert target endian to host endian
-     * in case they aint the same
-     */
+    /* shift away preceding bits */
+    chunk >>= bit_idx;
+
+    uint64_t mask = (num_bits == 64) ? UINT64_MAX : ((1ULL << num_bits) - 1);
+
+    uint64_t value = chunk & mask;
+
+    bw->bit_pos += num_bits;
+
+    /* endian fix */
     if(num_bits > 8)
     {
         uint8_t num_bytes = (num_bits + 7) / 8;
