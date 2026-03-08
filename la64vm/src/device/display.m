@@ -297,7 +297,7 @@ void *display_start(void *arg)
 
             NSRect r = NSMakeRect(100, 100, 500, 500);
             NSWindow *win = [[NSWindow alloc] initWithContentRect:r styleMask:(NSWindowStyleMaskTitled | NSWindowStyleMaskClosable |  NSWindowStyleMaskResizable | NSWindowStyleMaskMiniaturizable) backing:NSBackingStoreBuffered defer:NO];
-            [win setTitle:@"LA64LCD @ 64Hz"];
+            [win setTitle:@"LA64LCD @ 60Hz"];
 
             LA64GLView *glView = [[LA64GLView alloc] initWithFrame:r display:display];
             [win setContentView:glView];

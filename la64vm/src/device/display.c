@@ -110,7 +110,7 @@ void *display_start(void *arg)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* win = glfwCreateWindow(800, 800, "LA64LCD @ 64Hz", NULL, NULL);
+    GLFWwindow* win = glfwCreateWindow(800, 800, "LA64LCD @ 60Hz", NULL, NULL);
     if(!win) die("glfwCreateWindow failed");
     glfwMakeContextCurrent(win);
     glfwSwapInterval(1);

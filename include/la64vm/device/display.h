@@ -33,7 +33,7 @@
 #define LA64_FB_HEIGHT  256
 
 /* the freequency of the framebuffer */
-#define LA64_FB_TICK_HZ 64.0
+#define LA64_FB_TICK_HZ 60.0
 #define LA64_FB_TICK_DT (1.0 / LA64_FB_TICK_HZ)
 
 /* registers of the framebuffer MMIO device */
