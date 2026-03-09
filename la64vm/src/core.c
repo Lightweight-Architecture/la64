@@ -105,10 +105,70 @@ la64_opfunc_t opfunc_table[] = {
     la64_op_iret
 };
 
+static const uint8_t opcode_maxargs[256] = {
+    [LA64_OPCODE_HLT] = 0,
+    [LA64_OPCODE_NOP] = 0,
+
+    [LA64_OPCODE_MOV] = 2,
+    [LA64_OPCODE_SWP] = 2,
+    [LA64_OPCODE_SWPZ] = 2,
+    [LA64_OPCODE_PUSH] = 32,
+    [LA64_OPCODE_POP] = 32,
+    [LA64_OPCODE_LDB] = 2,
+    [LA64_OPCODE_LDW] = 2,
+    [LA64_OPCODE_LDD] = 2,
+    [LA64_OPCODE_LDQ] = 2,
+    [LA64_OPCODE_STB] = 2,
+    [LA64_OPCODE_STW] = 2,
+    [LA64_OPCODE_STD] = 2,
+    [LA64_OPCODE_STQ] = 2,
+
+    [LA64_OPCODE_ADD] = 3,
+    [LA64_OPCODE_SUB] = 3,
+    [LA64_OPCODE_MUL] = 3,
+    [LA64_OPCODE_DIV] = 3,
+    [LA64_OPCODE_IDIV] = 3,
+    [LA64_OPCODE_MOD] = 3,
+    [LA64_OPCODE_NOT] = 32,
+    [LA64_OPCODE_NEG] = 32,
+    [LA64_OPCODE_AND] = 3,
+    [LA64_OPCODE_OR] = 3,
+    [LA64_OPCODE_XOR] = 3,
+    [LA64_OPCODE_SHR] = 3,
+    [LA64_OPCODE_SHL] = 3,
+    [LA64_OPCODE_SAR] = 3,
+    [LA64_OPCODE_ROR] = 3,
+    [LA64_OPCODE_ROL] = 3,
+    [LA64_OPCODE_PDEP] = 3,
+    [LA64_OPCODE_PEXT] = 3,
+    [LA64_OPCODE_BSWAPW] = 1,
+    [LA64_OPCODE_BSWAPD] = 1,
+    [LA64_OPCODE_BSWAPQ] = 1,
+
+    [LA64_OPCODE_B] = 1,
+    [LA64_OPCODE_CMP] = 2,
+    [LA64_OPCODE_BE] = 1,
+    [LA64_OPCODE_BNE] = 1,
+    [LA64_OPCODE_BLT] = 1,
+    [LA64_OPCODE_BGT] = 1,
+    [LA64_OPCODE_BLE] = 1,
+    [LA64_OPCODE_BGE] = 1,
+    [LA64_OPCODE_BZ] = 2,
+    [LA64_OPCODE_BNZ] = 2,
+    [LA64_OPCODE_BL] = 32,
+    [LA64_OPCODE_RET] = 0,
+    [LA64_OPCODE_IRET] = 0,
+};
+
 la64_core_t *la64_core_alloc()
 {
     /* allocate a brand new core */
     la64_core_t *core = malloc(sizeof(la64_core_t));
+
+    if(core == NULL)
+    {
+        return NULL;
+    }
 
     bzero(core, sizeof(la64_core_t));
 
@@ -117,12 +177,6 @@ la64_core_t *la64_core_alloc()
 
 void la64_core_dealloc(la64_core_t *core)
 {
-    /* null pointer check */
-    if(core == NULL)
-    {
-        return;
-    }
-
     /* release core */
     free(core);
 }
@@ -149,66 +203,7 @@ static void la64_core_decode_instruction_at_pc(la64_core_t *core)
     /* getting opcode */
     core->op.op = (uint8_t)bitwalker_read(&bw, 8);
 
-    uint8_t maxargs = 32;
-
-    /* making shortcuts for opcodes with fixed arguments */
-    switch(core->op.op)
-    {
-        case LA64_OPCODE_HLT:
-        case LA64_OPCODE_NOP:
-        case LA64_OPCODE_RET:
-        case LA64_OPCODE_IRET:
-            maxargs = 0;
-            break;
-        case LA64_OPCODE_B:
-        case LA64_OPCODE_BE:
-        case LA64_OPCODE_BNE:
-        case LA64_OPCODE_BLT:
-        case LA64_OPCODE_BGT:
-        case LA64_OPCODE_BLE:
-        case LA64_OPCODE_BGE:
-        case LA64_OPCODE_BSWAPW:
-        case LA64_OPCODE_BSWAPD:
-        case LA64_OPCODE_BSWAPQ:
-            maxargs = 1;
-            break;
-        case LA64_OPCODE_MOV:
-        case LA64_OPCODE_SWP:
-        case LA64_OPCODE_SWPZ:
-        case LA64_OPCODE_LDB:
-        case LA64_OPCODE_LDW:
-        case LA64_OPCODE_LDD:
-        case LA64_OPCODE_LDQ:
-        case LA64_OPCODE_STB:
-        case LA64_OPCODE_STW:
-        case LA64_OPCODE_STD:
-        case LA64_OPCODE_STQ:
-        case LA64_OPCODE_CMP:
-        case LA64_OPCODE_BZ:
-        case LA64_OPCODE_BNZ:
-            maxargs = 2;
-            break;
-        case LA64_OPCODE_ADD:
-        case LA64_OPCODE_SUB:
-        case LA64_OPCODE_MUL:
-        case LA64_OPCODE_DIV:
-        case LA64_OPCODE_IDIV:
-        case LA64_OPCODE_MOD:
-        case LA64_OPCODE_AND:
-        case LA64_OPCODE_OR:
-        case LA64_OPCODE_XOR:
-        case LA64_OPCODE_SHR:
-        case LA64_OPCODE_SHL:
-        case LA64_OPCODE_SAR:
-        case LA64_OPCODE_ROR:
-        case LA64_OPCODE_ROL:
-        case LA64_OPCODE_PDEP:
-        case LA64_OPCODE_PEXT:
-            maxargs = 3;
-            break;
-        default:
-            break;
-    }
+    uint8_t maxargs = opcode_maxargs[core->op.op];
 
     /* parsing loop */
     bool reached_end = false;
