@@ -282,22 +282,22 @@ static void *la64_core_execute_thread(void *arg)
     /* going into da execution loop */
     while(1)
     {
-        /* checking if exception is non-NONE */
-        if(!core->in_interrupt &&
-           core->rl[LA64_REGISTER_CR2] != LA64_EXCEPTION_NONE)
+        if(!core->in_interrupt)
         {
-exception_shortcut:
-            core->halted = true;
-            la64_raise_interrupt(core->machine, LA64_IRQ_EXCEPTION);
-        }
-
-        /* checking if core is halted, if so simply skip execution */
-        if(!core->in_interrupt &&
-           core->halted)
-        {
-            /* yield cpu to not burn it */
-            usleep(100);
-            goto skip_execution;
+            /* checking if exception is non-NONE */
+            if(core->rl[LA64_REGISTER_CR2] != LA64_EXCEPTION_NONE)
+            {
+                core->halted = true;
+                la64_raise_interrupt(core->machine, LA64_IRQ_EXCEPTION);
+            }
+            
+             /* checking if core is halted */
+            if(core->halted)
+            {
+                /* yield cpu to not burn it */
+                usleep(100);
+                goto skip_execution;
+            }
         }
 
         /* decoding instruction */
