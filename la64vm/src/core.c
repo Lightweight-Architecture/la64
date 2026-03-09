@@ -42,6 +42,10 @@
 
 #include <lautils/bitwalker.h>
 
+#if defined(__APPLE__)
+#include <CoreFoundation/CFRunLoop.h>
+#endif /* __APPLE__ */
+
 la64_opfunc_t opfunc_table[] = {
     /* core operations */
     la64_op_hlt,
@@ -364,7 +368,6 @@ void la64_core_execute(la64_core_t *core)
     pthread_create(&(core->pthread), NULL, la64_core_execute_thread, (void*)core);
 
 #if defined(__APPLE__)
-    extern void CFRunLoopRun();
     CFRunLoopRun();
 #endif /* __APPLE__ */
     
