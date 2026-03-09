@@ -27,11 +27,13 @@
 #include <string.h>
 
 register_entry_t register_table[] = {
+    /* special purpose register */
     { .name = "pc", .reg = LA64_REGISTER_PC },
     { .name = "sp", .reg = LA64_REGISTER_SP },
     { .name = "fp", .reg = LA64_REGISTER_FP },
     { .name = "cf", .reg = LA64_REGISTER_CF },
 
+    /* general purpose register */
     { .name = "r0", .reg = LA64_REGISTER_R0 },
     { .name = "r1", .reg = LA64_REGISTER_R1 },
     { .name = "r2", .reg = LA64_REGISTER_R2 },
@@ -60,6 +62,14 @@ register_entry_t register_table[] = {
     { .name = "cr7", .reg = LA64_REGISTER_CR7 },
     { .name = "cr8", .reg = LA64_REGISTER_CR8 },
     { .name = "cr9", .reg = LA64_REGISTER_CR9 },
+
+    /* register nicknames */
+    { .name = "r17",  .reg = LA64_REGISTER_RR },
+    { .name = "crel", .reg = LA64_REGISTER_CR0 },
+    { .name = "crksp", .reg = LA64_REGISTER_CR1 },
+    { .name = "crexc", .reg = LA64_REGISTER_CR2 },
+    { .name = "crvec", .reg = LA64_REGISTER_CR3 },
+    { .name = "crptb", .reg = LA64_REGISTER_CR4 },
 };
 
 register_entry_t *register_from_string(const char *name)

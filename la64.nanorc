@@ -18,7 +18,7 @@ color magenta "\.(data|bss)\b"
 color brightmagenta "%[A-Za-z_][A-Za-z0-9_]*%"
 
 # REGISTERS
-color cyan "\b(r([0-9]|1[0-9]|2[0-6])|cr([0-9]|[12][0-9]|3[01])|rr|pc|sp|fp|cf)\b"
+color cyan "\b(r([0-9]|1[0-7])|cr([0-9]|[12][0-9]|3[01])|rr|pc|sp|fp|cf|cr(el|ksp|exc|vec|ptb))\b"
 
 # CONSTANTS
 color brightyellow "\b[A-Z][A-Z0-9_]+\b"
