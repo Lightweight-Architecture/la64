@@ -24,7 +24,10 @@
 
 #include <la64vm/instruction/instruction.h>
 #include <la64vm/instruction/alu.h>
+
+#if defined(__x86_64__)
 #include <immintrin.h>
+#endif /* __x86_64__ */
 
 #define DEFINE_LA64_ARITHMETIC_OP(act)                                                              \
     if(core->op.param_cnt == 2)                                                                     \
@@ -206,7 +209,9 @@ void la64_op_rol(la64_core_t *core)
     *core->op.param[0] = (v << n) | (v >> (64 - n));
 }
 
+#if defined(__x86_64__)
 __attribute__((target("bmi2")))
+#endif /*__x86_64__  */
 void la64_op_pdep(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
@@ -227,12 +232,14 @@ void la64_op_pdep(la64_core_t *core)
         mask = *core->op.param[2];
     }
 
+#if defined(__x86_64__)
     if(__builtin_cpu_supports("bmi2"))
     {
         *dest = _pdep_u64(src, mask);
     }
     else
     {
+#endif /*__x86_64__  */
         uint64_t result = 0;
         uint64_t src_bit = 0;
 
@@ -249,10 +256,14 @@ void la64_op_pdep(la64_core_t *core)
         }
 
         *dest = result;
+#if defined(__x86_64__)
     }
+#endif /*__x86_64__  */
 }
 
+#if defined(__x86_64__)
 __attribute__((target("bmi2")))
+#endif /*__x86_64__  */
 void la64_op_pext(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
@@ -273,12 +284,14 @@ void la64_op_pext(la64_core_t *core)
         mask = *core->op.param[2];
     }
 
+#if defined(__x86_64__)
     if(__builtin_cpu_supports("bmi2"))
     {
         *dest = _pext_u64(src, mask);
     }
     else
     {
+#endif /*__x86_64__  */
         uint64_t result = 0;
         uint64_t dest_bit = 0;
 
@@ -295,7 +308,10 @@ void la64_op_pext(la64_core_t *core)
         }
 
         *dest = result;
+
+#if defined(__x86_64__)
     }
+#endif /*__x86_64__  */
 }
 
 void la64_op_bswapw(la64_core_t *core)
