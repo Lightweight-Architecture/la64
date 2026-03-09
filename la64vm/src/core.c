@@ -343,7 +343,6 @@ skip_execution:
         /* tick the timer always */
     tick_timer:
         {
-            extern uint64_t la64_get_host_cycles(void);
             la64_timer_tick(core->machine->timer, la64_get_host_cycles());
         }
     }
