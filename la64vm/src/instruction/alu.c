@@ -24,6 +24,7 @@
 
 #include <la64vm/instruction/instruction.h>
 #include <la64vm/instruction/alu.h>
+#include <immintrin.h>
 
 #define DEFINE_LA64_ARITHMETIC_OP(act)                                                              \
     if(core->op.param_cnt == 2)                                                                     \
@@ -205,6 +206,7 @@ void la64_op_rol(la64_core_t *core)
     *core->op.param[0] = (v << n) | (v >> (64 - n));
 }
 
+__attribute__((target("bmi2")))
 void la64_op_pdep(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
@@ -225,28 +227,32 @@ void la64_op_pdep(la64_core_t *core)
         mask = *core->op.param[2];
     }
 
-#ifdef __BMI2__
-    *dest = _pdep_u64(src, mask);
-#else
-    uint64_t result = 0;
-    uint64_t src_bit = 0;
-
-    for(int i = 0; i < 64; i++)
+    if(__builtin_cpu_supports("bmi2"))
     {
-        if(mask & (1ULL << i))
-        {
-            if(src & (1ULL << src_bit))
-            {
-                result |= (1ULL << i);
-            }
-            src_bit++;
-        }
+        *dest = _pdep_u64(src, mask);
     }
+    else
+    {
+        uint64_t result = 0;
+        uint64_t src_bit = 0;
 
-    *dest = result;
-#endif
+        for(int i = 0; i < 64; i++)
+        {
+            if(mask & (1ULL << i))
+            {
+                if(src & (1ULL << src_bit))
+                {
+                    result |= (1ULL << i);
+                }
+                src_bit++;
+            }
+        }
+
+        *dest = result;
+    }
 }
 
+__attribute__((target("bmi2")))
 void la64_op_pext(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
@@ -267,45 +273,45 @@ void la64_op_pext(la64_core_t *core)
         mask = *core->op.param[2];
     }
 
-#ifdef __BMI2__
-    *dest = _pext_u64(src, mask);
-#else
-    uint64_t result = 0;
-    uint64_t dest_bit = 0;
-
-    for(int i = 0; i < 64; i++)
+    if(__builtin_cpu_supports("bmi2"))
     {
-        if(mask & (1ULL << i))
-        {
-            if(src & (1ULL << i))
-            {
-                result |= (1ULL << dest_bit);
-            }
-            dest_bit++;
-        }
+        *dest = _pext_u64(src, mask);
     }
+    else
+    {
+        uint64_t result = 0;
+        uint64_t dest_bit = 0;
 
-    *dest = result;
-#endif
+        for(int i = 0; i < 64; i++)
+        {
+            if(mask & (1ULL << i))
+            {
+                if(src & (1ULL << i))
+                {
+                    result |= (1ULL << dest_bit);
+                }
+                dest_bit++;
+            }
+        }
+
+        *dest = result;
+    }
 }
 
 void la64_op_bswapw(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 1);
-    uint64_t v = *core->op.param[0];
-    *core->op.param[0] = __builtin_bswap16((uint16_t)v);
+    *core->op.param[0] = __builtin_bswap16((uint16_t)*core->op.param[0]);
 }
 
 void la64_op_bswapd(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 1);
-    uint64_t v = *core->op.param[0];
-    *core->op.param[0] = __builtin_bswap32((uint32_t)v);
+    *core->op.param[0] = __builtin_bswap32((uint32_t)*core->op.param[0]);
 }
 
 void la64_op_bswapq(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 1);
-    uint64_t v = *core->op.param[0];
-    *core->op.param[0] = __builtin_bswap64(v);
+    *core->op.param[0] = __builtin_bswap64(*core->op.param[0]);
 }
