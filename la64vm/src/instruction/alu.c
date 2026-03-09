@@ -89,42 +89,42 @@
 
 void la64_op_add(la64_core_t *core)
 {
-    la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
+    la64_instr_termcond((unsigned)(core->op.param_cnt - 2) > 1);
 
     DEFINE_LA64_ARITHMETIC_OP(+);
 }
 
 void la64_op_sub(la64_core_t *core)
 {
-    la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
+    la64_instr_termcond((unsigned)(core->op.param_cnt - 2) > 1);
 
     DEFINE_LA64_ARITHMETIC_OP(-);
 }
 
 void la64_op_mul(la64_core_t *core)
 {
-    la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
+    la64_instr_termcond((unsigned)(core->op.param_cnt - 2) > 1);
 
     DEFINE_LA64_ARITHMETIC_OP(*);
 }
 
 void la64_op_div(la64_core_t *core)
 {
-    la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
+    la64_instr_termcond((unsigned)(core->op.param_cnt - 2) > 1);
 
     DEFINE_LA64_ARITHMETIC_OP_ZERO_BAD(/);
 }
 
 void la64_op_idiv(la64_core_t *core)
 {
-    la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
+    la64_instr_termcond((unsigned)(core->op.param_cnt - 2) > 1);
 
     DEFINE_LA64_SIGNED_ARITHMETIC_OP_ZERO_BAD(/);
 }
 
 void la64_op_mod(la64_core_t *core)
 {
-    la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
+    la64_instr_termcond((unsigned)(core->op.param_cnt - 2) > 1);
 
     DEFINE_LA64_ARITHMETIC_OP_ZERO_BAD(%);
 }
@@ -151,42 +151,42 @@ void la64_op_neg(la64_core_t *core)
 
 void la64_op_and(la64_core_t *core)
 {
-    la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
+    la64_instr_termcond((unsigned)(core->op.param_cnt - 2) > 1);
 
     DEFINE_LA64_ARITHMETIC_OP(&);
 }
 
 void la64_op_or(la64_core_t *core)
 {
-    la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
+    la64_instr_termcond((unsigned)(core->op.param_cnt - 2) > 1);
 
     DEFINE_LA64_ARITHMETIC_OP(|);
 }
 
 void la64_op_xor(la64_core_t *core)
 {
-    la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
+    la64_instr_termcond((unsigned)(core->op.param_cnt - 2) > 1);
 
     DEFINE_LA64_ARITHMETIC_OP(^);
 }
 
 void la64_op_shr(la64_core_t *core)
 {
-    la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
+    la64_instr_termcond((unsigned)(core->op.param_cnt - 2) > 1);
 
     DEFINE_LA64_ARITHMETIC_OP(>>);
 }
 
 void la64_op_shl(la64_core_t *core)
 {
-    la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
+    la64_instr_termcond((unsigned)(core->op.param_cnt - 2) > 1);
 
     DEFINE_LA64_ARITHMETIC_OP(<<);
 }
 
 void la64_op_sar(la64_core_t *core)
 {
-    la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
+    la64_instr_termcond((unsigned)(core->op.param_cnt - 2) > 1);
 
     DEFINE_LA64_SIGNED_ARITHMETIC_OP(>>);
 }
@@ -214,7 +214,7 @@ __attribute__((target("bmi2")))
 #endif /*__x86_64__  */
 void la64_op_pdep(la64_core_t *core)
 {
-    la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
+    la64_instr_termcond((unsigned)(core->op.param_cnt - 2) > 1);
 
     uint64_t *dest = core->op.param[0];
     uint64_t src = *core->op.param[core->op.param_cnt - 2];
@@ -255,7 +255,7 @@ __attribute__((target("bmi2")))
 #endif /*__x86_64__  */
 void la64_op_pext(la64_core_t *core)
 {
-    la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
+    la64_instr_termcond((unsigned)(core->op.param_cnt - 2) > 1);
 
     uint64_t *dest = core->op.param[0];
     uint64_t src = *core->op.param[core->op.param_cnt - 2];
