@@ -241,20 +241,21 @@ void la64_op_pdep(la64_core_t *core)
     {
 #endif /*__x86_64__  */
         uint64_t result = 0;
-        uint64_t src_bit = 0;
+        uint64_t bit = 1;
 
-        for(int i = 0; i < 64; i++)
+        while(mask)
         {
-            if(mask & (1ULL << i))
-            {
-                if(src & (1ULL << src_bit))
-                {
-                    result |= (1ULL << i);
-                }
-                src_bit++;
-            }
-        }
+            uint64_t lowest = mask & -mask;
 
+            if(src & bit)
+            {
+                result |= lowest;
+            }
+
+            mask ^= lowest;
+            bit <<= 1;
+        }
+        
         *dest = result;
 #if defined(__x86_64__)
     }
@@ -293,22 +294,22 @@ void la64_op_pext(la64_core_t *core)
     {
 #endif /*__x86_64__  */
         uint64_t result = 0;
-        uint64_t dest_bit = 0;
+        uint64_t bit = 1;
 
-        for(int i = 0; i < 64; i++)
+        while(mask)
         {
-            if(mask & (1ULL << i))
+            uint64_t lowest = mask & -mask;
+
+            if(src & lowest)
             {
-                if(src & (1ULL << i))
-                {
-                    result |= (1ULL << dest_bit);
-                }
-                dest_bit++;
+                result |= bit;
             }
+
+            mask ^= lowest;
+            bit <<= 1;
         }
 
         *dest = result;
-
 #if defined(__x86_64__)
     }
 #endif /*__x86_64__  */
