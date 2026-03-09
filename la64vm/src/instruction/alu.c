@@ -216,21 +216,9 @@ void la64_op_pdep(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
 
-    uint64_t src, mask;
-    uint64_t *dest;
-
-    if(core->op.param_cnt == 2)
-    {
-        dest = core->op.param[0];
-        src = *core->op.param[0];
-        mask = *core->op.param[1];
-    }
-    else
-    {
-        dest = core->op.param[0];
-        src = *core->op.param[1];
-        mask = *core->op.param[2];
-    }
+    uint64_t *dest = core->op.param[0];
+    uint64_t src = *core->op.param[core->op.param_cnt - 2];
+    uint64_t mask = *core->op.param[core->op.param_cnt - 1];
 
 #if defined(__x86_64__)
     if(__builtin_cpu_supports("bmi2"))
@@ -269,21 +257,9 @@ void la64_op_pext(la64_core_t *core)
 {
     la64_instr_termcond(core->op.param_cnt != 2 && core->op.param_cnt != 3);
 
-    uint64_t src, mask;
-    uint64_t *dest;
-
-    if(core->op.param_cnt == 2)
-    {
-        dest = core->op.param[0];
-        src = *core->op.param[0];
-        mask = *core->op.param[1];
-    }
-    else
-    {
-        dest = core->op.param[0];
-        src = *core->op.param[1];
-        mask = *core->op.param[2];
-    }
+    uint64_t *dest = core->op.param[0];
+    uint64_t src = *core->op.param[core->op.param_cnt - 2];
+    uint64_t mask = *core->op.param[core->op.param_cnt - 1];
 
 #if defined(__x86_64__)
     if(__builtin_cpu_supports("bmi2"))
