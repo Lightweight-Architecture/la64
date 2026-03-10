@@ -32,9 +32,14 @@
 #include <la64asm/code.h>
 #include <la64asm/diag.h>
 
+static inline unsigned long align_up(unsigned long v, unsigned long a)
+{
+    return (v + a - 1) & ~(a - 1);
+}
+
 void code_token_section(compiler_invocation_t *ci)
 {
-    /* iterating for section token type */
+    /* iterating for section token type and creating data section */
     for(unsigned long i = 0; i < ci->line_cnt; i++)
     {
         if(ci->line[i].type == COMPILER_LINE_TYPE_SECTION)
@@ -135,7 +140,17 @@ void code_token_section(compiler_invocation_t *ci)
                 }
                 i--;
             }
-            else if(strcmp(ci->line[i].token[1].str, ".bss") == 0)
+        }
+    }
+
+    ci->image_addr = align_up(ci->image_addr, 0x2000);
+
+    /* iterating for section token type and creating bss section */
+    for(unsigned long i = 0; i < ci->line_cnt; i++)
+    {
+        if(ci->line[i].type == COMPILER_LINE_TYPE_SECTION)
+        {
+            if(strcmp(ci->line[i].token[1].str, ".bss") == 0)
             {
                 /* finding variable type */
                 i++;
@@ -186,4 +201,6 @@ void code_token_section(compiler_invocation_t *ci)
             }
         }
     }
+
+    ci->image_addr = align_up(ci->image_addr, 0x2000);
 }
