@@ -38,37 +38,59 @@ int main(int argc, char *argv[])
 {
     int opt;
     const char *output_path = NULL;
+    int file_count = 0;
+    char **files = calloc(argc, sizeof(char *));
 
     /* invocation settings */
     bool page_align = true;
 
-    /* parse options */
-    while((opt = getopt(argc, argv, "o:f:")) != -1)
+    /* parse arguments */
+    for(int i = 1; i < argc; i++)
     {
-        switch (opt)
+        if(strcmp(argv[i], "-o") == 0 && i + 1 < argc)
         {
-            case 'o':
-                output_path = optarg;
-                break;
-            case 'f':
-                if(strcmp(optarg, "page_align") == 0)
-                {
-                    page_align = true;
-                }
-                else if(strcmp(optarg, "no_page_align") == 0)
-                {
-                    page_align = false;
-                }
-                else
-                {
-                    diag_error(NULL, "unknown feature flag '%s'\n", optarg);
-                }
-                break;
-            default:
-                break;
+            output_path = argv[++i];
+        }
+        else if(strncmp(argv[i], "-f", 2) == 0)
+        {
+            const char *flag;
+            if(argv[i][2] != '\0')
+            {
+                flag = argv[i] + 2;
+            }
+            else if(i + 1 < argc)
+            {
+                flag = argv[++i];
+            }
+            else
+            {
+                diag_error(NULL, "missing argument to '-f'\n");
+            }
+
+            if(strcmp(flag, "page_align") == 0)
+            {
+                page_align = true;
+            }
+            else if(strcmp(flag, "no_page_align") == 0)
+            {
+                page_align = false;
+            }
+            else
+            {
+                diag_error(NULL, "unknown feature flag '%s'\n", flag);
+            }
+        }
+        else if(argv[i][0] != '-')
+        {
+            files[file_count++] = strdup(argv[i]);
+        }
+        else
+        {
+            diag_error(NULL, "unknown option '%s'\n", argv[i]);
         }
     }
 
+    /* checking for output path */
     if(!output_path)
     {
         diag_warn(NULL, "no output binary specified, falling back to a.out\n");
@@ -85,53 +107,10 @@ int main(int argc, char *argv[])
 
     ci->page_align = page_align;
 
-    /* parse options */
-    while((opt = getopt(argc, argv, "o:f:")) != -1)
-    {
-        switch (opt)
-        {
-            case 'f':
-                if(strcmp(optarg, "page_align") == 0)
-                {
-                    ci->page_align = true;
-                }
-                else if(strcmp(optarg, "no_page_align") == 0)
-                {
-                    ci->page_align = false;
-                }
-                else
-                {
-                    diag_error(NULL, "unknown feature flag '%s'\n", optarg);
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
     /* remaining arguments are input files */
-    int file_count = argc - optind;
     if(file_count <= 0)
     {
         diag_error(NULL, "no input files provided\n");
-    }
-
-    /* handling input files */
-    char **files = calloc(file_count, sizeof(char *));
-    if(!files)
-    {
-        diag_error(NULL, "fatal\n");
-    }
-
-    /* copying their paths over */
-    for(int i = 0; i < file_count; i++)
-    {
-        files[i] = strdup(argv[optind + i]);
-        if(!files[i])
-        {
-            diag_error(NULL, "fatal\n");
-            return 1;
-        }
     }
 
     /* generating tokens,labels,sections out of the code */
