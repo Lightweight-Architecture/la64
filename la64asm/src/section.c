@@ -143,7 +143,10 @@ void code_token_section(compiler_invocation_t *ci)
         }
     }
 
-    ci->image_addr = align_up(ci->image_addr, 0x2000);
+    if(ci->page_align)
+    {
+        ci->image_addr = align_up(ci->image_addr, 0x2000);
+    }
 
     /* iterating for section token type and creating bss section */
     for(unsigned long i = 0; i < ci->line_cnt; i++)
@@ -202,5 +205,8 @@ void code_token_section(compiler_invocation_t *ci)
         }
     }
 
-    ci->image_addr = align_up(ci->image_addr, 0x2000);
+    if(ci->page_align)
+    {
+        ci->image_addr = align_up(ci->image_addr, 0x2000);
+    }
 }

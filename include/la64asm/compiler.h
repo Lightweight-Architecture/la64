@@ -27,6 +27,7 @@
 
 #include <la64asm/type.h>
 
-void compile_files(const char **files, int file_cnt, const char *output);
+compiler_invocation_t *compiler_invocation_alloc(void);
+void compiler_invocation_dealloc(compiler_invocation_t *ci);
 
 #endif /* COMPILER_COMPILER_H */

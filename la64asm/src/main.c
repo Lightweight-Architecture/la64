@@ -27,20 +27,42 @@
 #include <string.h>
 #include <unistd.h>
 #include <la64asm/compiler.h>
+#include <la64asm/code.h>
+#include <la64asm/label.h>
+#include <la64asm/emit.h>
+#include <la64asm/section.h>
+#include <la64asm/macro.h>
 #include <la64asm/diag.h>
 
 int main(int argc, char *argv[])
 {
+    /* allocating compiler invocation */
+    compiler_invocation_t *ci = compiler_invocation_alloc();
+    
     int opt;
     const char *output_path = NULL;
 
     /* parse options */
-    while((opt = getopt(argc, argv, "o:")) != -1)
+    while((opt = getopt(argc, argv, "o:f:")) != -1)
     {
         switch (opt)
         {
             case 'o':
                 output_path = optarg;
+                break;
+            case 'f':
+                if(strcmp(optarg, "page_align") == 0)
+                {
+                    ci->page_align = true;
+                }
+                else if(strcmp(optarg, "no_page_align") == 0)
+                {
+                    ci->page_align = false;
+                }
+                else
+                {
+                    diag_error(NULL, "unknown feature flag '%s'\n", optarg);
+                }
                 break;
             default:
                 break;
@@ -78,8 +100,25 @@ int main(int argc, char *argv[])
         }
     }
 
-    /* compile */
-    compile_files((const char **)files, file_count, output_path);
+     /* generating tokens,labels,sections out of the code */
+    code_tokengen(ci, (const char **)files, file_count);
+
+    /* doing parsing acrobatic */
+    code_token_label(ci);
+    code_token_section(ci);
+    code_token_macro(ci);
+
+    /* finally compiling it to machine code */
+    la64_compiler_emit_all(ci);
+
+    /* insert entry */
+    code_token_label_insert_start(ci);
+
+    /* spitting out binary */
+    code_binary_spitout(ci, output_path);
+
+    /* its oneshot */
+    /* compiler_invocation_dealloc(ci); */
 
     /* cleanup */
     for(int i = 0; i < file_count; i++)

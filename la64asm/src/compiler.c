@@ -34,37 +34,23 @@
 
 compiler_invocation_t *compiler_invocation_alloc(void)
 {
-    compiler_invocation_t *ci = calloc(1, sizeof(compiler_invocation_t));
-    ci->image_addr = 8;
+    compiler_invocation_t *ci = malloc(sizeof(compiler_invocation_t));
+
+    if(ci == NULL)
+    {
+        return NULL;
+    }
+
+    /* zero out invocation */
+    bzero(ci, sizeof(compiler_invocation_t));
+
+    ci->image_addr = 8;     /* leaving space for the start entry */
+    ci->page_align = true;  /* default value */
+    
     return ci;
 }
 
 void compiler_invocation_dealloc(compiler_invocation_t *ci)
 {
     /* todo: this must be redone from scratch */
-}
-
-void compile_files(const char **files,
-                   int file_cnt,
-                   const char *output)
-{
-    /* allocating compiler invocation */
-    compiler_invocation_t *ci = compiler_invocation_alloc();
-
-    /* generating tokens,labels,sections out of the code */
-    code_tokengen(ci, files, file_cnt);
-
-    /* allocate space for the low level compiler to put resolved addresses at */
-    code_token_label(ci);
-    code_token_section(ci);
-    code_token_macro(ci);
-
-    /* finally compiling it to machine code */
-    la64_compiler_emit_all(ci);
-
-    /* insert entry */
-    code_token_label_insert_start(ci);
-
-    /* spitting out binary */
-    code_binary_spitout(ci, output);
 }

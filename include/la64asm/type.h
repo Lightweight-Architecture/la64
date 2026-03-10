@@ -27,6 +27,7 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include <lautils/bitwalker.h>
 
@@ -90,6 +91,9 @@ typedef struct compiler_invocation {
     reloc_table_entry_t *rtbe;              /* relocation table root entry */
     uint8_t image[0xFFFFFF];                /* replace with better technique that is more incremental */
     uint64_t image_addr;                    /* current address */
+
+    /* options */
+    bool page_align;                        /* default: true */
 } compiler_invocation_t;
 
 #endif /* COMPILER_TYPE_H */
