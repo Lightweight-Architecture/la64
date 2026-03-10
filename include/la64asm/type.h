@@ -90,12 +90,11 @@ typedef struct compiler_invocation {
     compiler_label_t *label;                /* label array */
     uint64_t label_cnt;                     /* count of labels */
     reloc_table_entry_t *rtbe;              /* relocation table root entry */
-    //uint8_t image[0xFFFFFF];                /* replace with better technique that is more incremental */
-    //uint64_t image_addr;                    /* current address */
     fdwalker_t *fdwalker;
 
     /* options */
     bool page_align;                        /* default: true */
+    const char *start_entry_name;           /* default: _start */
 } compiler_invocation_t;
 
 #endif /* LA64ASM_TYPE_H */

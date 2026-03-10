@@ -133,11 +133,11 @@ uint64_t label_lookup(compiler_invocation_t *ci,
 void code_token_label_insert_start(compiler_invocation_t *ci)
 {
     /* finding start label */
-    uint64_t addr = label_lookup(ci, "_start");
+    uint64_t addr = label_lookup(ci, ci->start_entry_name);
 
     if(addr == COMPILER_LABEL_NOT_FOUND)
     {
-        diag_error(NULL, "\"_start\" label not found, cannot produce boot image\n");
+        diag_error(NULL, "\"%s\" label not found, cannot produce boot image\n", ci->start_entry_name);
     }
 
     /* writing start address into the start of the image */

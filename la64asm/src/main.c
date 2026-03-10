@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
     const char *output_path = NULL;
     int file_count = 0;
     char **files = calloc(argc, sizeof(char *));
+    const char *start_entry_name = "_start";
 
     /* invocation settings */
     bool page_align = true;
@@ -80,6 +81,24 @@ int main(int argc, char *argv[])
                 diag_error(NULL, "unknown feature flag '%s'\n", flag);
             }
         }
+        else if(strncmp(argv[i], "-e", 2) == 0)
+        {
+            const char *flag;
+            if(argv[i][2] != '\0')
+            {
+                flag = argv[i] + 2;
+            }
+            else if(i + 1 < argc)
+            {
+                flag = argv[++i];
+            }
+            else
+            {
+                diag_error(NULL, "missing argument to '-e'\n");
+            }
+
+            start_entry_name = flag;
+        }
         else if(argv[i][0] != '-')
         {
             files[file_count++] = strdup(argv[i]);
@@ -106,6 +125,7 @@ int main(int argc, char *argv[])
     }
 
     ci->page_align = page_align;
+    ci->start_entry_name = start_entry_name;
 
     /* remaining arguments are input files */
     if(file_count <= 0)
