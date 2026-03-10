@@ -31,20 +31,42 @@
 #include <la64asm/section.h>
 #include <la64asm/macro.h>
 #include <la64asm/diag.h>
+#include <fcntl.h>
+#include <unistd.h>
 
-compiler_invocation_t *compiler_invocation_alloc(void)
+compiler_invocation_t *compiler_invocation_alloc(const char *output_path)
 {
+    /* open file */
+    int fd = open(output_path, O_RDWR | O_CREAT | O_TRUNC, 0777);
+
+    if(fd < 0)
+    {
+        return NULL;
+    }
+
     compiler_invocation_t *ci = malloc(sizeof(compiler_invocation_t));
 
     if(ci == NULL)
     {
+        close(fd);
         return NULL;
     }
 
     /* zero out invocation */
     bzero(ci, sizeof(compiler_invocation_t));
 
-    ci->image_addr = 8;     /* leaving space for the start entry */
+    ci->fdwalker = malloc(sizeof(fdwalker_t));
+
+    if(ci->fdwalker == NULL)
+    {
+        free(ci);
+        close(fd);
+        return NULL;
+    }
+
+    fdwalker_init(ci->fdwalker, fd, BW_LITTLE_ENDIAN);
+    fdwalker_seek(ci->fdwalker, 8, 0);
+
     ci->page_align = true;  /* default value */
     
     return ci;

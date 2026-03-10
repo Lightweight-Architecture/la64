@@ -27,7 +27,7 @@
 
 #include <la64asm/type.h>
 
-compiler_invocation_t *compiler_invocation_alloc(void);
+compiler_invocation_t *compiler_invocation_alloc(const char *output_path);
 void compiler_invocation_dealloc(compiler_invocation_t *ci);
 
 #endif /* LA64ASM_COMPILER_H */

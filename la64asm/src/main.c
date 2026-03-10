@@ -36,11 +36,11 @@
 
 int main(int argc, char *argv[])
 {
-    /* allocating compiler invocation */
-    compiler_invocation_t *ci = compiler_invocation_alloc();
-    
     int opt;
     const char *output_path = NULL;
+
+    /* invocation settings */
+    bool page_align = true;
 
     /* parse options */
     while((opt = getopt(argc, argv, "o:f:")) != -1)
@@ -50,6 +50,46 @@ int main(int argc, char *argv[])
             case 'o':
                 output_path = optarg;
                 break;
+            case 'f':
+                if(strcmp(optarg, "page_align") == 0)
+                {
+                    page_align = true;
+                }
+                else if(strcmp(optarg, "no_page_align") == 0)
+                {
+                    page_align = false;
+                }
+                else
+                {
+                    diag_error(NULL, "unknown feature flag '%s'\n", optarg);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    if(!output_path)
+    {
+        diag_warn(NULL, "no output binary specified, falling back to a.out\n");
+        output_path = "a.out";
+    }
+
+    /* allocating compiler invocation */
+    compiler_invocation_t *ci = compiler_invocation_alloc(output_path);
+
+    if(ci == NULL)
+    {
+        diag_error(NULL, "something went terribly wrong\n");
+    }
+
+    ci->page_align = page_align;
+
+    /* parse options */
+    while((opt = getopt(argc, argv, "o:f:")) != -1)
+    {
+        switch (opt)
+        {
             case 'f':
                 if(strcmp(optarg, "page_align") == 0)
                 {
@@ -67,12 +107,6 @@ int main(int argc, char *argv[])
             default:
                 break;
         }
-    }
-
-    if(!output_path)
-    {
-        diag_warn(NULL, "no output binary specified, falling back to a.out\n");
-        output_path = "a.out";
     }
 
     /* remaining arguments are input files */
@@ -100,7 +134,7 @@ int main(int argc, char *argv[])
         }
     }
 
-     /* generating tokens,labels,sections out of the code */
+    /* generating tokens,labels,sections out of the code */
     code_tokengen(ci, (const char **)files, file_count);
 
     /* doing parsing acrobatic */
@@ -113,9 +147,6 @@ int main(int argc, char *argv[])
 
     /* insert entry */
     code_token_label_insert_start(ci);
-
-    /* spitting out binary */
-    code_binary_spitout(ci, output_path);
 
     /* its oneshot */
     /* compiler_invocation_dealloc(ci); */

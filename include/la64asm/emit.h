@@ -32,27 +32,29 @@
 #include <la64asm/opcode.h>
 #include <stdbool.h>
 
+#include <lautils/fdwalker.h>
+
 /* opcode emit */
-void la64_compiler_emit_opcode(bitwalker_t *bw, uint8_t op);
+void la64_compiler_emit_opcode(fdwalker_t *fw, uint8_t op);
 
 /* register emit */
-void la64_compiler_emit_reg(bitwalker_t *bw, uint8_t reg);
+void la64_compiler_emit_reg(fdwalker_t *fw, uint8_t reg);
 
 /* intermediate emit */
-void la64_compiler_emit_imm8(bitwalker_t *bw, uint8_t imm);
-void la64_compiler_emit_imm16(bitwalker_t *bw, uint16_t imm);
-void la64_compiler_emit_imm32(bitwalker_t *bw, uint32_t imm);
-void la64_compiler_emit_imm64(bitwalker_t *bw, uint64_t imm);
-void la64_compiler_emit_imm(bitwalker_t *bw, uint64_t imm);
+void la64_compiler_emit_imm8(fdwalker_t *fw, uint8_t imm);
+void la64_compiler_emit_imm16(fdwalker_t *fw, uint16_t imm);
+void la64_compiler_emit_imm32(fdwalker_t *fw, uint32_t imm);
+void la64_compiler_emit_imm64(fdwalker_t *fw, uint64_t imm);
+void la64_compiler_emit_imm(fdwalker_t *fw, uint64_t imm);
 
 /* end emitter */
-void la64_compiler_emit_end(bitwalker_t *bw);
+void la64_compiler_emit_end(fdwalker_t *fw);
 
 /* instruction emitter */
-bool la64_compiler_emit_instr_inc(const opcode_entry_t *opce, compiler_line_t *cl, bitwalker_t *bw);
-bool la64_compiler_emit_instr_dec(const opcode_entry_t *opce, compiler_line_t *cl, bitwalker_t *bw);
-bool la64_compiler_emit_instr_clr(const opcode_entry_t *opce, compiler_line_t *cl, bitwalker_t *bw);
-bool la64_compiler_emit_instr_default(const opcode_entry_t *opce, compiler_line_t *cl, bitwalker_t *bw);
+bool la64_compiler_emit_instr_inc(const opcode_entry_t *opce, compiler_line_t *cl);
+bool la64_compiler_emit_instr_dec(const opcode_entry_t *opce, compiler_line_t *cl);
+bool la64_compiler_emit_instr_clr(const opcode_entry_t *opce, compiler_line_t *cl);
+bool la64_compiler_emit_instr_default(const opcode_entry_t *opce, compiler_line_t *cl);
 
 /* automised code emitting */
 bool la64_compiler_emit(compiler_line_t *cl);

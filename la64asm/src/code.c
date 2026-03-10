@@ -233,25 +233,3 @@ void code_tokengen(compiler_invocation_t *ci,
         munmap(ci->file[i].code, ci->file[i].len);
     }
 }
-
-void code_binary_spitout(compiler_invocation_t *ci,
-                         const char *output)
-{
-    /* handling output null */
-    output = (output == NULL) ? "a.out" : output;
-
-    /* open output file */
-    int fd = open(output, O_WRONLY | O_CREAT | O_TRUNC, 0666);
-
-    /* handling failure to open file */
-    if(fd < 0)
-    {
-        diag_error(NULL, "couldnt open output file %s\n", output);
-    }
-
-    /* writing output file */
-    write(fd, ci->image, ci->image_addr);
-
-    /* closing file descriptor */
-    close(fd);
-}

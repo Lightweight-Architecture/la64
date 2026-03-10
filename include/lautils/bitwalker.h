@@ -42,27 +42,21 @@ typedef struct {
     bw_endian_t endian;
 } bitwalker_t;
 
-/* helper */
-
 bw_endian_t bw_host_endian(void);
 uint64_t bw_swap_n(uint64_t v, uint8_t num_bytes);
-
-/* initiliazation */
 
 void bitwalker_init(bitwalker_t *bw, uint8_t *buf, size_t capacity, bw_endian_t endian);
 void bitwalker_init_read(bitwalker_t *bw, const uint8_t *buf, size_t len, bw_endian_t endian);
 
-/* management */
-
 void bitwalker_reset(bitwalker_t *bw);
-
-/* read and write */
 
 int bitwalker_write(bitwalker_t *bw, uint64_t value, uint8_t num_bits);
 uint64_t bitwalker_read(bitwalker_t *bw, uint8_t num_bits);
-uint64_t bitwalker_peek(bitwalker_t *bw, uint8_t num_bits);
+
 void bitwalker_skip(bitwalker_t *bw, size_t num_bits);
+
 size_t bitwalker_bytes_used(const bitwalker_t *bw);
+
 void bitwalker_align_byte(bitwalker_t *bw);
 
 #endif /* BITWALKER_H */

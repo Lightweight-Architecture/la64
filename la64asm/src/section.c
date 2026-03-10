@@ -58,7 +58,7 @@ void code_token_section(compiler_invocation_t *ci)
 
                     /* inserting address as label */
                     ci->label[ci->label_cnt].name = strdup(ci->line[i].token[0].str);
-                    ci->label[ci->label_cnt++].addr = ci->image_addr;
+                    ci->label[ci->label_cnt++].addr = fdwalker_bytes_used(ci->fdwalker);
 
                     /* checking if its known */
                     int dbs = 8;
@@ -90,11 +90,7 @@ void code_token_section(compiler_invocation_t *ci)
                         {
                             /* its a buffer so we copy the buffer into section */
                             char *buffer = (char*)pr.value;
-                            for(unsigned short j = 0; j < pr.len; j++)
-                            {
-                                ci->image[ci->image_addr + j] = (unsigned char)buffer[j];
-                            }
-                            ci->image_addr += pr.len;
+                            fdwalker_write_buf(ci->fdwalker, buffer, pr.len);
                         }
                         else if(pr.type == laParserValueTypeString)
                         {
@@ -124,17 +120,16 @@ void code_token_section(compiler_invocation_t *ci)
 
                             rtbe->name = strdup(ci->line[i].token[a].str);
                             rtbe->ctlink = &(ci->line[i].token[a]);
-                            bitwalker_init(&(rtbe->bw), &(ci->image[ci->image_addr]), 8, BW_LITTLE_ENDIAN);
-                            ci->image_addr += 8;
+                            rtbe->byte_pos = ci->fdwalker->byte_pos;
+                            rtbe->bit_idx = ci->fdwalker->bit_idx;
+                            fdwalker_skip(ci->fdwalker, 64);
                         }
                         else
                         {
                             bitwalker_t bw;
 
                             /* storing value */
-                            bitwalker_init(&bw, &(ci->image[ci->image_addr]), dbs / 8, BW_LITTLE_ENDIAN);
-                            bitwalker_write(&bw, pr.value, dbs);
-                            ci->image_addr += bitwalker_bytes_used(&bw);
+                            fdwalker_write(ci->fdwalker, pr.value, dbs);
                         }
                     }
                 }
@@ -145,7 +140,8 @@ void code_token_section(compiler_invocation_t *ci)
 
     if(ci->page_align)
     {
-        ci->image_addr = align_up(ci->image_addr, 0x2000);
+        ci->fdwalker->byte_pos = align_up(ci->fdwalker->byte_pos, 0x2000);
+        ci->fdwalker->bit_idx = 0;
     }
 
     /* iterating for section token type and creating bss section */
@@ -167,7 +163,7 @@ void code_token_section(compiler_invocation_t *ci)
 
                     /* insert label into label array */
                     ci->label[ci->label_cnt].name = strdup(ci->line[i].token[0].str);
-                    ci->label[ci->label_cnt++].addr = ci->image_addr;
+                    ci->label[ci->label_cnt++].addr = fdwalker_bytes_used(ci->fdwalker);
 
                     /* find out size */
                     int dbs = 8;
@@ -198,7 +194,7 @@ void code_token_section(compiler_invocation_t *ci)
                         diag_error(&(ci->line[i].token[2]), "invalid size for .bss section entry \"%s\"\n", ci->line[i].token[2].str);
                     }
 
-                    ci->image_addr += (dbs / 8) * pr.value;
+                    ci->fdwalker->byte_pos += (dbs / 8) * pr.value;
                 }
                 i--;
             }
@@ -207,6 +203,7 @@ void code_token_section(compiler_invocation_t *ci)
 
     if(ci->page_align)
     {
-        ci->image_addr = align_up(ci->image_addr, 0x2000);
+        ci->fdwalker->byte_pos = align_up(ci->fdwalker->byte_pos, 0x2000);
+        ci->fdwalker->bit_idx = 0;
     }
 }

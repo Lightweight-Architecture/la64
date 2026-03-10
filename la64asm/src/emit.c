@@ -34,85 +34,86 @@
 #include <la64asm/register.h>
 #include <la64asm/label.h>
 
-#include <lautils/bitwalker.h>
+#include <lautils/fdwalker.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 /* opcode emit */
-void la64_compiler_emit_opcode(bitwalker_t *bw,
+void la64_compiler_emit_opcode(fdwalker_t *fw,
                                uint8_t op)
 {
-    bitwalker_write(bw, op, 8);
+    fdwalker_write(fw, op, 8);
 }
 
 /* register emit */
-void la64_compiler_emit_reg(bitwalker_t *bw,
+void la64_compiler_emit_reg(fdwalker_t *fw,
                             uint8_t reg)
 {
     assert(reg < LA64_REGISTER_MAX);
 
-    bitwalker_write(bw, LA64_PARAMETER_CODING_REG, 3);
-    bitwalker_write(bw, reg, 5);
+    fdwalker_write(fw, LA64_PARAMETER_CODING_REG, 3);
+    fdwalker_write(fw, reg, 5);
 }
 
 /* intermediate emit */
-void la64_compiler_emit_imm8(bitwalker_t *bw,
+void la64_compiler_emit_imm8(fdwalker_t *fw,
                              uint8_t imm)
 {
-    bitwalker_write(bw, LA64_PARAMETER_CODING_IMM8, 3);
-    bitwalker_write(bw, imm, 8);
+    fdwalker_write(fw, LA64_PARAMETER_CODING_IMM8, 3);
+    fdwalker_write(fw, imm, 8);
 }
 
-void la64_compiler_emit_imm16(bitwalker_t *bw,
+void la64_compiler_emit_imm16(fdwalker_t *fw,
                               uint16_t imm)
 {
-    bitwalker_write(bw, LA64_PARAMETER_CODING_IMM16, 3);
-    bitwalker_write(bw, imm, 16);
+    fdwalker_write(fw, LA64_PARAMETER_CODING_IMM16, 3);
+    fdwalker_write(fw, imm, 16);
 }
 
-void la64_compiler_emit_imm32(bitwalker_t *bw,
+void la64_compiler_emit_imm32(fdwalker_t *fw,
                               uint32_t imm)
 {
-    bitwalker_write(bw, LA64_PARAMETER_CODING_IMM32, 3);
-    bitwalker_write(bw, imm, 32);
+    fdwalker_write(fw, LA64_PARAMETER_CODING_IMM32, 3);
+    fdwalker_write(fw, imm, 32);
 }
 
-void la64_compiler_emit_imm64(bitwalker_t *bw,
+void la64_compiler_emit_imm64(fdwalker_t *fw,
                               uint64_t imm)
 {
-    bitwalker_write(bw, LA64_PARAMETER_CODING_IMM64, 3);
-    bitwalker_write(bw, imm, 64);
+    fdwalker_write(fw, LA64_PARAMETER_CODING_IMM64, 3);
+    fdwalker_write(fw, imm, 64);
 }
 
-void la64_compiler_emit_imm(bitwalker_t *bw,
+void la64_compiler_emit_imm(fdwalker_t *fw,
                             uint64_t imm)
 {
     if(imm <= 0xFF)
     {
-        la64_compiler_emit_imm8(bw, (uint8_t)imm);
+        la64_compiler_emit_imm8(fw, (uint8_t)imm);
     }
     else if(imm <= 0xFFFF)
     {
-        la64_compiler_emit_imm16(bw, (uint16_t)imm);
+        la64_compiler_emit_imm16(fw, (uint16_t)imm);
     }
     else if(imm <= 0xFFFFFFFF)
     {
-        la64_compiler_emit_imm32(bw, (uint32_t)imm);
+        la64_compiler_emit_imm32(fw, (uint32_t)imm);
     }
     else if(imm <= 0xFFFFFFFFFFFFFFFF)
     {
-        la64_compiler_emit_imm64(bw, (uint64_t)imm);
+        la64_compiler_emit_imm64(fw, (uint64_t)imm);
     }
 }
 
 /* end emitter */
-void la64_compiler_emit_end(bitwalker_t *bw)
+void la64_compiler_emit_end(fdwalker_t *fw)
 {
-    bitwalker_write(bw, LA64_PARAMETER_CODING_INSTR_END, 3);
+    fdwalker_write(fw, LA64_PARAMETER_CODING_INSTR_END, 3);
 }
 
 /* instruction emitter */
 bool la64_compiler_emit_instr_inc(opcode_entry_t *opce,
-                                  compiler_line_t *cl,
-                                  bitwalker_t *bw)
+                                  compiler_line_t *cl)
 {
     /*
      * background is this was a native instruction, but
@@ -127,7 +128,7 @@ bool la64_compiler_emit_instr_inc(opcode_entry_t *opce,
     for(uint64_t i = 1; i < cl->token_cnt; i++)
     {
         /* increment means each parameter, one opcode */
-        la64_compiler_emit_opcode(bw, LA64_OPCODE_ADD);
+        la64_compiler_emit_opcode(cl->ci->fdwalker, LA64_OPCODE_ADD);
 
         /* it must be a register */
         register_entry_t *reg = register_from_string(cl->token[i].str);
@@ -139,21 +140,17 @@ bool la64_compiler_emit_instr_inc(opcode_entry_t *opce,
         }
 
         /* emit parameters */
-        la64_compiler_emit_reg(bw, reg->reg);
-        la64_compiler_emit_imm8(bw, 1);
-        la64_compiler_emit_end(bw);
-        bitwalker_align_byte(bw);
+        la64_compiler_emit_reg(cl->ci->fdwalker, reg->reg);
+        la64_compiler_emit_imm8(cl->ci->fdwalker, 1);
+        la64_compiler_emit_end(cl->ci->fdwalker);
+        fdwalker_align_byte(cl->ci->fdwalker);
     }
-
-    /* advancing image address */
-    cl->ci->image_addr += bitwalker_bytes_used(bw);
 
     return true;
 }
 
 bool la64_compiler_emit_instr_dec(opcode_entry_t *opce,
-                                  compiler_line_t *cl,
-                                  bitwalker_t *bw)
+                                  compiler_line_t *cl)
 {
     /*
      * background is this was a native instruction, but
@@ -168,7 +165,7 @@ bool la64_compiler_emit_instr_dec(opcode_entry_t *opce,
     for(uint64_t i = 1; i < cl->token_cnt; i++)
     {
         /* increment means each parameter, one opcode */
-        la64_compiler_emit_opcode(bw, LA64_OPCODE_SUB);
+        la64_compiler_emit_opcode(cl->ci->fdwalker, LA64_OPCODE_SUB);
 
         /* it must be a register */
         register_entry_t *reg = register_from_string(cl->token[i].str);
@@ -180,21 +177,17 @@ bool la64_compiler_emit_instr_dec(opcode_entry_t *opce,
         }
 
         /* emit parameters */
-        la64_compiler_emit_reg(bw, reg->reg);
-        la64_compiler_emit_imm8(bw, 1);
-        la64_compiler_emit_end(bw);
-        bitwalker_align_byte(bw);
+        la64_compiler_emit_reg(cl->ci->fdwalker, reg->reg);
+        la64_compiler_emit_imm8(cl->ci->fdwalker, 1);
+        la64_compiler_emit_end(cl->ci->fdwalker);
+        fdwalker_align_byte(cl->ci->fdwalker);
     }
-
-    /* advancing image address */
-    cl->ci->image_addr += bitwalker_bytes_used(bw);
 
     return true;
 }
 
 bool la64_compiler_emit_instr_clr(opcode_entry_t *opce,
-                                  compiler_line_t *cl,
-                                  bitwalker_t *bw)
+                                  compiler_line_t *cl)
 {
     /*
      * people would argue to emit XOR but XOR 
@@ -214,7 +207,7 @@ bool la64_compiler_emit_instr_clr(opcode_entry_t *opce,
     for(uint64_t i = 1; i < cl->token_cnt; i++)
     {
         /* increment means each parameter, one opcode */
-        la64_compiler_emit_opcode(bw, LA64_OPCODE_MOV);
+        la64_compiler_emit_opcode(cl->ci->fdwalker, LA64_OPCODE_MOV);
 
         /* it must be a register */
         register_entry_t *reg = register_from_string(cl->token[i].str);
@@ -226,23 +219,19 @@ bool la64_compiler_emit_instr_clr(opcode_entry_t *opce,
         }
 
         /* emit parameters */
-        la64_compiler_emit_reg(bw, reg->reg);
-        la64_compiler_emit_imm8(bw, 0);
-        bitwalker_align_byte(bw);
+        la64_compiler_emit_reg(cl->ci->fdwalker, reg->reg);
+        la64_compiler_emit_imm8(cl->ci->fdwalker, 0);
+        fdwalker_align_byte(cl->ci->fdwalker);
     }
-
-    /* advancing image address */
-    cl->ci->image_addr += bitwalker_bytes_used(bw);
 
     return true;
 }
 
 bool la64_compiler_emit_instr_default(const opcode_entry_t *opce,
-                                      compiler_line_t *cl,
-                                      bitwalker_t *bw)
+                                      compiler_line_t *cl)
 {
     /* setting opcode from entry */ 
-    la64_compiler_emit_opcode(bw, opce->opcode);
+    la64_compiler_emit_opcode(cl->ci->fdwalker, opce->opcode);
 
     /* parse parameters */
     for(uint64_t i = 1; i < cl->token_cnt; i++)
@@ -255,7 +244,7 @@ bool la64_compiler_emit_instr_default(const opcode_entry_t *opce,
 
         if(reg != NULL)
         {
-            la64_compiler_emit_reg(bw, reg->reg);
+            la64_compiler_emit_reg(cl->ci->fdwalker, reg->reg);
             continue;
         }
 
@@ -273,7 +262,7 @@ bool la64_compiler_emit_instr_default(const opcode_entry_t *opce,
         {
             /* its a label */
             /* set mode to 64bit, because a label is 64bit wide */
-            bitwalker_write(bw, LA64_PARAMETER_CODING_IMM64, 3);
+            fdwalker_write(cl->ci->fdwalker, LA64_PARAMETER_CODING_IMM64, 3);
 
             /* it must be a label and therefore a entry in the new relocation table ;) */
             /* checking label type in question */
@@ -308,7 +297,8 @@ bool la64_compiler_emit_instr_default(const opcode_entry_t *opce,
             }
 
             rtbe->name = label;
-            rtbe->bw = *bw;
+            rtbe->byte_pos = cl->ci->fdwalker->byte_pos;
+            rtbe->bit_idx = cl->ci->fdwalker->bit_idx;
             rtbe->ctlink = &(cl->token[i]);
 
             /*
@@ -317,21 +307,21 @@ bool la64_compiler_emit_instr_default(const opcode_entry_t *opce,
              * already. the relocation table later will
              * fill this space with the address.
              */
-            bitwalker_skip(bw, 64);
+            fdwalker_skip(cl->ci->fdwalker, 64);
         }
         else
         {
             /* its a intermediate */
-            la64_compiler_emit_imm(bw, pr.value);
+            la64_compiler_emit_imm(cl->ci->fdwalker, pr.value);
         }
     }
 
     if(opce->maxargs == 32 || opce->maxargs != (cl->token_cnt - 1))
     {
-        la64_compiler_emit_end(bw);
+        la64_compiler_emit_end(cl->ci->fdwalker);
     }
 
-    cl->ci->image_addr += bitwalker_bytes_used(bw);
+    fdwalker_align_byte(cl->ci->fdwalker);
 
     return true;
 }
@@ -378,14 +368,9 @@ bool la64_compiler_emit(compiler_line_t *cl)
         return false;
     }
 
-    /* initilizing bitwalker */
-    bitwalker_t bw;
-    bitwalker_init(&bw, &(cl->ci->image[cl->ci->image_addr]), 256, BW_LITTLE_ENDIAN);
-
-    /* check if emitting pseudo instruction */
     assert(opce->handler != NULL);
 
-    return opce->handler(opce, cl, &bw);
+    return opce->handler(opce, cl);
 }
 
 bool la64_compiler_emit_all(compiler_invocation_t *ci)
@@ -413,7 +398,13 @@ bool la64_compiler_emit_all(compiler_invocation_t *ci)
      * appending binary end label, which is a compiler
      * constant.
      */
-    ci->label[ci->label_cnt].addr = ci->image_addr;
+    struct stat st;
+    if(fstat(ci->fdwalker->fd, &st) == -1)
+    {
+        diag_error(NULL, "fatal error occured, pls report\n");
+    }
+
+    ci->label[ci->label_cnt].addr = st.st_size;
     ci->label[ci->label_cnt++].name = strdup("__la64_exec_img_end");
 
     /*
@@ -430,7 +421,8 @@ bool la64_compiler_emit_all(compiler_invocation_t *ci)
 
         if(addr != COMPILER_LABEL_NOT_FOUND)
         {
-            bitwalker_write(&(rtbe->bw), addr, 64);
+            fdwalker_seek(ci->fdwalker, rtbe->byte_pos, rtbe->bit_idx);
+            fdwalker_write(ci->fdwalker, addr, 64);
         }
         else
         {
@@ -440,6 +432,8 @@ bool la64_compiler_emit_all(compiler_invocation_t *ci)
 
         rtbe = rtbe->next;
     }
+
+    fsync(ci->fdwalker->fd);
 
     return true;
 }

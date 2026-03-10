@@ -76,7 +76,7 @@ void code_token_label_append(compiler_token_t *ct)
     compiler_invocation_t *ci = cl->ci;
 
     /* assign address to label */
-    ci->label[ci->label_cnt].addr = ci->image_addr;
+    ci->label[ci->label_cnt].addr = fdwalker_bytes_used(ct->cl->ci->fdwalker);
 
     /* copying label name */
     size_t size = strlen(ct->str);
@@ -141,7 +141,7 @@ void code_token_label_insert_start(compiler_invocation_t *ci)
     }
 
     /* writing start address into the start of the image */
-    bitwalker_t bw;
-    bitwalker_init(&bw, ci->image, 8, BW_LITTLE_ENDIAN);
-    bitwalker_write(&bw, addr, 64);
+    fdwalker_t fw = *(ci->fdwalker);
+    fdwalker_seek(&fw, 0, 0);
+    fdwalker_write(&fw, addr, 64);
 }

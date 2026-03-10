@@ -29,7 +29,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <lautils/bitwalker.h>
+#include <lautils/fdwalker.h>
 
 #define COMPILER_LINE_TYPE_NONE                 0b0000
 #define COMPILER_LINE_TYPE_ASM                  0b0001
@@ -75,7 +75,8 @@ typedef struct reloc_table_entry reloc_table_entry_t;
 
 struct reloc_table_entry {
     char *name;                             /* resolved label name */
-    bitwalker_t bw;                         /* bitwalker state of when it was looked for (always 64bit skipped) */
+    size_t byte_pos;                        /* position */
+    uint8_t bit_idx;
     compiler_token_t *ctlink;               /* link to the originator of the entry */
     reloc_table_entry_t *next;              /* pointer to next entry */
 };
@@ -89,8 +90,9 @@ typedef struct compiler_invocation {
     compiler_label_t *label;                /* label array */
     uint64_t label_cnt;                     /* count of labels */
     reloc_table_entry_t *rtbe;              /* relocation table root entry */
-    uint8_t image[0xFFFFFF];                /* replace with better technique that is more incremental */
-    uint64_t image_addr;                    /* current address */
+    //uint8_t image[0xFFFFFF];                /* replace with better technique that is more incremental */
+    //uint64_t image_addr;                    /* current address */
+    fdwalker_t *fdwalker;
 
     /* options */
     bool page_align;                        /* default: true */

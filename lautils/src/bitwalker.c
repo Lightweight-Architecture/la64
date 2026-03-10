@@ -24,6 +24,10 @@
 
 #include <lautils/bitwalker.h>
 
+#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__
+#error "bitwalker requires a little-endian host"
+#endif
+
 /* helper */
 
 bw_endian_t bw_host_endian(void)
@@ -114,16 +118,16 @@ int bitwalker_write(bitwalker_t *bw,
         }
     }
 
-    uint64_t chunk = 0;
+    __uint128_t chunk = 0;
 
     /* copy up to 8 bytes from buffer */
     size_t remain = bw->capacity - bw->byte_pos;
-    size_t n = remain < 8 ? remain : 8;
+    size_t n = remain < 9 ? remain : 9;
 
     memcpy(&chunk, bw->buffer + bw->byte_pos, n);
 
     /* shift value into position */
-    chunk |= value << bw->bit_idx;
+    chunk |= (__uint128_t)value << bw->bit_idx;
 
     /* write back */
     memcpy(bw->buffer + bw->byte_pos, &chunk, n);
@@ -148,11 +152,11 @@ uint64_t bitwalker_read(bitwalker_t *bw,
         return 0;
     }
 
-    uint64_t chunk = 0;
+    __uint128_t chunk = 0;
 
     /* copy up to 8 bytes */
     size_t remain = bw->capacity - bw->byte_pos;
-    size_t n = remain < 8 ? remain : 8;
+    size_t n = remain < 9 ? remain : 9;
 
     memcpy(&chunk, bw->buffer + bw->byte_pos, n);
 

@@ -38,7 +38,7 @@
 typedef struct opcode_entry opcode_entry_t;
 
 /* handler for emitting instruction */
-typedef bool (*instruction_emit_handler)(const opcode_entry_t *opce, compiler_line_t *cl, bitwalker_t *bw);
+typedef bool (*instruction_emit_handler)(const opcode_entry_t *opce, compiler_line_t *cl);
 
 typedef struct opcode_entry {
     const char *name;                   /* name to match with of opcode */

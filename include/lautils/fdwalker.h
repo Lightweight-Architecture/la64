@@ -22,12 +22,34 @@
  * SOFTWARE.
  */
 
-#ifndef LA64ASM_CODE_H
-#define LA64ASM_CODE_H
+#ifndef FDWALKER_H
+#define FDWALKER_H
 
-#include <stdlib.h>
-#include <la64asm/type.h>
+#include <lautils/bitwalker.h>
 
-void code_tokengen(compiler_invocation_t *ci, const char **filev, int filec);
+typedef struct {
+    int         fd;
+    size_t      byte_pos;
+    uint8_t     bit_idx;
+    bw_endian_t endian;
+} fdwalker_t;
 
-#endif /* LA64ASM_CODE_H */
+void fdwalker_init(fdwalker_t *fw, int fd, bw_endian_t endian);
+//void fdwalker_init_read(fdwalker_t *fw, const uint8_t *buf, size_t len, bw_endian_t endian);
+
+void fdwalker_reset(fdwalker_t *fw);
+
+int fdwalker_write(fdwalker_t *fw, uint64_t value, uint8_t num_bits);
+uint64_t fdwalker_read(fdwalker_t *fw, uint8_t num_bits);
+int fdwalker_write_buf(fdwalker_t *fw, const char *buf, size_t len);
+int fdwalker_read_buf(fdwalker_t *fw, char *buf, size_t len);
+
+void fdwalker_seek(fdwalker_t *fw, size_t byte_pos, uint8_t bit_idx);
+
+void fdwalker_skip(fdwalker_t *fw, size_t num_bits);
+
+size_t fdwalker_bytes_used(const fdwalker_t *fw);
+
+void fdwalker_align_byte(fdwalker_t *fw);
+
+#endif /* FDWALKER_H */
