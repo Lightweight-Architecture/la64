@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef COMPILER_REGISTER_H
-#define COMPILER_REGISTER_H
+#ifndef LA64ASM_REGISTER_H
+#define LA64ASM_REGISTER_H
 
 #include <la64vm/core.h>
 
@@ -34,4 +34,4 @@ typedef struct {
 
 register_entry_t *register_from_string(const char *name);
 
-#endif /* COMPILER_REGISTER_H */
+#endif /* LA64ASM_REGISTER_H */

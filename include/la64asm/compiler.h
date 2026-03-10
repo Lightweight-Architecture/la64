@@ -22,12 +22,12 @@
  * SOFTWARE.
  */
 
-#ifndef COMPILER_COMPILER_H
-#define COMPILER_COMPILER_H
+#ifndef LA64ASM_COMPILER_H
+#define LA64ASM_COMPILER_H
 
 #include <la64asm/type.h>
 
 compiler_invocation_t *compiler_invocation_alloc(void);
 void compiler_invocation_dealloc(compiler_invocation_t *ci);
 
-#endif /* COMPILER_COMPILER_H */
+#endif /* LA64ASM_COMPILER_H */

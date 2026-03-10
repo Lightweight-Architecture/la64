@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef COMPILER_TYPE_H
-#define COMPILER_TYPE_H
+#ifndef LA64ASM_TYPE_H
+#define LA64ASM_TYPE_H
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -96,4 +96,4 @@ typedef struct compiler_invocation {
     bool page_align;                        /* default: true */
 } compiler_invocation_t;
 
-#endif /* COMPILER_TYPE_H */
+#endif /* LA64ASM_TYPE_H */

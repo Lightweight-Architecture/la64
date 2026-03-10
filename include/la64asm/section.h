@@ -22,12 +22,12 @@
  * SOFTWARE.
  */
 
-#ifndef COMPILER_SECTION_H
-#define COMPILER_SECTION_H
+#ifndef LA64ASM_SECTION_H
+#define LA64ASM_SECTION_H
 
 #include <la64asm/type.h>
 
 void code_token_section(compiler_invocation_t *ci);
 void code_remove_sections(compiler_invocation_t *ci);
 
-#endif /* COMPILER_SECTION_H */
+#endif /* LA64ASM_SECTION_H */

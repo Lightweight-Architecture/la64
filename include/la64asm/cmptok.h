@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef COMPILER_CMPTOK_H
-#define COMPILER_CMPTOK_H
+#ifndef LA64ASM_CMPTOK_H
+#define LA64ASM_CMPTOK_H
 
 #define CMPTOK_LENGHT_MAX               2048    /* if anyone comes close to that size, bro pls fix your variable naming style O.O */
 
@@ -47,4 +47,4 @@ typedef struct {
 
 cmptok_return_t cmptok(const char *token);
 
-#endif /* COMPILER_CMPTOK_H */
+#endif /* LA64ASM_CMPTOK_H */

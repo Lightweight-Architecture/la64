@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef LA16_EMIT_H
-#define LA16_EMIT_H
+#ifndef LA64ASM_EMIT_H
+#define LA64ASM_EMIT_H
 
 #include <la64vm/core.h>
 #include <la64vm/memory.h>
@@ -58,4 +58,4 @@ bool la64_compiler_emit_instr_default(const opcode_entry_t *opce, compiler_line_
 bool la64_compiler_emit(compiler_line_t *cl);
 bool la64_compiler_emit_all(compiler_invocation_t *ci);
 
-#endif /* LA16_EMIT_H */
+#endif /* LA64ASM_EMIT_H */

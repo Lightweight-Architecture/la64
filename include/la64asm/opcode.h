@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef COMPILER_OPCODE_H
-#define COMPILER_OPCODE_H
+#ifndef LA64ASM_OPCODE_H
+#define LA64ASM_OPCODE_H
 
 #include <la64vm/core.h>
 
@@ -64,4 +64,4 @@ typedef struct {
 const opcode_entry_t *opcode_from_string(const char *name);
 bool opcode_arg_accepts_reg_only(const opcode_entry_t *opce, uint8_t arg);
 
-#endif /* COMPILER_OPCODE_H */
+#endif /* LA64ASM_OPCODE_H */

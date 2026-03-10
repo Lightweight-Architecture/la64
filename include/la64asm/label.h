@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef COMPILER_LABEL_H
-#define COMPILER_LABEL_H
+#ifndef LA64ASM_LABEL_H
+#define LA64ASM_LABEL_H
 
 #define COMPILER_LABEL_NOT_FOUND 0x0
 
@@ -35,4 +35,4 @@ void code_token_label_insert_start(compiler_invocation_t *ci);
 
 uint64_t label_lookup(compiler_invocation_t *ci, const char *name);
 
-#endif /* COMPILER_LABEL_H */
+#endif /* LA64ASM_LABEL_H */

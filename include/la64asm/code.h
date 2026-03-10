@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef COMPILER_CODE_H
-#define COMPILER_CODE_H
+#ifndef LA64ASM_CODE_H
+#define LA64ASM_CODE_H
 
 #include <stdlib.h>
 #include <la64asm/type.h>
@@ -31,4 +31,4 @@
 void code_tokengen(compiler_invocation_t *ci, const char **filev, int filec);
 void code_binary_spitout(compiler_invocation_t *ci, const char *output);
 
-#endif /* COMPILER_CODE_H */
+#endif /* LA64ASM_CODE_H */
